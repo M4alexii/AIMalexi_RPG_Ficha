@@ -300,7 +300,15 @@ window.CoC = window.CoC || {};
       m.appendChild(bodyNode);
     }
 
+    // escHandler é declarado fora do addEventListener para que close() possa
+    // removê-lo INCONDICIONALMENTE (qualquer rota de fechamento — ESC, clique
+    // no backdrop, botão de ação — deve limpar o ciclo de vida do listener).
+    function escHandler(e) {
+      if (e.key === "Escape") close();
+    }
+
     function close() {
+      document.removeEventListener("keydown", escHandler);
       backdrop.remove();
       if (typeof onClose === "function") onClose();
     }
@@ -326,12 +334,7 @@ window.CoC = window.CoC || {};
       backdrop.addEventListener("click", (e) => {
         if (e.target === backdrop) close();
       });
-      document.addEventListener("keydown", function escHandler(e) {
-        if (e.key === "Escape") {
-          document.removeEventListener("keydown", escHandler);
-          close();
-        }
-      });
+      document.addEventListener("keydown", escHandler);
     }
     document.body.appendChild(backdrop);
     return { close, node: m };
