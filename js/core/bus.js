@@ -1,12 +1,46 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    AIMalexi RPG · js/core/bus.js
-   Event Bus — DESACOPLADO da Store (evita "Redux monstruoso").
+   Event Bus — pub/sub transversal, DESACOPLADO da Store.
 
-   M0.5: ESQUELETO.
-   M1: pub/sub para eventos transversais (roll:resolved, san:lost, status:changed)
-       que alimentam dashboard, sanity-fx, háptico e session_log SEM acoplar à
-       store principal.
+   Eventos de domínio (hp:changed, mp:changed, san:changed, status:changed)
+   alimentam dashboard, sanity-fx, háptico e session_log sem que esses
+   consumidores conheçam a store ou o dispatch. Um handler que lança nunca
+   derruba os demais nem o emissor.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 window.CoC = window.CoC || {};
-window.CoC.bus = window.CoC.bus || null;   // preenchido no M1
+
+(function () {
+
+  const listeners = new Map();   // event → Set<fn>
+
+  function on(event, fn) {
+    if (!event || typeof fn !== "function") return function () {};
+    let set = listeners.get(event);
+    if (!set) { set = new Set(); listeners.set(event, set); }
+    set.add(fn);
+    return function off() { set.delete(fn); };
+  }
+
+  function once(event, fn) {
+    const off = on(event, function (payload) { off(); fn(payload); });
+    return off;
+  }
+
+  function off(event, fn) {
+    const set = listeners.get(event);
+    if (set) set.delete(fn);
+  }
+
+  function emit(event, payload) {
+    const set = listeners.get(event);
+    if (!set || set.size === 0) return;
+    // Itera sobre cópia: um handler pode (des)inscrever durante a emissão.
+    for (const fn of Array.from(set)) {
+      try { fn(payload); } catch (e) { console.error("[bus] handler de '" + event + "' falhou", e); }
+    }
+  }
+
+  window.CoC.bus = { on, once, off, emit };
+
+})();
