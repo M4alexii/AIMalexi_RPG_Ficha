@@ -24,6 +24,51 @@
   const nameGen = window.CoC.names;
   const validators = window.CoC.validators;
 
+  // ─── Core Reativo (M1) ──────────────────────────────────────────────────
+  // Strangler parcial: o store reativo passa a ser a fonte do CHARACTER para o
+  // dispatch dos vitais. state.character segue sendo a MESMA referência guardada
+  // no slice (o dispatch muta in-place), então o resto do investigator.js legado
+  // que lê state.character continua válido sem alteração.
+  const coreStore = window.CoC.store;
+  const coreDispatch = window.CoC.dispatch;
+  const actions = window.CoC.actions;
+
+  // Empurra a referência viva de state.character para o slice do core store.
+  // Chamado no funil de render (carregar/preset/import) e ao limpar a UI.
+  function syncCoreCharacter() {
+    if (coreStore && typeof coreStore.setSlice === "function") {
+      coreStore.setSlice("character", state.character);
+    }
+  }
+
+  // Liga o investigator.js ao core reativo: re-render dos derivados quando o
+  // slice character muda (inclui mudanças via dispatch) e o aviso de loucura
+  // temporária, que migrou para o evento de domínio status:changed.
+  let _coreBound = false;
+  function bindCore() {
+    if (_coreBound) return;
+    _coreBound = true;
+
+    if (coreStore && typeof coreStore.subscribe === "function") {
+      coreStore.subscribe("character", function (char) {
+        // A 1ª emissão (no subscribe) e o sync explícito não devem forçar render —
+        // renderAll já cuida do desenho inicial. Só reagimos a bumps do dispatch,
+        // detectados por haver character ativo e o DOM de derivados já montado.
+        if (!char || char !== state.character) return;
+        if (!$("#derived-bar") || !$("#derived-bar").children.length) return;
+        renderDerived();
+      });
+    }
+
+    if (window.CoC.bus && typeof window.CoC.bus.on === "function") {
+      window.CoC.bus.on("status:changed", function (p) {
+        if (p && p.status === "temporaryInsanityCheck" && p.added) {
+          toast(`⚠ Perda de ${p.loss} SAN: Teste de Loucura Temporária (INT×5)!`, { type: "warn", duration: 6000 });
+        }
+      });
+    }
+  }
+
   // ─── Estado ───────────────────────────────────────────────────────────
   const state = {
     character: null,           // dados do personagem ativo
@@ -60,6 +105,7 @@
 
   async function boot() {
     populateOccupationDropdown();
+    bindCore();
     bindToolbar();
     bindModifiers();
     bindMobileTabs();
@@ -339,6 +385,7 @@
 
   function renderAll() {
     if (!state.character) return clearUI();
+    syncCoreCharacter();
     renderIdentity();
     renderAttributes();
     recalcDerived();   // recalcular antes de renderizar
@@ -351,6 +398,7 @@
   }
 
   function clearUI() {
+    syncCoreCharacter();
     $("#attr-grid").innerHTML = "<p class='dim center'>Nenhum personagem carregado.</p>";
     $("#derived-bar").innerHTML = "";
     $("#skills-groups").innerHTML = "";
@@ -607,6 +655,11 @@
     });
   }
 
+  // M1 strangler: esta é a ÚNICA função da ficha migrada para o dispatch.
+  // PV/PM/SAN viram actions de domínio (APPLY_DAMAGE, SPEND_MAGIC, LOSE_SANITY…),
+  // e o dispatch cuida de clamp + persist + bus + bump do slice. Mitos e a
+  // entrada por notação de dados (-X) permanecem locais — não há reducer para
+  // eles no M1 e mexê-los aqui seria escopo extra.
   async function applyDerivedDelta(key, op) {
     const c = state.character;
     if (!c?.derived?.[key]) return;
@@ -625,28 +678,54 @@
         logAndToast({ skill: `Perda ${key}`, d100: null, level: "fail", dmg: `${trimmed} → ${r.total}` });
       }
     }
+    if (delta === 0 && key !== "Mitos") return;
 
-    if (key === "Mitos") {
-      c.derived.Mitos.value = Math.max(0, (c.derived.Mitos.value || 0) + delta);
-      recalcDerived();
-    } else {
-      const cur = c.derived[key].current ?? c.derived[key].value;
-      let newVal = cur + delta;
-      if (key === "PV") newVal = Math.max(PV_MIN, Math.min(c.derived.PV.value, newVal));
-      else if (key === "PM") newVal = Math.max(0, Math.min(c.derived.PM.value, newVal));
-      else if (key === "SAN") newVal = Math.max(0, Math.min(c.derived.SAN.max, newVal));
-      c.derived[key].current = newVal;
-      if (key === "SAN" && delta < -4) {
-        c.status = c.status || {};
-        c.status.sanLossesToday = (c.status.sanLossesToday || 0) + Math.abs(delta);
-        toast(`⚠ Perda de ${Math.abs(delta)} SAN: Teste de Loucura Temporária (INT×5)!`, { type: "warn", duration: 6000 });
+    const dispatched = dispatchVitalDelta(key, delta);
+
+    if (!dispatched) {
+      // Caminho legado in-place: Mitos (sem reducer no M1) e — defensivamente —
+      // os vitais caso o core reativo não tenha carregado (degradação graciosa:
+      // a ficha NUNCA pode ficar sem ajustar PV/PM/SAN).
+      if (key === "Mitos") {
+        c.derived.Mitos.value = Math.max(0, (c.derived.Mitos.value || 0) + delta);
+        recalcDerived();
+      } else {
+        const cur = c.derived[key].current ?? c.derived[key].value;
+        let newVal = cur + delta;
+        if (key === "PV") newVal = Math.max(PV_MIN, Math.min(c.derived.PV.value, newVal));
+        else if (key === "PM") newVal = Math.max(0, Math.min(c.derived.PM.value, newVal));
+        else if (key === "SAN") newVal = Math.max(0, Math.min(c.derived.SAN.max, newVal));
+        c.derived[key].current = newVal;
+        if (key === "SAN" && delta < -4) {
+          c.status = c.status || {};
+          c.status.sanLossesToday = (c.status.sanLossesToday || 0) + Math.abs(delta);
+          toast(`⚠ Perda de ${Math.abs(delta)} SAN: Teste de Loucura Temporária (INT×5)!`, { type: "warn", duration: 6000 });
+        }
       }
+      renderDerived();
+      flashDerivedCard(key, delta);
+      applySanityAtmosphere();
+      persistCurrent();
+      return;
     }
 
-    renderDerived();
-    flashDerivedCard(key, delta);   // feedback visual: vermelho perdeu, verde ganhou
-    applySanityAtmosphere();        // filtro sutil quando SAN < 50% do máximo
-    persistCurrent();
+    // Vitais via dispatch: o reducer já mutou/clampeou/persistiu e o subscriber
+    // do slice re-renderizou. Aqui só o feedback visual transiente desta interação.
+    flashDerivedCard(key, delta);
+    applySanityAtmosphere();
+  }
+
+  // Mapeia (derivado, delta) → action de domínio e despacha. Retorna true se houve
+  // dispatch (vital reconhecido), false caso contrário (cai no caminho legado).
+  function dispatchVitalDelta(key, delta) {
+    if (!coreDispatch || !actions || delta === 0) return false;
+    let action = null;
+    if (key === "PV")  action = delta < 0 ? actions.applyDamage(-delta) : actions.healDamage(delta);
+    else if (key === "PM")  action = delta < 0 ? actions.spendMagic(-delta) : actions.restoreMagic(delta);
+    else if (key === "SAN") action = delta < 0 ? actions.loseSanity(-delta) : actions.recoverSanity(delta);
+    if (!action) return false;
+    coreDispatch(action);
+    return true;
   }
 
   /**
