@@ -167,6 +167,8 @@
     if (!state.character.id) state.character.id = null;
     store.setActiveCharacter(state.character.id);
     renderAll();
+    // Verifica ajustes de idade sem bloquear a UI
+    setTimeout(() => checkAgeAdjustments(), 600);
   }
 
   function loadPreset(presetName) {
@@ -188,6 +190,147 @@
     state.character.id = id;
     store.setActiveCharacter(id);
     refreshCharacterSelector();
+    surfaceValidationIssues();
+  }
+
+  // Mostra warnings de regra via toast — no máximo 1 issue por persist para não poluir.
+  // Não bloqueia: é informativo. Re-toast só se o issue mudou.
+  function surfaceValidationIssues() {
+    const v = rules.validateCharacter(state.character);
+    if (v.issues.length > 0) {
+      const key = v.issues[0];
+      if (state._lastValidationIssue !== key) {
+        state._lastValidationIssue = key;
+        toast(`⚠ Regra violada: ${key}`, { type: "warn", duration: 5000 });
+      }
+    } else {
+      state._lastValidationIssue = null;
+    }
+  }
+
+  // ═════════════════════════════════════════════════════════════════════
+  // AJUSTES DE IDADE (CoC 7E p.35-36)
+  // ═════════════════════════════════════════════════════════════════════
+
+  /**
+   * Verifica se o personagem precisa de ajustes de atributo por idade.
+   * Mostra toast com botão de ação — não bloqueia.
+   */
+  function checkAgeAdjustments() {
+    const c = state.character;
+    if (!c) return;
+    const age = Number(c.investigator?.age) || 0;
+    const adj = rules.calcAgeAdjustments(age);
+    if (!adj) return;
+    const applied = c.investigator?._ageAdjustedBracket;
+    if (applied === adj.bracket) return;
+    // Mostra aviso não-bloqueante com ação de abrir modal
+    toast(
+      `📅 Ajustes de idade pendentes (${adj.bracket}): ${adj.note}`,
+      {
+        type: "warn",
+        duration: 10000,
+        action: { label: "Aplicar", onClick: () => promptAndApplyAgeAdjustments(adj) }
+      }
+    );
+  }
+
+  /**
+   * Abre modal para aplicar os ajustes de idade do bracket atual.
+   * Para 40-49 e 50-59: jogador escolhe qual(is) atributo(s) reduzir.
+   * Para 60+: aplicação automática com confirmação.
+   */
+  async function promptAndApplyAgeAdjustments(adj) {
+    const c = state.character;
+    if (!c) return;
+    const attrs = c.attributes || {};
+    const attrVal = (k) => Number(attrs[k]?.value) || 0;
+
+    // Monta label com valor atual e pós-ajuste
+    const attrLabel = (k, amount) =>
+      `${k} (${attrVal(k)} → ${Math.max(1, attrVal(k) - amount)})`;
+
+    let chosenAttrs = [];
+
+    if (adj.playerChoices.length > 0) {
+      // Precisa de input do jogador (40-49 ou 50-59)
+      const choice = adj.playerChoices[0];
+      const wrapper = el("div", {});
+      wrapper.innerHTML = `
+        <p style="margin-bottom:0.75rem; color:var(--ink-dim);">${adj.note}</p>
+        ${adj.fixedDeductions && Object.keys(adj.fixedDeductions).length > 0
+          ? `<p style="margin-bottom:0.75rem;">Ajustes automáticos: ${
+              Object.entries(adj.fixedDeductions).map(([k, v]) => `−${v} ${k} (${attrVal(k)} → ${Math.max(1, attrVal(k) - v)})`).join(", ")
+            }</p>`
+          : ""}
+        <p style="margin-bottom:0.5rem;"><b>Escolha ${choice.choose === 1 ? "um atributo" : `${choice.choose} atributos`} para reduzir em ${choice.amount}:</b></p>
+        ${choice.from.map(k => `
+          <label style="display:block; margin:0.4rem 0; cursor:pointer;">
+            <input type="${choice.choose === 1 ? "radio" : "checkbox"}" name="age-adj" value="${k}" style="margin-right:0.4rem;" />
+            ${attrLabel(k, choice.amount)}
+          </label>
+        `).join("")}
+      `;
+
+      const confirmed = await new Promise(resolve => {
+        // resolveOnce garante que o Promise resolve apenas uma vez,
+        // mesmo se backdrop/ESC fechar o modal após o botão já ter resolvido.
+        let resolved = false;
+        const resolveOnce = (v) => { if (!resolved) { resolved = true; resolve(v); } };
+        modal({
+          title: `Ajustes de Idade — ${adj.bracket}`,
+          body: wrapper,
+          onClose: () => resolveOnce(false),
+          actions: [
+            { label: "Cancelar", onClick: () => resolveOnce(false) },
+            { label: "Aplicar", primary: true, onClick: () => {
+              const checked = Array.from(wrapper.querySelectorAll("input[name='age-adj']:checked")).map(i => i.value);
+              if (checked.length !== choice.choose) {
+                toast(`Selecione exatamente ${choice.choose} atributo(s).`, { type: "warn" });
+                return false; // mantém modal aberto
+              }
+              chosenAttrs = checked;
+              resolveOnce(true);
+            }}
+          ]
+        });
+      });
+
+      if (!confirmed) return;
+    } else {
+      // Bracket 60+: confirmação simples
+      const deductLines = Object.entries(adj.fixedDeductions)
+        .map(([k, v]) => `${k}: ${attrVal(k)} → ${Math.max(1, attrVal(k) - v)}`).join(" | ");
+      const ok = await confirm(
+        `Aplicar ajustes de idade (${adj.bracket})?\n\n${deductLines}`,
+        { title: `Ajustes de Idade — ${adj.bracket}`, confirmLabel: "Aplicar" }
+      );
+      if (!ok) return;
+    }
+
+    // Aplica deduções fixas
+    for (const [k, amount] of Object.entries(adj.fixedDeductions || {})) {
+      if (attrs[k]) attrs[k].value = Math.max(1, attrVal(k) - amount);
+    }
+
+    // Aplica escolhas do jogador
+    if (adj.playerChoices.length > 0) {
+      const amount = adj.playerChoices[0].amount;
+      for (const k of chosenAttrs) {
+        if (attrs[k]) attrs[k].value = Math.max(1, attrVal(k) - amount);
+      }
+    }
+
+    // Marca como aplicado para este bracket
+    c.investigator = c.investigator || {};
+    c.investigator._ageAdjustedBracket = adj.bracket;
+
+    recalcDerived();
+    renderAttributes();
+    renderDerived();
+    renderSkills();
+    persistCurrent();
+    toast(`✓ Ajustes de idade (${adj.bracket}) aplicados.`, { type: "success" });
   }
 
   // ═════════════════════════════════════════════════════════════════════
@@ -248,7 +391,7 @@
       node.oninput = () => {
         c.investigator[f] = node.value;
         if (f === "tagline") $("#identity-display").textContent = node.value ? "“" + node.value + "”" : "";
-        if (f === "age") recalcDerived(), renderDerived();
+        if (f === "age") { recalcDerived(); renderDerived(); checkAgeAdjustments(); }
         markDirty();
       };
       node.onblur = persistCurrent;
@@ -1619,6 +1762,21 @@
       c.attributes[code].value = r.total;
       c.attributes[code].rolled = `${formula} → ${r.raw.join("+")}=${r.rawSum}, ×5 = ${r.total}`;
     }
+
+    // Regra CoC 7E p.36: personagens jovens (15-19) rolam Sorte 2× e usam o maior valor.
+    const age = Number(c.investigator?.age) || 0;
+    if (age >= 15 && age <= 19) {
+      const r2 = dice.rollAttribute("3d6x5");
+      const first = c.attributes.Sorte.value;
+      if (r2.total > first) {
+        c.attributes.Sorte.value = r2.total;
+        c.attributes.Sorte.rolled += ` | re-roll: ${r2.raw.join("+")}=${r2.rawSum}×5=${r2.total} → melhor: ${r2.total}`;
+      } else {
+        c.attributes.Sorte.rolled += ` | re-roll: ${r2.raw.join("+")}=${r2.rawSum}×5=${r2.total} → mantido: ${first}`;
+      }
+      toast(`Jovem (15–19): Sorte rolada 2× — ${first} e ${r2.total}, melhor: ${c.attributes.Sorte.value}`, { type: "info", duration: 4000 });
+    }
+
     recalcDerived();
     renderAttributes();
     renderDerived();

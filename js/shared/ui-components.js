@@ -67,7 +67,7 @@ window.CoC = window.CoC || {};
   }
 
   function toast(message, opts = {}) {
-    const { type = "info", duration = 3500 } = opts;
+    const { type = "info", duration = 3500, action } = opts;
     const colors = {
       info:    { bg: "#1c1813", border: "#b8924f", color: "#e8dcc4" },
       success: { bg: "#1a2a1a", border: "#5a8a5a", color: "#cfe8cf" },
@@ -86,11 +86,35 @@ window.CoC = window.CoC || {};
         borderRadius: "3px",
         fontSize: "0.9rem",
         boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
-        maxWidth: "360px",
+        maxWidth: "400px",
         pointerEvents: "auto",
         animation: "toast-in 0.25s ease-out"
       }
     }, [message]);
+
+    // Botão de ação opcional (ex: "Aplicar" para ajustes de idade)
+    if (action && action.label && typeof action.onClick === "function") {
+      const btn = el("button", {
+        style: {
+          marginLeft: "0.75rem",
+          padding: "0.15rem 0.5rem",
+          background: colors.border,
+          color: colors.bg || "#1c1813",
+          border: "none",
+          borderRadius: "2px",
+          cursor: "pointer",
+          fontSize: "0.82rem",
+          fontWeight: "600",
+          verticalAlign: "middle"
+        }
+      }, [action.label]);
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        node.remove();
+        action.onClick();
+      };
+      node.appendChild(btn);
+    }
 
     ensureToastContainer().appendChild(node);
 

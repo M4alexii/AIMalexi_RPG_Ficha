@@ -361,28 +361,109 @@ window.CoC = window.CoC || {};
     const issues = [];
     const warnings = [];
 
-    // Limite de 75 por perícia na criação (regra do livro)
-    if (Array.isArray(character.skills)) {
-      character.skills.forEach((s) => {
-        if (num(s.value) > 90) {
-          issues.push(`${s.name}: ${s.value}% excede o cap absoluto (90% mesmo com aprovação do Guardião)`);
-        } else if (num(s.value) > 75) {
-          warnings.push(`${s.name}: ${s.value}% acima do cap padrão (75) — exige aprovação do Guardião`);
-        }
-      });
-    }
+    // Limite de 75 por perícia na criação (regra do livro).
+    // Skills é objeto { nome: { value } } ou array legado.
+    const skillsArray = Array.isArray(character.skills)
+      ? character.skills
+      : Object.entries(character.skills || {}).map(([name, sk]) => ({ name, value: sk?.value ?? 0 }));
 
-    // Atributos dentro da faixa esperada (15-90 = 3-18 × 5)
+    skillsArray.forEach((s) => {
+      if (num(s.value) > 90) {
+        issues.push(`${s.name}: ${s.value}% excede o cap absoluto (90% mesmo com aprovação do Guardião)`);
+      } else if (num(s.value) > 75) {
+        warnings.push(`${s.name}: ${s.value}% acima do cap padrão (75) — exige aprovação do Guardião`);
+      }
+    });
+
+    // Atributos dentro da faixa esperada (15-90 = 3-18 × 5).
+    // Ajustes de idade podem levar atributos abaixo de 15 — tratado como warning, não error.
     if (character.attributes) {
       for (const [name, attr] of Object.entries(character.attributes)) {
+        if (name === "Sorte") continue; // Sorte não segue 3-18×5
         const v = num(typeof attr === "object" ? attr.value : attr);
-        if (v < 15 || v > 90) {
-          warnings.push(`${name}: ${v} fora da faixa típica (15-90)`);
+        if (v > 90) {
+          warnings.push(`${name}: ${v} acima do máximo esperado (90)`);
+        } else if (v < 1) {
+          warnings.push(`${name}: ${v} abaixo do mínimo (1)`);
         }
       }
     }
 
     return { valid: issues.length === 0, issues, warnings };
+  }
+
+  /**
+   * Ajustes de atributos por faixa etária (CoC 7E, p.35-36).
+   *
+   * Faixas relevantes:
+   *   15-19 → −5 EDU; rolar Sorte 2× e usar o maior
+   *   40-49 → −5 APA; jogador escolhe −5 de FOR, CON ou DES
+   *   50-59 → −10 APA; jogador escolhe −10 de dois entre FOR, CON, DES
+   *   60-69 → −20 FOR, CON, DES; −15 APA
+   *   70-79 → −40 FOR, CON, DES; −20 APA
+   *   80+   → −80 FOR, CON, DES; −25 APA
+   *
+   * @param {number} age
+   * @returns {{ bracket: string, fixedDeductions: Object, playerChoices: Array, luckReroll: boolean, note: string } | null}
+   *   null para 20-39 (sem deduções por idade).
+   */
+  function calcAgeAdjustments(age) {
+    age = Math.floor(Number(age) || 0);
+    if (age >= 15 && age <= 19) {
+      return {
+        bracket: "15-19",
+        fixedDeductions: { EDU: 5 },
+        playerChoices: [],
+        luckReroll: true,
+        note: "15–19 anos: −5 EDU; rolar Sorte 2× e usar o maior"
+      };
+    }
+    if (age >= 40 && age <= 49) {
+      return {
+        bracket: "40-49",
+        fixedDeductions: { APA: 5 },
+        playerChoices: [{ choose: 1, from: ["FOR", "CON", "DES"], amount: 5 }],
+        luckReroll: false,
+        note: "40–49 anos: −5 APA; e −5 de FOR, CON ou DES (escolha do jogador)"
+      };
+    }
+    if (age >= 50 && age <= 59) {
+      return {
+        bracket: "50-59",
+        fixedDeductions: { APA: 10 },
+        playerChoices: [{ choose: 2, from: ["FOR", "CON", "DES"], amount: 10 }],
+        luckReroll: false,
+        note: "50–59 anos: −10 APA; e −10 de dois entre FOR, CON, DES (escolha)"
+      };
+    }
+    if (age >= 60 && age <= 69) {
+      return {
+        bracket: "60-69",
+        fixedDeductions: { FOR: 20, CON: 20, DES: 20, APA: 15 },
+        playerChoices: [],
+        luckReroll: false,
+        note: "60–69 anos: −20 FOR/CON/DES; −15 APA"
+      };
+    }
+    if (age >= 70 && age <= 79) {
+      return {
+        bracket: "70-79",
+        fixedDeductions: { FOR: 40, CON: 40, DES: 40, APA: 20 },
+        playerChoices: [],
+        luckReroll: false,
+        note: "70–79 anos: −40 FOR/CON/DES; −20 APA"
+      };
+    }
+    if (age >= 80) {
+      return {
+        bracket: "80+",
+        fixedDeductions: { FOR: 80, CON: 80, DES: 80, APA: 25 },
+        playerChoices: [],
+        luckReroll: false,
+        note: "80+ anos: −80 FOR/CON/DES; −25 APA"
+      };
+    }
+    return null; // 20-39: sem deduções por idade
   }
 
   // ─── Expor no namespace global ─────────────────────────────────────────
@@ -432,7 +513,8 @@ window.CoC = window.CoC || {};
     calcPersonalInterestPoints,
     buildOccupationContext,
     sumSkillPointsSpent,
-    validateCharacter
+    validateCharacter,
+    calcAgeAdjustments
   };
 
 })();
