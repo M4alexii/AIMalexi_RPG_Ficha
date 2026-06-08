@@ -143,10 +143,12 @@
       </div>
       <div id="sidebar-vitals" class="sidebar-vitals"></div>
       <div class="sidebar-attr-header">
-        <button id="btn-roll-all" class="btn-primary btn-sm" title="Rola todos os atributos do zero">🎲 Rolar Tudo</button>
-        <button id="btn-roll-attr" class="btn-sm" type="button" title="Rolar um atributo (teste na sessão)" aria-expanded="false" aria-controls="attr-roll-panel">🎯 Atributo</button>
+        <button id="btn-roll-all" class="btn-primary btn-sm" title="Gera todos os atributos do zero (rolagem 3d6×5 / 2d6+6×5)">🎲 Rolar Tudo</button>
+        <button id="btn-roll-attr" class="btn-sm" type="button" title="Faz um teste de atributo na sessão (ex.: teste de FOR)" aria-expanded="false" aria-controls="attr-roll-panel">🎯 Testar Atributo</button>
       </div>
       <div id="sidebar-attributes" class="sidebar-attributes"></div>
+      <!-- Painel de distribuição de pontos (point-buy) — visível no Modo Editar -->
+      <div id="attr-dist-panel" class="attr-dist-panel" hidden></div>
       <!-- Painel retrátil de rolagem de atributo — reusa a engine das perícias -->
       <div id="attr-roll-panel" class="attr-roll-panel" hidden style="margin-top:.5rem;padding:.5rem;border-top:1px solid var(--line,#3a342a);display:flex;flex-direction:column;gap:.4rem;">
         <div style="display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;">

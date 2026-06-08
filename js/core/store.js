@@ -181,12 +181,14 @@ window.CoC = window.CoC || {};
       // ── Atributos primários ────────────────────────────────────────────────
       case "SET_ATTRIBUTE": {
         if (!c) return state;
-        const { code: attrCode, value: attrVal } = action.payload;
+        const { code: attrCode, value: attrVal, rolled: attrRolled } = action.payload;
         if (!attrCode || !c.attributes || !c.attributes[attrCode]) return state;
         const nc = deepClone(c);
-        nc.attributes[attrCode] = Object.assign({}, nc.attributes[attrCode], {
-          value: Math.max(0, Math.min(99, Number(attrVal) || 0))
-        });
+        const patch = { value: Math.max(0, Math.min(99, Number(attrVal) || 0)) };
+        // Atualiza a proveniência só quando informada (evita "rolled" obsoleto:
+        // valor editado mas string de rolagem antiga). Omitido → preserva o atual.
+        if (attrRolled !== undefined) patch.rolled = attrRolled;
+        nc.attributes[attrCode] = Object.assign({}, nc.attributes[attrCode], patch);
         return Object.assign({}, state, { character: nc });
       }
 

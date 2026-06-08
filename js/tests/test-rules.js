@@ -324,6 +324,38 @@ group('computeSkillProvenance — origem rastreável (#32)');
 })();
 
 // ─────────────────────────────────────────────────────────────────────────────
+//  Point-buy de atributos (Fase 2) — computeAttributeBudget / clampAttribute
+// ─────────────────────────────────────────────────────────────────────────────
+group('atributos — point-buy (orçamento + caps)');
+
+(function () {
+  // Orçamento: soma das 8 características do pool (Sorte fora)
+  var b = rules.computeAttributeBudget({
+    attributes: {
+      FOR: { value: 50 }, CON: { value: 50 }, TAM: { value: 60 }, DES: { value: 60 },
+      APA: { value: 60 }, INT: { value: 60 }, POD: { value: 60 }, EDU: { value: 60 },
+      Sorte: { value: 50 }  // não conta no orçamento
+    }
+  });
+  assertEq(b.budget, 460, 'orçamento padrão = 460');
+  assertEq(b.spent, 460,  'gasto soma só as 8 do pool (Sorte excluída) = 460');
+  assertEq(b.remaining, 0, 'restante = 0 quando gasto = orçamento');
+
+  var b2 = rules.computeAttributeBudget({ attributes: { FOR: { value: 40 } } });
+  assertEq(b2.spent, 40,        'gasto tolera características ausentes (=0)');
+  assertEq(b2.remaining, 420,   'restante = 460 − 40');
+
+  // Caps: 3d6×5 (15–90) e 2d6+6×5 (40–90)
+  assertEq(rules.clampAttribute('FOR', 5),   15, 'FOR mínimo 15');
+  assertEq(rules.clampAttribute('FOR', 120), 90, 'FOR máximo 90');
+  assertEq(rules.clampAttribute('INT', 20),  40, 'INT (2d6+6) mínimo 40');
+  assertEq(rules.clampAttribute('EDU', 95),  90, 'EDU máximo 90');
+  assertEq(rules.clampAttribute('DES', 55),  55, 'valor dentro da faixa é preservado');
+  // Característica fora do pool (Sorte) → teto geral 0–99
+  assertEq(rules.clampAttribute('Sorte', 130), 99, 'Sorte (fora do pool) usa teto 99');
+})();
+
+// ─────────────────────────────────────────────────────────────────────────────
 //  Funções auxiliares locais (não disponíveis em window.CoC)
 // ─────────────────────────────────────────────────────────────────────────────
 

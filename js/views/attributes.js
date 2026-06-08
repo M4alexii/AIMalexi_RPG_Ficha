@@ -34,6 +34,21 @@ window.CoC.views = window.CoC.views || {};
   function _persist() { if (_bus) _bus.publish('identity:persist-requested', {}); }
   function _recalc()  { if (_store) _store.dispatch({ type: 'RECALC_DERIVED' }); }
 
+  // Aplica uma característica pelo write-path oficial (VIEW → executor → store),
+  // recalcula derivados, re-renderiza e persiste. `opts.rolled` registra a
+  // proveniência (ex.: "Distribuição manual") para não deixar o campo obsoleto.
+  function _applyAttribute(code, value, opts) {
+    var exec = window.CoC.core && window.CoC.core.executor;
+    var payload = { code: code, value: value };
+    if (opts && opts.rolled !== undefined) payload.rolled = opts.rolled;
+    if (exec && exec.execute) exec.execute({ type: 'SET_ATTRIBUTE', payload: payload });
+    _recalc();
+    render();
+    if (window.CoC.views.vitals && window.CoC.views.vitals.render) window.CoC.views.vitals.render();
+    if (window.CoC.views.skills && window.CoC.views.skills.render) window.CoC.views.skills.render();
+    _persist();
+  }
+
   function _escHtml(s) {
     var ui = window.CoC.ui || {};
     if (ui.escapeHtml) return ui.escapeHtml(s);
@@ -95,6 +110,8 @@ window.CoC.views = window.CoC.views || {};
       grid.appendChild(row);
     });
 
+    _renderDistPanel();
+
     if (editMode) {
       grid.querySelectorAll('.sattr-value').forEach(function(node) {
         node.onkeydown = function(e) {
@@ -121,20 +138,83 @@ window.CoC.views = window.CoC.views || {};
           var raw = String(node.textContent || '').replace(/[^0-9]/g, '');
           var v   = raw === '' ? prev : Math.max(0, Math.min(99, parseInt(raw, 10)));
           if (v === prev) { node.textContent = String(prev); return; }
-          // Escreve via executor (write-path oficial: VIEW → executor → state machine
-          // → store). Garante event-log + persist + sync; SET_ATTRIBUTE é 'live'.
-          var exec = window.CoC.core && window.CoC.core.executor;
-          if (exec && exec.execute) {
-            exec.execute({ type: 'SET_ATTRIBUTE', payload: { code: code, value: v } });
-          }
-          _recalc();
-          render();
-          if (window.CoC.views.vitals && window.CoC.views.vitals.render) window.CoC.views.vitals.render();
-          if (window.CoC.views.skills && window.CoC.views.skills.render) window.CoC.views.skills.render();
-          _persist();
+          // Edição manual marca a proveniência para não deixar `rolled` obsoleto.
+          _applyAttribute(code, v, { rolled: 'Distribuição manual' });
         };
       });
     }
+  }
+
+  // ── Painel de distribuição de pontos (point-buy, estilo perícias) ────────────
+  // Visível só no Modo Editar. Mostra um badge de orçamento (gasto/total) e
+  // steppers ± por característica, respeitando os caps de criação. Escreve pelo
+  // mesmo write-path das perícias (executor → SET_ATTRIBUTE) + recálculo de derivados.
+  function _stepRow(c, code, caps) {
+    var v   = Number(c.attributes[code] && c.attributes[code].value) || 0;
+    var cap = caps[code];
+    var capHint = cap ? (cap.min + '–' + cap.max) : '0–99';
+    return '<div class="adist-row" data-attr="' + code + '">' +
+             '<span class="adist-label">' + _escHtml(code) + '</span>' +
+             '<button type="button" class="adist-step" data-step="-5" aria-label="Diminuir ' + code + '">−</button>' +
+             '<span class="adist-val">' + v + '</span>' +
+             '<button type="button" class="adist-step" data-step="5" aria-label="Aumentar ' + code + '">+</button>' +
+             '<span class="adist-cap" title="Limites de criação (CoC 7e)">' + capHint + '</span>' +
+           '</div>';
+  }
+
+  function _renderDistPanel() {
+    var panel = $s('#attr-dist-panel');
+    if (!panel) return;
+    var c = _store ? _store.getState().character : null;
+    if (!c || !c.attributes || !_getEditMode()) {
+      panel.setAttribute('hidden', '');
+      panel.innerHTML = '';
+      return;
+    }
+    panel.removeAttribute('hidden');
+
+    var rules      = window.CoC.rules || {};
+    var validators = window.CoC.validators || {};
+    var pool = rules.ATTRIBUTE_POOL || ['FOR', 'CON', 'TAM', 'DES', 'APA', 'INT', 'POD', 'EDU'];
+    var caps = rules.ATTRIBUTE_CAPS || {};
+    var budget = rules.computeAttributeBudget
+      ? rules.computeAttributeBudget(c)
+      : { spent: 0, budget: 0, remaining: 0 };
+    var badge = validators.pointsBadgeState
+      ? validators.pointsBadgeState(budget.spent, budget.budget)
+      : { level: 'under', label: budget.spent + ' pts' };
+
+    var rows = '';
+    pool.forEach(function(code) { if (c.attributes[code]) rows += _stepRow(c, code, caps); });
+
+    panel.innerHTML =
+      '<div class="adist-head">' +
+        '<span class="adist-title">Distribuir Pontos</span>' +
+        '<span class="adist-badge ' + _escHtml(badge.level) + '">' + _escHtml(badge.label) + '</span>' +
+      '</div>' +
+      '<div class="adist-rows">' + rows + '</div>' +
+      (c.attributes.Sorte
+        ? '<div class="adist-rows adist-luck">' + _stepRow(c, 'Sorte', caps) + '</div>' +
+          '<div class="adist-note">Sorte é rolada à parte (fora do orçamento).</div>'
+        : '') +
+      '<div class="adist-note">Pool das 8 características ≈ ' + budget.budget + ' pts (CoC 7e).</div>';
+
+    panel.querySelectorAll('.adist-step').forEach(function(btn) {
+      btn.onclick = function() {
+        var row  = btn.closest('.adist-row');
+        var code = row && row.dataset.attr;
+        if (!code) return;
+        var char = _store ? _store.getState().character : null;
+        if (!char || !char.attributes || !char.attributes[code]) return;
+        var cur  = Number(char.attributes[code].value) || 0;
+        var step = parseInt(btn.dataset.step, 10) || 0;
+        var next = rules.clampAttribute
+          ? rules.clampAttribute(code, cur + step)
+          : Math.max(0, Math.min(99, cur + step));
+        if (next === cur) return;
+        _applyAttribute(code, next, { rolled: 'Distribuição manual' });
+      };
+    });
   }
 
   // ── Painel retrátil de rolagem de atributo ───────────────────────────────────

@@ -557,6 +557,49 @@ window.CoC = window.CoC || {};
     return maxHP > 0 && damage >= Math.ceil(maxHP / 2);
   }
 
+  // ── Point-buy de atributos (CoC 7e — alternativa à rolagem) ─────────────────
+  // As 8 características (sem Sorte) somam ~460 pontos no método de compra. Os caps
+  // espelham as faixas dos dados: 3d6×5 (15–90) e 2d6+6×5 (40–90). Sorte é rolada
+  // à parte (3d6×5) e não entra no orçamento.
+  var ATTRIBUTE_POINT_BUDGET = 460;
+  var ATTRIBUTE_POOL = ['FOR', 'CON', 'TAM', 'DES', 'APA', 'INT', 'POD', 'EDU'];
+  var ATTRIBUTE_CAPS = {
+    FOR: { min: 15, max: 90 }, CON: { min: 15, max: 90 }, DES: { min: 15, max: 90 },
+    APA: { min: 15, max: 90 }, POD: { min: 15, max: 90 },
+    TAM: { min: 40, max: 90 }, INT: { min: 40, max: 90 }, EDU: { min: 40, max: 90 }
+  };
+
+  /**
+   * Soma os pontos gastos nas 8 características do pool (sem Sorte) e devolve o
+   * orçamento de point-buy. Função PURA.
+   * @param {Object} character
+   * @returns {{ spent:number, budget:number, remaining:number }}
+   */
+  function computeAttributeBudget(character) {
+    character = character || {};
+    var attrs = character.attributes || {};
+    var spent = 0;
+    for (var i = 0; i < ATTRIBUTE_POOL.length; i++) {
+      var a = attrs[ATTRIBUTE_POOL[i]];
+      spent += num(a && a.value);
+    }
+    return { spent: spent, budget: ATTRIBUTE_POINT_BUDGET, remaining: ATTRIBUTE_POINT_BUDGET - spent };
+  }
+
+  /**
+   * Aplica os limites de criação (min/max) de uma característica a um valor.
+   * Características fora do pool (ex.: Sorte) usam o teto geral 0–99.
+   * @param {string} code - FOR, CON, ...
+   * @param {number} value
+   * @returns {number}
+   */
+  function clampAttribute(code, value) {
+    var v = Math.round(num(value));
+    var cap = ATTRIBUTE_CAPS[code];
+    if (!cap) return Math.max(0, Math.min(99, v));
+    return Math.max(cap.min, Math.min(cap.max, v));
+  }
+
   window.CoC.rules = {
     calcHP,
     calcMP,
@@ -576,7 +619,12 @@ window.CoC = window.CoC || {};
     calcAgeAdjustments,
     rollEduImprovement,
     rollSkillImprovement,
-    isMajorWound
+    isMajorWound,
+    computeAttributeBudget,
+    clampAttribute,
+    ATTRIBUTE_POINT_BUDGET: ATTRIBUTE_POINT_BUDGET,
+    ATTRIBUTE_POOL: ATTRIBUTE_POOL,
+    ATTRIBUTE_CAPS: ATTRIBUTE_CAPS
   };
 
 })();
