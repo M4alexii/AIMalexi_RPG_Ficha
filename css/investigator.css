@@ -374,16 +374,19 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   .sidebar-col { display: none; }
   .sidebar-col.tab-active { display: block; }
 
-  /* §21 — Aba Log ocupa a largura inteira: Modificadores | Chat (meio, maior) | Log */
+  /* §21 — Aba Log ocupa a largura inteira: Modificadores | Chat (meio, maior) | Log.
+     Posicionamento por grid-template-areas (não por `order`) para garantir que o
+     CHAT preencha a coluna larga do meio e o LOG fique à direita, sem ambiguidade. */
   .sidebar-col[data-tab="log"].tab-active {
     display: grid;
     grid-template-columns: 220px minmax(0, 1fr) 300px;
+    grid-template-areas: "mods chat log";
     gap: var(--gap-lg);
     align-items: start;
   }
-  .sidebar-col[data-tab="log"] .modifier-panel { order: 1; margin-bottom: 0; align-self: start; }
-  .sidebar-col[data-tab="log"] #chat-panel    { order: 2; margin-top: 0; height: calc(100vh - 9rem); }
-  .sidebar-col[data-tab="log"] #roll-log       { order: 3; max-height: calc(100vh - 9rem); overflow-y: auto; }
+  .sidebar-col[data-tab="log"] .modifier-panel { grid-area: mods; margin-bottom: 0; align-self: start; }
+  .sidebar-col[data-tab="log"] #chat-panel     { grid-area: chat; margin-top: 0; height: calc(100vh - 9rem); }
+  .sidebar-col[data-tab="log"] #roll-log        { grid-area: log;  max-height: calc(100vh - 9rem); overflow-y: auto; }
   /* Chat preenche a coluna do meio inteira */
   .sidebar-col[data-tab="log"] #chat-panel .chat-list { max-height: none; flex: 1 1 auto; }
 }
