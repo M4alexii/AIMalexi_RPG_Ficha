@@ -1,9 +1,9 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    AIMalexi RPG · sw.js
-   Service Worker — Cache-First para funcionamento 100% offline.
+   Service Worker — Cache-First para o shell local e uso offline parcial.
 
    Estratégia:
-   - Na instalação: pré-cacheia todos os assets estáticos (shell do app).
+   - Na instalação: pré-cacheia os assets locais principais (shell do app).
    - Em fetch: serve do cache primeiro; só vai à rede se não houver hit.
    - Em atualização: novo SW aguarda até todas as abas serem fechadas
      antes de assumir (skipWaiting desabilitado intencionalmente para
@@ -13,7 +13,7 @@
    Para forçar atualização imediata: incremente CACHE_VERSION abaixo.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const CACHE_VERSION = "v60";
+const CACHE_VERSION = "v61";
 const CACHE_NAME = "aimalexi-rpg-" + CACHE_VERSION;
 
 // Assets que devem estar disponíveis offline imediatamente após instalação.
@@ -21,6 +21,7 @@ const CACHE_NAME = "aimalexi-rpg-" + CACHE_VERSION;
 const PRECACHE_URLS = [
   "./",
   "./index.html",
+  "./manifest.json",
   "./js/config.js",
   "./js/i18n.js",
   "./js/settings.js",
@@ -53,6 +54,8 @@ const PRECACHE_URLS = [
   "./js/core/render-pipeline.js",
   "./js/core/state-machine.js",
   "./js/core/executor.js",
+  "./js/core/replay-consumer.js",
+  "./js/core/session-export.js",
   "./js/dev/trace.js",
   "./js/dev/perf.js",
   "./js/views/vitals.js",

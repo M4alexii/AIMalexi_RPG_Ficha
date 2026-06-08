@@ -169,8 +169,8 @@ window.CoC.core = window.CoC.core || {};
       status: 'live',
       boundary_randomness: true,
       // difficulty e met são opcionais para compatibilidade com logs antigos
-      // (ausentes → difficulty="regular", met=true)
-      resolved_fields: ['roll', 'skillValue', 'level', 'difficulty', 'met'],
+      // (ausentes → difficulty="regular", met=true) — fora dos campos obrigatórios.
+      resolved_fields: ['roll', 'skillValue', 'level'],
     },
     SKILL_IMPROVED: {
       aggregate: 'character', domain: 'skills',
