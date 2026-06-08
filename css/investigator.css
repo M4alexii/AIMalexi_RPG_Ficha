@@ -128,11 +128,12 @@
 }
 .sattr-value {
   font-family: var(--font-serif);
-  font-size: 0.92rem;
-  font-weight: bold;
-  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);            /* contraste máximo — é o número que se lê primeiro */
   min-width: 1.6rem;
   cursor: default;
+  letter-spacing: 0.01em;
 }
 .sattr-value[contenteditable="true"] {
   cursor: text;
@@ -140,12 +141,17 @@
   outline: none;
   padding: 0 1px;
 }
+/* Frações ½/⅕ recuadas (tom-sobre-tom) — claramente secundárias ao valor total. */
 .sattr-fracs {
   margin-left: auto;
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  color: var(--ink-faded);
+  color: var(--ink-dim);
+  opacity: 0.82;
   white-space: nowrap;
+  background: color-mix(in srgb, var(--ink) 7%, transparent);
+  border-radius: 0.4rem;
+  padding: 0.02rem 0.32rem;
 }
 
 /* ── Edição inline dos atributos (Modo Editar): steppers ± nas próprias cartas ── */
