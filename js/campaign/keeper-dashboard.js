@@ -44,6 +44,7 @@ window.CoC.campaign = window.CoC.campaign || {};
       _cs.markStale();
     }
     _renderDashboard(_cs.getState());
+    _mountChat();
   }
 
   // ── Buttons ───────────────────────────────────────────────────────────────
@@ -175,9 +176,31 @@ window.CoC.campaign = window.CoC.campaign || {};
       case 'EXECUTION_TRACE':
         _handleExecutionTrace(event);
         break;
+      case 'CHAT_MESSAGE':
+        // Encaminha ao chat (cobre o caso de a campanha iniciar APÓS o mount,
+        // quando o onEvent interno do chat ainda não estava registrado). O chat
+        // deduplica por msgId, então não há mensagem repetida.
+        if (window.CoC.views && window.CoC.views.chat && window.CoC.views.chat.receive) {
+          window.CoC.views.chat.receive(event);
+        }
+        return;
     }
 
     _renderDashboard(_cs.getState());
+  }
+
+  function _mountChat() {
+    var chat = window.CoC.views && window.CoC.views.chat;
+    var listEl = document.getElementById('chat-list');
+    if (!chat || !chat.mount || !listEl) return;
+    chat.mount({
+      listEl:    listEl,
+      inputEl:   document.getElementById('chat-input'),
+      sendBtnEl: document.getElementById('chat-send'),
+      hintEl:    document.getElementById('chat-hint'),
+      getAuthor: function () { return 'Guardião'; },
+      getRole:   function () { return 'keeper'; }
+    });
   }
 
   function _handleExecutionTrace(event) {

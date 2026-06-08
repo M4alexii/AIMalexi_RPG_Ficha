@@ -245,6 +245,19 @@
         <ul style="list-style:none; padding:0; margin:0;"></ul>
       </div>
 
+      <!-- CHAT DE CAMPANHA (espelho do investigador; Guardião ⇄ Jogadores) -->
+      <div class="chat-panel no-print" id="chat-panel">
+        <div class="chat-header">
+          <strong style="font-family: var(--font-serif); color: var(--keeper-accent-bright, var(--brass));">💬 Chat da Campanha</strong>
+          <span class="chat-hint" id="chat-hint"></span>
+        </div>
+        <div class="chat-list" id="chat-list" aria-live="polite"></div>
+        <div class="chat-compose">
+          <input type="text" id="chat-input" class="chat-input" placeholder="Mensagem do Guardião..." maxlength="500" aria-label="Mensagem do chat" />
+          <button id="chat-send" class="btn-primary btn-sm" type="button">Enviar</button>
+        </div>
+      </div>
+
   </section><!-- /T5 Timeline -->
 
   <!-- ═══ T6 · LORE DA CAMPANHA ═══ -->
@@ -346,6 +359,7 @@
      ORQUESTRADOR DA FICHA DO MESTRE
      ═══════════════════════════════════════════════════════════════════════ -->
 <script src="js/keeper.js"></script>
+<script src="js/views/chat.js"></script>
 <script src="js/campaign/keeper-dashboard.js"></script>
 <script src="js/keeper-tabs.js"></script>
 <script src="js/keeper-notes.js"></script>

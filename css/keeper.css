@@ -1589,3 +1589,68 @@
   .app { max-width: 100%; }
   .ko-kpis { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CHAT DE CAMPANHA — espelho do investigador (aba Timeline do Mestre)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.chat-panel {
+  margin-top: 0.85rem;
+  background: var(--bg-card);
+  border: 1px solid var(--ink-faded);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.chat-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid var(--ink-faded);
+}
+.chat-hint { font-size: 0.68rem; color: var(--ink-faded); font-style: italic; }
+.chat-list {
+  max-height: 38vh;
+  min-height: 8rem;
+  overflow-y: auto;
+  padding: 0.5rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.chat-msg {
+  border-radius: var(--radius);
+  padding: 0.3rem 0.5rem;
+  background: var(--bg-card-hi);
+  border-left: 3px solid var(--mist, #7a8590);
+}
+.chat-msg.keeper { border-left-color: var(--brass); }
+.chat-msg-head { display: flex; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.1rem; }
+.chat-author {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--brass);
+}
+.chat-msg.player .chat-author { color: var(--mist, #9aa6b0); }
+.chat-time { font-family: var(--font-mono); font-size: 0.65rem; color: var(--ink-faded); }
+.chat-text { font-size: 0.85rem; line-height: 1.4; word-break: break-word; }
+.chat-compose {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.5rem 0.6rem;
+  border-top: 1px solid var(--ink-faded);
+}
+.chat-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: var(--bg-deep);
+  border: 1px solid var(--ink-faded);
+  border-radius: var(--radius);
+  color: var(--ink);
+  padding: 0.35rem 0.5rem;
+  font-size: 0.85rem;
+}
