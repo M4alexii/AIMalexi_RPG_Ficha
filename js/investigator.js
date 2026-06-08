@@ -480,8 +480,16 @@
           char.investigator.portraitId = await mp.dataURIToBlobId(char.investigator.portraitId);
         }
 
-        applyTheme(char._meta?.theme || "arkham");
-        state.character = char;  // dispatches SET_CHARACTER → pipeline.renderAll()
+        // Normaliza a estrutura (coerção de tipos de identidade/background) — a
+        // mesma garantia do boot. Sem isto, imports com campos legados (ex.:
+        // background.meaningfulLocations como array) corrompem/perdem dados
+        // pessoais do investigador ao renderizar.
+        const normalized = window.CoC.schema.normalizeCharacter(char);
+        if (normalized._meta.schemaWarnings.length > 0) {
+          console.warn("[import][schema]", normalized._meta.schemaWarnings);
+        }
+        applyTheme(normalized._meta?.theme || "arkham");
+        state.character = normalized;  // dispatches SET_CHARACTER → pipeline.renderAll()
         persistCurrent();
         toast("Personagem importado com sucesso!", { type: "success" });
       } catch (err) {

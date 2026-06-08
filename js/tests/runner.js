@@ -99,6 +99,7 @@ load('js/tests/test-rules.js');
 load('js/tests/test-store.js');
 load('js/tests/test-dice.js');
 load('js/tests/test-schema.js');
+load('js/tests/test-data-integrity.js');
 load('js/tests/test-persist-middleware.js');
 load('js/tests/test-error-boundary.js');
 load('js/tests/test-combat.js');

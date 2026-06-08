@@ -153,7 +153,9 @@ window.CoC.core = window.CoC.core || {};
     // ── Perícias ──────────────────────────────────────────────────────────────
     SET_SKILL: {
       aggregate: 'character', domain: 'skills',
-      renders: ['skills'], persists: true, sacred: false,
+      // 'finances' incluída: "Nível de Crédito" é perícia E aparece no card de
+      // Finanças — re-render conjunto evita dessincronia entre as duas abas.
+      renders: ['skills', 'finances'], persists: true, sacred: false,
       effects: [],
       status: 'live',
     },
