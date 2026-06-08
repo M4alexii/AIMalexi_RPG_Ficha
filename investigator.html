@@ -144,23 +144,9 @@
       <div id="sidebar-vitals" class="sidebar-vitals"></div>
       <div class="sidebar-attr-header">
         <button id="btn-roll-all" class="btn-primary btn-sm" title="Gera todos os atributos do zero (rolagem 3d6×5 / 2d6+6×5)">🎲 Rolar Tudo</button>
-        <button id="btn-roll-attr" class="btn-sm" type="button" title="Faz um teste de atributo na sessão (ex.: teste de FOR)" aria-expanded="false" aria-controls="attr-roll-panel">🎯 Testar Atributo</button>
+        <span id="attr-budget" class="attr-budget" hidden title="Soma das 8 características (point-buy CoC 7e ≈ 460)"></span>
       </div>
       <div id="sidebar-attributes" class="sidebar-attributes"></div>
-      <!-- Painel de distribuição de pontos (point-buy) — visível no Modo Editar -->
-      <div id="attr-dist-panel" class="attr-dist-panel" hidden></div>
-      <!-- Painel retrátil de rolagem de atributo — reusa a engine das perícias -->
-      <div id="attr-roll-panel" class="attr-roll-panel" hidden style="margin-top:.5rem;padding:.5rem;border-top:1px solid var(--line,#3a342a);display:flex;flex-direction:column;gap:.4rem;">
-        <div style="display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;">
-          <select id="attr-roll-which" aria-label="Atributo a rolar" style="flex:1 1 auto;min-width:7rem;"></select>
-          <select id="attr-roll-diff" aria-label="Dificuldade" style="flex:0 0 auto;">
-            <option value="regular">Regular</option>
-            <option value="hard">Difícil</option>
-            <option value="extreme">Extremo</option>
-          </select>
-          <button id="attr-roll-go" class="btn-primary btn-sm" type="button">🎲 Rolar</button>
-        </div>
-      </div>
       <button id="btn-edit-mode" class="sidebar-edit-btn" title="Alternar Modo Editar (permite valores fora dos limites com aprovação)">✎ Editar Investigador</button>
       <button id="btn-deps" class="sidebar-edit-btn" title="Ver o grafo de dependências de regras (o que cada atributo afeta)">🔗 Ver Dependências</button>
     </aside>

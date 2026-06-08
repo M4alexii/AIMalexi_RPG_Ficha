@@ -156,7 +156,7 @@ window.CoC = window.CoC || {};
     if (tl) {
       var ev = (st.timeline || []).slice(-6).reverse();
       tl.innerHTML = ev.length
-        ? ev.map(function (e) { return '<div class="ko-ev ' + _esc(e.cls || '') + '">' + _esc(e.text || e.type || '') + '</div>'; }).join('')
+        ? ev.map(function (e) { return '<div class="ko-ev ' + _esc(e.cls || '') + '">' + (e.text != null ? e.text : _esc(e.type || '')) + '</div>'; }).join('')
         : '<div class="ko-none">Sem eventos ainda.</div>';
     }
   }

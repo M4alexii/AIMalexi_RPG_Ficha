@@ -148,6 +148,37 @@
   white-space: nowrap;
 }
 
+/* ── Edição inline dos atributos (Modo Editar): steppers ± nas próprias cartas ── */
+.sattr-step {
+  flex: 0 0 auto;
+  width: 1.4rem; height: 1.4rem;
+  line-height: 1; font-size: 0.95rem; padding: 0;
+  border: 1px solid var(--line, #3a342a);
+  background: var(--bg-card-hi);
+  color: var(--ink);
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+.sattr-step:hover { border-color: var(--brass); color: var(--brass); }
+/* Em edição, mantém a carta na horizontal mesmo nos breakpoints que empilham */
+.sidebar-attributes .sattr-row.editing { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.2rem; }
+.sidebar-attributes .sattr-row.editing .sattr-value { font-size: 1rem; min-width: 1.8rem; text-align: center; }
+.sidebar-attributes .sattr-row.editing .sattr-fracs { flex-basis: 100%; text-align: center; }
+/* Badge de orçamento (point-buy) na barra de atributos */
+.attr-budget {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--line, #3a342a);
+  color: var(--ink-dim);
+  white-space: nowrap;
+}
+.attr-budget[hidden] { display: none; }
+.attr-budget.ok   { color: #7bbf7b; border-color: #3f6b3f; }
+.attr-budget.warn { color: #d8b86a; border-color: #6b5a2f; }
+.attr-budget.err  { color: #d88a8a; border-color: #6b3434; }
+
 /* ── Painel de distribuição de pontos (point-buy, Modo Editar) ── */
 .attr-dist-panel {
   margin-top: 0.5rem;
@@ -389,6 +420,12 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   .sidebar-col[data-tab="log"] #roll-log        { grid-area: log;  max-height: calc(100vh - 9rem); overflow-y: auto; }
   /* Chat preenche a coluna do meio inteira */
   .sidebar-col[data-tab="log"] #chat-panel .chat-list { max-height: none; flex: 1 1 auto; }
+
+  /* Aba Log ativa: a content-col fica vazia (seções escondidas) mas ocupava o 1fr,
+     espremendo o Log na coluna de 400px e jogando a barra para fora da margem.
+     Colapsa a content-col → Modificadores | Chat | Log ocupam a largura inteira. */
+  body[data-tab="log"] .main-panel { grid-template-columns: 1fr; }
+  body[data-tab="log"] .main-panel > .content-col { display: none; }
 }
 
 /* ── Responsive ────────────────────────────────────────────────────────── */

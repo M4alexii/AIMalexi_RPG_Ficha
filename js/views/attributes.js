@@ -4,19 +4,13 @@
 
    Responsabilidades:
    - Renderizar grid de atributos primários (#sidebar-attributes)
-   - Suportar modo edição (contenteditable) com clamp 0–99
-   - Disparar RECALC_DERIVED via store após edição manual
-   - Publicar identity:persist-requested para persistência
+   - Modo Edição: edição inline nas PRÓPRIAS cartas (digitar + steppers ±),
+     respeitando os caps de criação; badge de orçamento (point-buy) na barra.
+   - Disparar RECALC_DERIVED via store após edição; persistir.
 
-   Depende de:
-   - window.CoC.store   (dispatch RECALC_DERIVED + getState)
-   - window.CoC.bus     (publish persist-requested)
-   - window.CoC.dice    (half, fifth — para frações)
-   - window.CoC.ui      (el, escapeHtml)
-   - opts.getEditMode() — callback que retorna boolean (injetado pelo orquestrador)
-
-   Nota: editMode vive em state do investigator.js. Enquanto o orquestrador não for
-   migrado para store, o acesso se dá via callback para evitar acoplamento direto.
+   Depende de: window.CoC.store, window.CoC.bus, window.CoC.dice, window.CoC.ui,
+   window.CoC.rules (clampAttribute/computeAttributeBudget), window.CoC.validators.
+   opts.getEditMode() — callback boolean injetado pelo orquestrador.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 window.CoC       = window.CoC       || {};
@@ -36,7 +30,7 @@ window.CoC.views = window.CoC.views || {};
 
   // Aplica uma característica pelo write-path oficial (VIEW → executor → store),
   // recalcula derivados, re-renderiza e persiste. `opts.rolled` registra a
-  // proveniência (ex.: "Distribuição manual") para não deixar o campo obsoleto.
+  // proveniência (ex.: "Edição manual") para não deixar o campo obsoleto.
   function _applyAttribute(code, value, opts) {
     var exec = window.CoC.core && window.CoC.core.executor;
     var payload = { code: code, value: value };
@@ -72,13 +66,19 @@ window.CoC.views = window.CoC.views || {};
     return e;
   }
 
+  function _clamp(code, value) {
+    var rules = window.CoC.rules || {};
+    return rules.clampAttribute ? rules.clampAttribute(code, value)
+                                : Math.max(0, Math.min(99, Math.round(value)));
+  }
+
   // ── Render ─────────────────────────────────────────────────────────────────
   function render() {
     var grid = $s('#sidebar-attributes');
     if (!grid) return;
     grid.innerHTML = '';
     var c = _store ? _store.getState().character : null;
-    if (!c || !c.attributes) return;
+    if (!c || !c.attributes) { _renderBudget(null, false); return; }
 
     var editMode = _getEditMode();
     var dice     = window.CoC.dice;
@@ -87,32 +87,61 @@ window.CoC.views = window.CoC.views || {};
       var attr = c.attributes[code];
       if (!attr) return;
       var v   = Number(attr.value) || 0;
-      var row = _mkEl('div', { class: 'sattr-row', 'data-attr': code });
+      var row = _mkEl('div', { class: 'sattr-row' + (editMode ? ' editing' : ''), 'data-attr': code });
+
+      row.appendChild(_mkEl('span', { class: 'sattr-label' }, [_escHtml(code)]));
+
+      if (editMode) {
+        row.appendChild(_mkEl('button', {
+          type: 'button', class: 'sattr-step', 'data-step': '-5',
+          title: 'Diminuir', 'aria-label': 'Diminuir ' + code
+        }, ['−']));
+      }
 
       var valNode = _mkEl('span', {
         class: 'sattr-value',
         contenteditable: editMode ? 'true' : 'false',
         title: _escHtml(attr.rolled || '')
       }, [String(v)]);
+      row.appendChild(valNode);
+
+      if (editMode) {
+        row.appendChild(_mkEl('button', {
+          type: 'button', class: 'sattr-step', 'data-step': '5',
+          title: 'Aumentar', 'aria-label': 'Aumentar ' + code
+        }, ['+']));
+      }
 
       var half  = dice ? dice.half(v)  : Math.floor(v / 2);
       var fifth = dice ? dice.fifth(v) : Math.floor(v / 5);
-
-      var fracsEl = _mkEl('span', { class: 'sattr-fracs' }, [
+      row.appendChild(_mkEl('span', { class: 'sattr-fracs' }, [
         _mkEl('span', { class: 'sattr-frac-half',  title: 'Difícil' },  ['½' + half]),
         _mkEl('span', { class: 'sattr-frac-sep'                      },  [' · ']),
         _mkEl('span', { class: 'sattr-frac-fifth', title: 'Extremo' }, ['⅕' + fifth]),
-      ]);
+      ]));
 
-      row.appendChild(_mkEl('span', { class: 'sattr-label' }, [_escHtml(code)]));
-      row.appendChild(valNode);
-      row.appendChild(fracsEl);
       grid.appendChild(row);
     });
 
-    _renderDistPanel();
+    _renderBudget(c, editMode);
 
     if (editMode) {
+      // Steppers ± (respeitam caps de criação)
+      grid.querySelectorAll('.sattr-step').forEach(function(btn) {
+        btn.onclick = function() {
+          var row  = btn.closest('.sattr-row');
+          var code = row && row.dataset.attr;
+          if (!code) return;
+          var char = _store ? _store.getState().character : null;
+          if (!char || !char.attributes || !char.attributes[code]) return;
+          var cur  = Number(char.attributes[code].value) || 0;
+          var next = _clamp(code, cur + (parseInt(btn.dataset.step, 10) || 0));
+          if (next === cur) return;
+          _applyAttribute(code, next, { rolled: 'Edição manual' });
+        };
+      });
+
+      // Edição direta (digitar). Vazio/inválido → mantém o valor anterior.
       grid.querySelectorAll('.sattr-value').forEach(function(node) {
         node.onkeydown = function(e) {
           if (e.key === 'Enter')  { e.preventDefault(); node.blur(); }
@@ -134,132 +163,39 @@ window.CoC.views = window.CoC.views || {};
           var char = _store ? _store.getState().character : null;
           if (!char || !char.attributes || !char.attributes[code]) return;
           var prev = Number(char.attributes[code].value) || 0;
-          // Sanitiza: só dígitos. Campo vazio/inválido → mantém o valor anterior (não zera).
-          var raw = String(node.textContent || '').replace(/[^0-9]/g, '');
-          var v   = raw === '' ? prev : Math.max(0, Math.min(99, parseInt(raw, 10)));
+          var raw  = String(node.textContent || '').replace(/[^0-9]/g, '');
+          // Digitar permite o teto geral 0–99 (override do Guardião); os ± usam os caps.
+          var v    = raw === '' ? prev : Math.max(0, Math.min(99, parseInt(raw, 10)));
           if (v === prev) { node.textContent = String(prev); return; }
-          // Edição manual marca a proveniência para não deixar `rolled` obsoleto.
-          _applyAttribute(code, v, { rolled: 'Distribuição manual' });
+          _applyAttribute(code, v, { rolled: 'Edição manual' });
         };
       });
     }
   }
 
-  // ── Painel de distribuição de pontos (point-buy, estilo perícias) ────────────
-  // Visível só no Modo Editar. Mostra um badge de orçamento (gasto/total) e
-  // steppers ± por característica, respeitando os caps de criação. Escreve pelo
-  // mesmo write-path das perícias (executor → SET_ATTRIBUTE) + recálculo de derivados.
-  function _stepRow(c, code, caps) {
-    var v   = Number(c.attributes[code] && c.attributes[code].value) || 0;
-    var cap = caps[code];
-    var capHint = cap ? (cap.min + '–' + cap.max) : '0–99';
-    return '<div class="adist-row" data-attr="' + code + '">' +
-             '<span class="adist-label">' + _escHtml(code) + '</span>' +
-             '<button type="button" class="adist-step" data-step="-5" aria-label="Diminuir ' + code + '">−</button>' +
-             '<span class="adist-val">' + v + '</span>' +
-             '<button type="button" class="adist-step" data-step="5" aria-label="Aumentar ' + code + '">+</button>' +
-             '<span class="adist-cap" title="Limites de criação (CoC 7e)">' + capHint + '</span>' +
-           '</div>';
-  }
-
-  function _renderDistPanel() {
-    var panel = $s('#attr-dist-panel');
-    if (!panel) return;
-    var c = _store ? _store.getState().character : null;
-    if (!c || !c.attributes || !_getEditMode()) {
-      panel.setAttribute('hidden', '');
-      panel.innerHTML = '';
-      return;
-    }
-    panel.removeAttribute('hidden');
-
-    var rules      = window.CoC.rules || {};
+  // Badge de orçamento (point-buy CoC 7e) na barra de atributos — só em edição.
+  // Base: as 8 características (sem Sorte) somam ~460 pts no método de compra
+  // (média ~57,5 cada); informativo, NÃO bloqueia valores.
+  function _renderBudget(c, editMode) {
+    var el = $s('#attr-budget');
+    if (!el) return;
+    if (!c || !editMode) { el.setAttribute('hidden', ''); el.textContent = ''; el.className = 'attr-budget'; return; }
+    var rules = window.CoC.rules || {};
+    var b = rules.computeAttributeBudget ? rules.computeAttributeBudget(c) : null;
+    if (!b) { el.setAttribute('hidden', ''); return; }
     var validators = window.CoC.validators || {};
-    var pool = rules.ATTRIBUTE_POOL || ['FOR', 'CON', 'TAM', 'DES', 'APA', 'INT', 'POD', 'EDU'];
-    var caps = rules.ATTRIBUTE_CAPS || {};
-    var budget = rules.computeAttributeBudget
-      ? rules.computeAttributeBudget(c)
-      : { spent: 0, budget: 0, remaining: 0 };
     var badge = validators.pointsBadgeState
-      ? validators.pointsBadgeState(budget.spent, budget.budget)
-      : { level: 'under', label: budget.spent + ' pts' };
-
-    var rows = '';
-    pool.forEach(function(code) { if (c.attributes[code]) rows += _stepRow(c, code, caps); });
-
-    panel.innerHTML =
-      '<div class="adist-head">' +
-        '<span class="adist-title">Distribuir Pontos</span>' +
-        '<span class="adist-badge ' + _escHtml(badge.level) + '">' + _escHtml(badge.label) + '</span>' +
-      '</div>' +
-      '<div class="adist-rows">' + rows + '</div>' +
-      (c.attributes.Sorte
-        ? '<div class="adist-rows adist-luck">' + _stepRow(c, 'Sorte', caps) + '</div>' +
-          '<div class="adist-note">Sorte é rolada à parte (fora do orçamento).</div>'
-        : '') +
-      '<div class="adist-note">Pool das 8 características ≈ ' + budget.budget + ' pts (CoC 7e).</div>';
-
-    panel.querySelectorAll('.adist-step').forEach(function(btn) {
-      btn.onclick = function() {
-        var row  = btn.closest('.adist-row');
-        var code = row && row.dataset.attr;
-        if (!code) return;
-        var char = _store ? _store.getState().character : null;
-        if (!char || !char.attributes || !char.attributes[code]) return;
-        var cur  = Number(char.attributes[code].value) || 0;
-        var step = parseInt(btn.dataset.step, 10) || 0;
-        var next = rules.clampAttribute
-          ? rules.clampAttribute(code, cur + step)
-          : Math.max(0, Math.min(99, cur + step));
-        if (next === cur) return;
-        _applyAttribute(code, next, { rolled: 'Distribuição manual' });
-      };
-    });
-  }
-
-  // ── Painel retrátil de rolagem de atributo ───────────────────────────────────
-  // Reusa a engine das perícias (window.CoC.views.rolls.rollAttribute) — um único
-  // painel retrátil, sem botões por atributo. Wire idempotente (init roda uma vez).
-  var LABELS = {
-    FOR: 'Força', CON: 'Constituição', TAM: 'Tamanho', DES: 'Destreza',
-    APA: 'Aparência', INT: 'Inteligência', POD: 'Poder', EDU: 'Educação', Sorte: 'Sorte'
-  };
-
-  function _wireRollPanel() {
-    var toggle = $s('#btn-roll-attr');
-    var panel  = $s('#attr-roll-panel');
-    var which  = $s('#attr-roll-which');
-    var diff   = $s('#attr-roll-diff');
-    var go     = $s('#attr-roll-go');
-    if (!toggle || !panel || !which || !go) return;
-
-    if (!which.options.length) {
-      ATTRS.forEach(function(code) {
-        var o = document.createElement('option');
-        o.value = code;
-        o.textContent = code + (LABELS[code] ? ' — ' + LABELS[code] : '');
-        which.appendChild(o);
-      });
-    }
-
-    toggle.onclick = function() {
-      var willOpen = panel.hasAttribute('hidden');
-      if (willOpen) panel.removeAttribute('hidden'); else panel.setAttribute('hidden', '');
-      toggle.setAttribute('aria-expanded', String(willOpen));
-    };
-
-    go.onclick = function() {
-      var rolls = window.CoC.views && window.CoC.views.rolls;
-      if (!rolls || typeof rolls.rollAttribute !== 'function') return;
-      rolls.rollAttribute(which.value, { difficulty: diff ? diff.value : 'regular' });
-    };
+      ? validators.pointsBadgeState(b.spent, b.budget)
+      : { level: 'under', label: b.spent + ' / ' + b.budget };
+    el.removeAttribute('hidden');
+    el.className = 'attr-budget ' + badge.level;
+    el.textContent = '◆ ' + badge.label;
   }
 
   function init(store, opts) {
     _store       = store || window.CoC.store;
     _bus         = window.CoC.bus;
     _getEditMode = (opts && typeof opts.getEditMode === 'function') ? opts.getEditMode : function() { return false; };
-    _wireRollPanel();
   }
 
   window.CoC.views.attributes = Object.freeze({ render: render, init: init });
