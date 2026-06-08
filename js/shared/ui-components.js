@@ -240,7 +240,7 @@ window.CoC = window.CoC || {};
         class: "bottom-sheet-backdrop",
         style: {
           position: "fixed", inset: 0,
-          background: "rgba(10, 8, 7, 0.6)", zIndex: 95
+          background: "rgba(10, 8, 7, 0.6)", zIndex: 125
         }
       });
       sheet = el("div", {
@@ -253,7 +253,7 @@ window.CoC = window.CoC || {};
           borderTop: "2px solid var(--brass)",
           borderRadius: "12px 12px 0 0",
           padding: "1rem 1rem 5rem",
-          zIndex: 96,
+          zIndex: 126,
           overflowY: "auto",
           animation: "sheet-up 0.3s ease-out",
           boxShadow: "0 -8px 32px rgba(0,0,0,0.7)"
@@ -514,7 +514,15 @@ window.CoC = window.CoC || {};
     style.textContent = `
       @keyframes sheet-up   { from { transform: translateY(100%); } to { transform: translateY(0); } }
       @keyframes sheet-down { from { transform: translateY(0); } to { transform: translateY(100%); } }
-      @media (max-width: 768px) { .fab { display: flex !important; } }
+      @media (max-width: 768px) {
+        .fab {
+          display: flex !important;
+          /* Acima da bottom-nav fixa (~3.5rem) e do conteúdo da aba Log, para o
+             dado nunca ficar atrás/inacessível no mobile. */
+          bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px)) !important;
+          z-index: 120 !important;
+        }
+      }
     `;
     document.head.appendChild(style);
   })();

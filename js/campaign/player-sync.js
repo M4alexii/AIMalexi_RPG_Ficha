@@ -156,7 +156,9 @@ window.CoC.campaign = window.CoC.campaign || {};
 
     var ontology = window.CoC.campaign && window.CoC.campaign.ontology;
     var statusPayload = {
-      playerName:    _playerName || inv.playerName || 'Jogador',
+      // Prefere o nome ATUAL da ficha (vivo) sobre o _playerName capturado no join
+      // (que ficava obsoleto ao trocar de personagem). Prompt do join = fallback.
+      playerName:    inv.playerName || _playerName || 'Jogador',
       characterName: inv.name || '?',
       seqNo:         _seqNo,
       status: {
@@ -210,7 +212,7 @@ window.CoC.campaign = window.CoC.campaign || {};
       var seq = ++_seqNo;
       var tracePayload = {
         characterName: inv.name    || '?',
-        playerName:    _playerName || inv.playerName || '?',
+        playerName:    inv.playerName || _playerName || '?',
         entry:         { type: data.type, payload: data.payload },
         seqNo:         seq,
         eventId:       (_tp.getPeerId() || '?') + ':' + seq
