@@ -121,8 +121,12 @@ window.CoC.views = window.CoC.views || {};
           var raw = String(node.textContent || '').replace(/[^0-9]/g, '');
           var v   = raw === '' ? prev : Math.max(0, Math.min(99, parseInt(raw, 10)));
           if (v === prev) { node.textContent = String(prev); return; }
-          // Despacha pelo store completo (event-log + persist + sync)
-          if (_store) _store.dispatch({ type: 'SET_ATTRIBUTE', payload: { code: code, value: v } });
+          // Escreve via executor (write-path oficial: VIEW → executor → state machine
+          // → store). Garante event-log + persist + sync; SET_ATTRIBUTE é 'live'.
+          var exec = window.CoC.core && window.CoC.core.executor;
+          if (exec && exec.execute) {
+            exec.execute({ type: 'SET_ATTRIBUTE', payload: { code: code, value: v } });
+          }
           _recalc();
           render();
           if (window.CoC.views.vitals && window.CoC.views.vitals.render) window.CoC.views.vitals.render();

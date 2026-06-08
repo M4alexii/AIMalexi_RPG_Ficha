@@ -31,6 +31,7 @@ function load(rel) {
 
 // Ordem importa: CoCData antes das regras (calcDB lê window.CoCData em call time)
 load('data/damage-bonus-table.js');
+load('data/skills.js');        // window.CoCData.findSkill — usado por computeSkillProvenance
 load('js/engine/coc7e-rules.js');
 load('js/engine/dice.js');
 
