@@ -1008,6 +1008,7 @@
 
   function applyTab() {
     const tab = state.mobileTab;
+    document.body.dataset.tab = tab || "";   // hook de CSS (ex.: aba Log ocupa largura total)
     $$("[data-tab]").forEach(s => s.classList.toggle("tab-active", s.dataset.tab === tab));
     $$(".mobile-tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
     $$(".desktop-tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));

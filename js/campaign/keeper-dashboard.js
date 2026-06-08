@@ -154,7 +154,7 @@ window.CoC.campaign = window.CoC.campaign || {};
         _cs.upsertInvestigator(event.peerId, { online: true });
         _cs.pushTimeline({
           type: 'player-connected',
-          text: (event.playerName || 'Jogador') + ' entrou na campanha.',
+          text: '<b>' + _esc(event.playerName || 'Jogador') + '</b> entrou na campanha.',
           cls:  'ev-roll'
         });
         // Request status from the new player
@@ -168,7 +168,7 @@ window.CoC.campaign = window.CoC.campaign || {};
         if (event.peerId) _cs.setInvestigatorOffline(event.peerId);
         _cs.pushTimeline({
           type: 'player-disconnected',
-          text: (event.playerName || 'Jogador') + ' saiu.',
+          text: '<b>' + _esc(event.playerName || 'Jogador') + '</b> saiu.',
           cls:  'ev-roll'
         });
         break;

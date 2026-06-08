@@ -148,6 +148,37 @@
   white-space: nowrap;
 }
 
+/* ── Edição inline dos atributos (Modo Editar): steppers ± nas próprias cartas ── */
+.sattr-step {
+  flex: 0 0 auto;
+  width: 1.4rem; height: 1.4rem;
+  line-height: 1; font-size: 0.95rem; padding: 0;
+  border: 1px solid var(--line, #3a342a);
+  background: var(--bg-card-hi);
+  color: var(--ink);
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+.sattr-step:hover { border-color: var(--brass); color: var(--brass); }
+/* Em edição, mantém a carta na horizontal mesmo nos breakpoints que empilham */
+.sidebar-attributes .sattr-row.editing { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.2rem; }
+.sidebar-attributes .sattr-row.editing .sattr-value { font-size: 1rem; min-width: 1.8rem; text-align: center; }
+.sidebar-attributes .sattr-row.editing .sattr-fracs { flex-basis: 100%; text-align: center; }
+/* Badge de orçamento (point-buy) na barra de atributos */
+.attr-budget {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--line, #3a342a);
+  color: var(--ink-dim);
+  white-space: nowrap;
+}
+.attr-budget[hidden] { display: none; }
+.attr-budget.ok   { color: #7bbf7b; border-color: #3f6b3f; }
+.attr-budget.warn { color: #d8b86a; border-color: #6b5a2f; }
+.attr-budget.err  { color: #d88a8a; border-color: #6b3434; }
+
 /* ── Painel de distribuição de pontos (point-buy, Modo Editar) ── */
 .attr-dist-panel {
   margin-top: 0.5rem;
@@ -389,6 +420,12 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   .sidebar-col[data-tab="log"] #roll-log        { grid-area: log;  max-height: calc(100vh - 9rem); overflow-y: auto; }
   /* Chat preenche a coluna do meio inteira */
   .sidebar-col[data-tab="log"] #chat-panel .chat-list { max-height: none; flex: 1 1 auto; }
+
+  /* Aba Log ativa: a content-col fica vazia (seções escondidas) mas ocupava o 1fr,
+     espremendo o Log na coluna de 400px e jogando a barra para fora da margem.
+     Colapsa a content-col → Modificadores | Chat | Log ocupam a largura inteira. */
+  body[data-tab="log"] .main-panel { grid-template-columns: 1fr; }
+  body[data-tab="log"] .main-panel > .content-col { display: none; }
 }
 
 /* ── Responsive ────────────────────────────────────────────────────────── */
@@ -2322,14 +2359,46 @@ body[data-difficulty="extreme"] .skill-frac-sep {
    Page-scoped (só a ficha do investigador). Não altera desktop.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* Desktop: as ações fluem direto no toolbar (sem caixa intermediária);
-   o botão overflow e o cromo do bottom sheet ficam ocultos. */
-.toolbar-actions { display: contents; }
-.toolbar-actions .sheet-group { display: contents; }
-.toolbar-actions .sheet-handle,
-.toolbar-actions .sheet-title { display: none; }
-#btn-overflow { display: none; }
-.sheet-backdrop { display: none; }
+/* Desktop: utilitários de baixa frequência (Importar/Exportar/PDF/Sessão/Config/
+   Efeitos/temas/Excluir) num DRAWER retrátil pela ESQUERDA — declutter do topo.
+   Acionado pelo ☰ (#btn-overflow). Mobile (≤767px) sobrescreve p/ bottom sheet. */
+.toolbar-actions {
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  width: min(320px, 86vw);
+  z-index: 300;
+  background: var(--bg-card);
+  border-right: 1px solid var(--brass);
+  box-shadow: 8px 0 32px rgba(0, 0, 0, 0.6);
+  padding: 1rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  transform: translateX(-100%);
+  transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.toolbar-actions.open { transform: translateX(0); }
+.toolbar-actions .sheet-handle { display: none; }
+.toolbar-actions .sheet-title {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--ink-faded); margin-bottom: 0.5rem;
+}
+.toolbar-actions .sheet-group {
+  display: flex; flex-direction: column; gap: 0.25rem;
+  padding: 0.5rem 0; border-bottom: 1px solid var(--ink-faded);
+}
+.toolbar-actions .sheet-group:last-of-type { border-bottom: none; }
+.toolbar-actions .sheet-group-danger { padding-top: 0.6rem; }
+.toolbar-actions button { width: 100%; text-align: left; min-height: 44px; border-radius: var(--radius); }
+.toolbar-actions .theme-picker { border-left: none; padding: 0.4rem 0.2rem; margin: 0; justify-content: flex-start; gap: 0.5rem; }
+.toolbar-actions .theme-swatch { width: 32px; height: 32px; }
+
+#btn-overflow { display: inline-flex; order: -1; font-size: 1.15rem; }   /* ☰ à esquerda do topo */
+.sheet-backdrop { display: block; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); z-index: 290; }
+.sheet-backdrop[hidden] { display: none; }
 
 /* ── MOBILE (≤ 767px) ─────────────────────────────────────────────────────── */
 @media (max-width: 767px) {
@@ -2381,6 +2450,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
     display: flex;
     position: fixed;
     left: 0; right: 0; bottom: 0; top: auto;
+    width: auto; border-right: none;   /* reseta o drawer-esquerdo do desktop */
     flex-direction: column;
     align-items: stretch;
     gap: 0;
