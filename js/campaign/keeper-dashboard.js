@@ -212,6 +212,19 @@ window.CoC.campaign = window.CoC.campaign || {};
     var cls   = 'ev-roll';
 
     function _amt(v) { return v != null ? v : '?'; }
+    function _lvlLabel(level) {
+      return ({ critical: 'Crítico', crit: 'Crítico', extreme: 'Extremo', hard: 'Bom',
+                regular: 'Regular', fail: 'Falha', fumble: 'Desastre' })[level] || (level || '—');
+    }
+    function _mark(met, level) {
+      if (level === 'critical' || level === 'crit') return '★';
+      if (level === 'fumble') return '💀';
+      return (met === false || level === 'fail') ? '✗' : '✓';
+    }
+    function _diffTag(difficulty) {
+      if (!difficulty || difficulty === 'regular') return '';
+      return ' [' + (difficulty === 'hard' ? 'Difícil' : difficulty === 'extreme' ? 'Extremo' : difficulty) + ']';
+    }
 
     switch (entry.type) {
       case 'APPLY_DAMAGE':
@@ -235,13 +248,22 @@ window.CoC.campaign = window.CoC.campaign || {};
         cls  = 'ev-magic';
         break;
       case 'ROLL_SKILL':
-        text = '<b>' + actor + '</b> rolou ' + _esc(p.skillName || 'perícia') +
-               ': ' + _amt(p.roll) + '% vs ' +
-               _amt(p.value) + '% → ' + _esc(p.outcome != null ? String(p.outcome) : '?');
+        text = _mark(p.met, p.level) + ' <b>' + actor + '</b> · ' + _esc(p.skillName || 'perícia') +
+               ' ' + _amt(p.skillValue) + '%' + _diffTag(p.difficulty) +
+               ' → ' + _amt(p.roll) + ' (' + _esc(_lvlLabel(p.level)) + ')' +
+               (p.pushed ? ' ⟳ forçada' : '');
+        cls  = (p.met === false || p.level === 'fail' || p.level === 'fumble') ? 'ev-roll' : 'ev-roll';
+        break;
+      case 'ROLL_ATTRIBUTE':
+        text = _mark(p.met, p.level) + ' <b>' + actor + '</b> · teste de ' + _esc(p.attribute || 'atributo') +
+               ' ' + _amt(p.result) + '%' + _diffTag(p.difficulty) +
+               ' → ' + _amt(p.roll) + ' (' + _esc(_lvlLabel(p.level)) + ')';
         cls  = 'ev-roll';
         break;
       case 'ATTACK_RESOLVED':
-        text = '<b>' + actor + '</b> atacou com ' + _esc(p.weaponName || '?') + '.';
+        text = '<b>' + actor + '</b> ' + (p.hit ? 'acertou' : 'errou') + ' o ataque' +
+               (p.level ? ' (' + _esc(_lvlLabel(p.level)) + ')' : '') +
+               (p.hit && p.damage != null ? ' · ' + p.damage + ' de dano' : '') + '.';
         cls  = 'ev-combat';
         break;
       default:

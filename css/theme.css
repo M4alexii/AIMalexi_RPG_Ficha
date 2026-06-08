@@ -511,6 +511,30 @@ label {
   color: var(--ink-faded);
   float: right;
 }
+.roll-entry .roll-marker {
+  display: inline-block;
+  width: 1.1em;
+  margin-right: 0.3rem;
+  font-weight: 700;
+  text-align: center;
+}
+.roll-entry .roll-marker.ok  { color: var(--ok, #6a9a6a); }
+.roll-entry .roll-marker.bad { color: var(--err, #b34a4a); }
+.roll-entry .roll-target {
+  font-family: var(--font-mono);
+  font-size: 0.8em;
+  color: var(--ink-faded);
+}
+.roll-entry .roll-diff {
+  font-family: var(--font-mono);
+  font-size: 0.68em;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--brass);
+  border: 1px solid var(--brass);
+  border-radius: 0.4rem;
+  padding: 0 0.3rem;
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    MODAL / DIALOG

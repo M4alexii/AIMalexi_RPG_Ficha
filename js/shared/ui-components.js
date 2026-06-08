@@ -409,10 +409,23 @@ window.CoC = window.CoC || {};
     // Classe visual: se dificuldade não atingida, exibe como falha na cor
     const displayLevel = (e.met === false) ? "fail" : (e.level || "");
     const node = el("li", { class: `roll-entry ${displayLevel}` });
-    let html = "";
+
+    // Marcador de resultado — leitura instantânea (estilo Roll20)
+    const lvl = e.level || "";
+    let marker = "•", markCls = "neutral";
+    if (lvl === "critical" || lvl === "crit") { marker = "★"; markCls = "ok"; }
+    else if (lvl === "fumble")                { marker = "💀"; markCls = "bad"; }
+    else if (e.met === false || lvl === "fail") { marker = "✗"; markCls = "bad"; }
+    else if (lvl)                             { marker = "✓"; markCls = "ok"; }
+
+    let html = `<span class="roll-marker ${markCls}">${marker}</span>`;
     if (e.skill)  html += `<span class="skill">${escapeHtml(e.skill)}</span>`;
-    if (e.target != null) html += ` <span style="color:var(--ink-faded);font-size:0.8em">(${e.target})</span>`;
-    if (e.d100 != null) html += ` <span class="result">${e.d100}</span>`;
+    if (e.target != null) html += ` <span class="roll-target">${e.target}%</span>`;
+    if (e.difficulty && e.difficulty !== "regular") {
+      const dl = e.difficulty === "hard" ? "Difícil" : (e.difficulty === "extreme" ? "Extremo" : e.difficulty);
+      html += ` <span class="roll-diff">${escapeHtml(dl)}</span>`;
+    }
+    if (e.d100 != null) html += ` <span class="result">→ ${e.d100}</span>`;
     if (e.level) {
       let levelText = labels[e.level] || e.level;
       if (e.met === false && e.difficulty && e.difficulty !== "regular") {
