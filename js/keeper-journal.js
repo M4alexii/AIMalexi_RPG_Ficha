@@ -96,21 +96,52 @@
       return;
     }
 
-    container.innerHTML = visible.map(function (t) {
-      var cat = _catMeta(t.category);
-      return '<article class="journal-card" data-id="' + _esc(t.id) + '">' +
-        '<div class="journal-card-head">' +
-          '<span class="journal-cat-badge">' + cat.icon + ' ' + _esc(cat.label) + '</span>' +
-          '<span class="journal-date">' + _esc(t.date || '') + '</span>' +
-          '<div class="journal-card-actions">' +
-            '<button class="btn-ghost btn-icon" data-journal-edit="' + _esc(t.id) + '" title="Editar">✎</button>' +
-            '<button class="btn-danger btn-icon" data-journal-del="' + _esc(t.id) + '" title="Remover">🗑️</button>' +
-          '</div>' +
-        '</div>' +
-        '<h4 class="journal-title">' + _esc(t.title || '(sem título)') + '</h4>' +
-        '<div class="journal-content">' + _esc(t.content || '').replace(/\n/g, '<br>') + '</div>' +
-      '</article>';
+    // Agrupa por pasta (Notion-like): "/" no rótulo sugere subpastas.
+    var groups = {}, order = [];
+    visible.forEach(function (t) {
+      var f = (t.folder || '').trim() || '— Sem pasta —';
+      if (!groups[f]) { groups[f] = []; order.push(f); }
+      groups[f].push(t);
+    });
+    order.sort(function (a, b) { return a.localeCompare(b); });
+
+    container.innerHTML = order.map(function (f) {
+      return '<details class="journal-folder" open>' +
+        '<summary class="journal-folder-head">📁 ' + _esc(f) +
+          ' <span class="journal-folder-count">' + groups[f].length + '</span></summary>' +
+        '<div class="journal-folder-body">' + groups[f].map(_cardHtml).join('') + '</div>' +
+      '</details>';
     }).join('');
+  }
+
+  function _cardHtml(t) {
+    var cat = _catMeta(t.category);
+    return '<article class="journal-card" data-id="' + _esc(t.id) + '">' +
+      '<div class="journal-card-head">' +
+        '<span class="journal-cat-badge">' + cat.icon + ' ' + _esc(cat.label) + '</span>' +
+        '<span class="journal-date">' + _esc(t.date || '') + '</span>' +
+        '<div class="journal-card-actions">' +
+          '<button class="btn-ghost btn-icon" data-journal-edit="' + _esc(t.id) + '" title="Editar">✎</button>' +
+          '<button class="btn-danger btn-icon" data-journal-del="' + _esc(t.id) + '" title="Remover">🗑️</button>' +
+        '</div>' +
+      '</div>' +
+      '<h4 class="journal-title">' + _esc(t.title || '(sem título)') + '</h4>' +
+      '<div class="journal-content">' + _linkify(t.content) + '</div>' +
+    '</article>';
+  }
+
+  // Converte [[Título]] em links clicáveis para outros tópicos (escapando o resto).
+  function _linkify(raw) {
+    raw = String(raw || '');
+    var out = '', re = /\[\[([^\]]+)\]\]/g, last = 0, m;
+    while ((m = re.exec(raw))) {
+      out += _esc(raw.slice(last, m.index)).replace(/\n/g, '<br>');
+      var t = m[1].trim();
+      out += '<a href="#" class="journal-link" data-journal-link="' + _esc(t) + '">🔗 ' + _esc(t) + '</a>';
+      last = re.lastIndex;
+    }
+    out += _esc(raw.slice(last)).replace(/\n/g, '<br>');
+    return out;
   }
 
   // ── Edição (modal) ──────────────────────────────────────────────────────────
@@ -119,7 +150,7 @@
     if (!ui || !ui.modal) { _openEditorFallback(topic); return; }
     var isNew = !topic;
     var t = topic || {
-      id: _uuid(), category: 'sessao', title: '', content: '',
+      id: _uuid(), category: 'sessao', title: '', content: '', folder: '',
       date: new Date().toISOString().slice(0, 10), order: 0
     };
 
@@ -132,8 +163,9 @@
           }).join('') +
         '</select></div>' +
         '<div><label>Título</label><input id="jt-title" value="' + _esc(t.title) + '" style="width:100%" /></div>' +
+        '<div><label>Pasta (use / para subpastas)</label><input id="jt-folder" value="' + _esc(t.folder || '') + '" style="width:100%" placeholder="ex.: Ato 1/Mansão Corbitt" /></div>' +
         '<div><label>Data</label><input id="jt-date" type="date" value="' + _esc(t.date) + '" style="width:100%" /></div>' +
-        '<div><label>Conteúdo</label><textarea id="jt-content" rows="6" style="width:100%">' + _esc(t.content) + '</textarea></div>' +
+        '<div><label>Conteúdo <span style="color:var(--ink-faded);font-weight:normal">— use [[Título de outro tópico]] para vincular</span></label><textarea id="jt-content" rows="6" style="width:100%">' + _esc(t.content) + '</textarea></div>' +
         '<div><label>Ordem (menor aparece antes)</label><input id="jt-order" type="number" value="' + (t.order || 0) + '" style="width:100%" /></div>' +
       '</div>';
 
@@ -145,6 +177,7 @@
         { label: 'Salvar', primary: true, onClick: function () {
           t.category = document.getElementById('jt-cat').value;
           t.title    = (document.getElementById('jt-title').value || '').trim();
+          t.folder   = (document.getElementById('jt-folder').value || '').trim();
           t.date     = document.getElementById('jt-date').value || t.date;
           t.content  = document.getElementById('jt-content').value || '';
           t.order    = parseInt(document.getElementById('jt-order').value, 10) || 0;
@@ -172,6 +205,27 @@
     render();
   }
 
+  // Navega até o tópico cujo título casa com o link [[...]], abrindo a pasta e
+  // destacando o card.
+  function _gotoByTitle(title) {
+    var target = _getTopics().find(function (t) { return (t.title || '').trim() === title; });
+    var container = document.getElementById('journal-topics');
+    if (!target || !container) return;
+    if (_filter !== 'all') {
+      _filter = 'all';
+      var sel = document.getElementById('journal-filter'); if (sel) sel.value = 'all';
+      render();
+    }
+    var idSel = (window.CSS && CSS.escape) ? CSS.escape(target.id) : target.id;
+    var card = container.querySelector('[data-id="' + idSel + '"]');
+    if (card) {
+      var det = card.closest('details'); if (det) det.open = true;
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.classList.add('journal-flash');
+      setTimeout(function () { card.classList.remove('journal-flash'); }, 1500);
+    }
+  }
+
   function _deleteTopic(id) {
     var topics = _getTopics().filter(function (t) { return t.id !== id; });
     _save(topics);
@@ -190,6 +244,8 @@
     if (container && !container._journalDelegated) {
       container._journalDelegated = true;
       container.addEventListener('click', function (e) {
+        var link = e.target.closest('[data-journal-link]');
+        if (link) { e.preventDefault(); _gotoByTitle(link.dataset.journalLink); return; }
         var ed = e.target.closest('[data-journal-edit]');
         if (ed) {
           var topic = _getTopics().find(function (t) { return t.id === ed.dataset.journalEdit; });

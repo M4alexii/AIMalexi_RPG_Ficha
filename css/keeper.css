@@ -1654,3 +1654,48 @@
   padding: 0.35rem 0.5rem;
   font-size: 0.85rem;
 }
+
+/* ── Diário estilo Notion: pastas + links entre tópicos ── */
+.journal-folder { margin-bottom: 0.9rem; }
+.journal-folder-head {
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+  color: var(--keeper-accent-bright, var(--brass-bright));
+  padding: 0.3rem 0;
+  border-bottom: 1px solid var(--ink-faded);
+  list-style: none;
+  user-select: none;
+}
+.journal-folder-head::-webkit-details-marker { display: none; }
+.journal-folder-head::before { content: '▸ '; color: var(--ink-faded); }
+.journal-folder[open] > .journal-folder-head::before { content: '▾ '; }
+.journal-folder-count {
+  font-size: 0.7rem;
+  color: var(--ink-faded);
+  border: 1px solid var(--ink-faded);
+  border-radius: 0.6rem;
+  padding: 0 0.35rem;
+  margin-left: 0.25rem;
+}
+.journal-folder-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 0.8rem;
+  margin-top: 0.6rem;
+}
+.journal-link {
+  color: var(--keeper-accent-bright, var(--brass-bright));
+  text-decoration: none;
+  border-bottom: 1px dotted currentColor;
+  cursor: pointer;
+}
+.journal-link:hover { color: var(--brass); }
+.journal-card.journal-flash {
+  animation: journal-flash 1.5s ease;
+}
+@keyframes journal-flash {
+  0%, 100% { box-shadow: none; }
+  20% { box-shadow: 0 0 0 2px var(--keeper-accent, var(--brass)); }
+}
