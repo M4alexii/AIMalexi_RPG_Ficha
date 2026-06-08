@@ -1099,6 +1099,76 @@
 .inv-stat.san  .inv-stat-value { color: var(--brass-bright); }
 .inv-stat.mp   .inv-stat-value { color: #9b7fd4; }
 .inv-stat.luck .inv-stat-value { color: var(--mist); }
+.inv-stat.armor .inv-stat-value { color: var(--ink-dim); }
+
+/* ── Visão geral do Mestre: condições + atributos/perícias por investigador ── */
+.inv-card-conditions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.4rem;
+}
+.inv-cond-chip {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.05rem 0.35rem;
+  border-radius: 0.5rem;
+  background: rgba(139, 26, 26, 0.18);
+  border: 1px solid var(--blood);
+  color: #e0a0a0;
+  white-space: nowrap;
+}
+.inv-card-detail {
+  margin-top: 0.45rem;
+  border-top: 1px dashed var(--ink-faded);
+  padding-top: 0.35rem;
+}
+.inv-card-detail > summary {
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--brass);
+  list-style: none;
+}
+.inv-card-detail > summary::-webkit-details-marker { display: none; }
+.inv-card-detail > summary::before { content: '▸ '; }
+.inv-card-detail[open] > summary::before { content: '▾ '; }
+.inv-detail-sec { margin-top: 0.4rem; }
+.inv-detail-sec h5 {
+  margin: 0 0 0.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-faded);
+}
+.inv-attrs, .inv-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.4rem;
+}
+.inv-kv {
+  display: inline-flex;
+  gap: 0.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  background: var(--bg-deep);
+  border: 1px solid var(--ink-faded);
+  border-radius: 0.3rem;
+  padding: 0.05rem 0.3rem;
+}
+.inv-kv-k { color: var(--ink-dim); }
+.inv-kv-v { color: var(--ink); font-weight: 700; }
+.inv-skills .inv-kv-k {
+  max-width: 11rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 .inv-card-bars {
   margin-top: 0.35rem;

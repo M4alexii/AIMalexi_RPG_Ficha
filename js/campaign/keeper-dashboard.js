@@ -279,6 +279,18 @@ window.CoC.campaign = window.CoC.campaign || {};
     _renderTimeline(state.timeline || []);
   }
 
+  // Grade chave→valor (atributos/perícias) para o detalhe do investigador.
+  function _kvGrid(obj, cls, sortDesc) {
+    if (!obj || typeof obj !== 'object') return '';
+    var keys = Object.keys(obj);
+    if (!keys.length) return '';
+    if (sortDesc) keys.sort(function (a, b) { return (obj[b] || 0) - (obj[a] || 0); });
+    return '<div class="' + cls + '">' + keys.map(function (k) {
+      return '<span class="inv-kv"><span class="inv-kv-k">' + _esc(k) +
+             '</span><span class="inv-kv-v">' + _esc(obj[k]) + '</span></span>';
+    }).join('') + '</div>';
+  }
+
   function _renderInvestigatorCards(investigators) {
     var container = $s('#investigators-cards');
     var countEl   = $s('#is-count');
@@ -301,6 +313,11 @@ window.CoC.campaign = window.CoC.campaign || {};
       var sanPct  = Math.max(0, Math.min(100, Math.round((s.san || 0) / sanMax * 100)));
       var mpPct   = Math.max(0, Math.min(100, Math.round((s.mp  || 0) / mpMax  * 100)));
 
+      var armor      = Number(s.armor) || 0;
+      var conditions = Array.isArray(s.conditions) ? s.conditions : [];
+      var attrsHtml  = _kvGrid(s.attrs,  'inv-attrs');
+      var skillsHtml = _kvGrid(s.skills, 'inv-skills', true);
+
       return '<div class="inv-card ' + (inv.online ? 'online' : 'offline') + '">' +
         '<div class="inv-card-header">' +
           '<span class="inv-card-online-dot"></span>' +
@@ -312,12 +329,25 @@ window.CoC.campaign = window.CoC.campaign || {};
           '<div class="inv-stat san"><span class="inv-stat-label">SAN</span><span class="inv-stat-value">' + (s.san != null ? s.san : '?') + '</span></div>' +
           '<div class="inv-stat mp"><span class="inv-stat-label">PM</span><span class="inv-stat-value">' + (s.mp != null ? s.mp : '?') + '</span></div>' +
           '<div class="inv-stat luck"><span class="inv-stat-label">SOR</span><span class="inv-stat-value">' + (s.luck != null ? s.luck : '?') + '</span></div>' +
+          (armor > 0 ? '<div class="inv-stat armor"><span class="inv-stat-label">ARM</span><span class="inv-stat-value">' + armor + '</span></div>' : '') +
         '</div>' +
         '<div class="inv-card-bars">' +
           '<div class="inv-bar hp"><div class="inv-bar-fill" style="width:' + hpPct + '%"></div></div>' +
           '<div class="inv-bar san"><div class="inv-bar-fill" style="width:' + sanPct + '%"></div></div>' +
           '<div class="inv-bar mp"><div class="inv-bar-fill" style="width:' + mpPct + '%"></div></div>' +
         '</div>' +
+        (conditions.length
+          ? '<div class="inv-card-conditions">' + conditions.map(function (co) {
+              return '<span class="inv-cond-chip">' + _esc(co) + '</span>';
+            }).join('') + '</div>'
+          : '') +
+        ((attrsHtml || skillsHtml)
+          ? '<details class="inv-card-detail">' +
+              '<summary>Atributos &amp; Perícias</summary>' +
+              (attrsHtml  ? '<div class="inv-detail-sec"><h5>Atributos</h5>' + attrsHtml  + '</div>' : '') +
+              (skillsHtml ? '<div class="inv-detail-sec"><h5>Perícias</h5>'  + skillsHtml + '</div>' : '') +
+            '</details>'
+          : '') +
       '</div>';
     }).join('');
   }
