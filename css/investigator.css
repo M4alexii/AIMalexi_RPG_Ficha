@@ -977,7 +977,8 @@ body[data-difficulty="extreme"] .skill-frac-sep {
 
 .skills-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  /* Boxes um pouco mais largas para acomodar nomes longos sem estourar. */
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 0.4rem;
 }
 
@@ -1001,6 +1002,12 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   font-family: var(--font-body);
   font-size: 0.92rem;
   color: var(--ink);
+  /* min-width:0 permite que a coluna 1fr encolha; sem isso, nomes longos
+     (ex.: "Armas de Fogo (Pistolas)") estouram a box e quebram o layout. */
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  line-height: 1.2;
 }
 .skill-row .skill-name .skill-tag {
   font-family: var(--font-mono);

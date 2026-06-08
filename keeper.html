@@ -249,7 +249,11 @@
 
   <!-- ═══ T6 · LORE DA CAMPANHA ═══ -->
   <section class="ktab-panel" data-ktab="lore">
-    <p class="ktab-hint">Wiki interna do Guardião — salva localmente neste dispositivo.</p>
+    <div class="lore-head">
+      <p class="ktab-hint">Wiki interna do Guardião — salva localmente neste dispositivo.</p>
+      <button id="btn-load-standard-pack" class="btn-primary btn-sm" type="button"
+        title="Carrega criaturas clássicas do Mythos no Bestiário + uma estrutura inicial de campanha (Lore e Diário) para editar.">🧰 Carregar Pacote Padrão</button>
+    </div>
     <div class="lore-grid">
       <div class="lore-card"><label for="lore-faccoes">Facções</label><textarea id="lore-faccoes" placeholder="Organizações, cultos, grupos..."></textarea></div>
       <div class="lore-card"><label for="lore-misterios">Mistérios</label><textarea id="lore-misterios" placeholder="Enigmas, ameaças, verdades ocultas..."></textarea></div>
@@ -346,6 +350,7 @@
 <script src="js/keeper-tabs.js"></script>
 <script src="js/keeper-notes.js"></script>
 <script src="js/keeper-journal.js"></script>
+<script src="js/keeper-standard-pack.js"></script>
 <script src="js/keeper-dashboard-summary.js"></script>
 
 </body>
