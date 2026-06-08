@@ -108,7 +108,7 @@ assert(_live.includes('ADD_WEAPON'),      'byStatus("live") inclui ADD_WEAPON');
 
 const _planned2 = _onto.byStatus('planned');
 assert(Array.isArray(_planned2) && _planned2.length > 0, 'byStatus("planned") retorna entradas');
-assert(!_planned2.includes('SET_ATTRIBUTE'), 'byStatus("planned") não inclui SET_ATTRIBUTE já migrado');
+assert(_live.includes('SET_ATTRIBUTE'), 'byStatus("live") inclui SET_ATTRIBUTE (migrado p/ executor)');
 
 const _gaps = _onto.byStatus('gap');
 assert(Array.isArray(_gaps) && _gaps.length > 0, 'byStatus("gap") retorna lacunas documentadas');
@@ -166,12 +166,12 @@ assert(_store.getState().character.attributes.Sorte.value === _luckBefore - 5,
 group('event-ontology — gap analysis (documental)');
 
 assert(_gaps.length >= 4, 'pelo menos 4 lacunas de domínio documentadas');
-assert(!_gaps.includes('SKILL_IMPROVED'), 'SKILL_IMPROVED já não é lacuna');
+assert(_live.includes('SKILL_IMPROVED'),  'SKILL_IMPROVED promovido a live (melhoria pós-sessão)');
 assert(_gaps.includes('INITIATIVE_SET'),  'lacuna: INITIATIVE_SET (tracker de encounter)');
 assert(_gaps.includes('SESSION_STARTED'), 'lacuna: SESSION_STARTED (M5)');
 assert(_planned2.length >= 3, 'pelo menos 3 ações planejadas documentadas');
 assert(_planned2.includes('SET_IDENTITY'), 'planejada: SET_IDENTITY (migração identity.js)');
-assert(_live.includes('SET_ATTRIBUTE'), 'live: SET_ATTRIBUTE (migração atributos concluída)');
+assert(!_planned2.includes('SET_ATTRIBUTE'), 'SET_ATTRIBUTE não é mais planejada (migração concluída)');
 
 // ── Action Schema — boundary_randomness + resolved_fields ──────────────────
 group('event-ontology — Action Schema: boundary_randomness e BOUNDARY_FIELDS');
@@ -188,7 +188,7 @@ assert(_brActions.length >= 3,                  'byBoundaryRandomness retorna �
 assert(_brActions.includes('ATTACK_RESOLVED'),  'ATTACK_RESOLVED é boundary_randomness');
 assert(_brActions.includes('LOSE_SANITY'),      'LOSE_SANITY é boundary_randomness');
 assert(_brActions.includes('SPEND_MAGIC'),      'SPEND_MAGIC é boundary_randomness');
-assert(_brActions.includes('ROLL_SKILL'),       'ROLL_SKILL é boundary_randomness');
+assert(_brActions.includes('ROLL_SKILL'),       'ROLL_SKILL (planned) é boundary_randomness');
 
 // BOUNDARY_FIELDS tem os campos corretos
 assert(Array.isArray(_onto.BOUNDARY_FIELDS['ATTACK_RESOLVED']),        'ATTACK_RESOLVED tem resolved_fields');

@@ -15,6 +15,16 @@ window.CoC = window.CoC || {};
   const ARRAY_SECTIONS  = ['weapons', 'equipment', 'inventory', 'journal', 'spells', 'tomes', 'occupationSkills'];
   const OBJECT_SECTIONS = ['skills', 'pointsAllocation', 'finances', 'background', 'status'];
 
+  // Identidade do investigador — campos textuais que NUNCA devem sumir num import.
+  const ID_TEXT_FIELDS  = ['name', 'playerName', 'occupation', 'age', 'sex',
+                           'residence', 'birthplace', 'pronouns', 'tagline'];
+  // Campos de antecedentes que a UI trata como texto multi-linha, mas que saves
+  // antigos guardavam como array (ex.: meaningfulLocations: [..]). Sem coerção, o
+  // binding de input mistura vírgulas e corrompe/perde a informação pessoal.
+  const BG_TEXT_FIELDS  = ['description', 'ideology', 'significantPeople', 'meaningfulLocations',
+                           'treasuredPossessions', 'traits', 'injuriesScars', 'phobiasManias',
+                           'tomes', 'encounters', 'hobbies', 'convictions'];
+
   function _uuid() {
     if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -132,6 +142,40 @@ window.CoC = window.CoC || {};
       if (c[field2] == null || typeof c[field2] !== 'object' || Array.isArray(c[field2])) {
         if (c[field2] != null) warn(field2 + ' invalid type — reset to {}');
         c[field2] = {};
+      }
+    }
+
+    // ── investigator (identidade) ─────────────────────────────────────────────
+    // Fora de OBJECT_SECTIONS de propósito: precisa de coerção de campo, não de
+    // reset total. Garante objeto + campos textuais como string (sem perder valor).
+    if (!c.investigator || typeof c.investigator !== 'object' || Array.isArray(c.investigator)) {
+      if (c.investigator != null) warn('investigator invalid type — reset to {}');
+      c.investigator = {};
+    }
+    for (var ti = 0; ti < ID_TEXT_FIELDS.length; ti++) {
+      var idf = ID_TEXT_FIELDS[ti];
+      var idv = c.investigator[idf];
+      if (idv == null) { c.investigator[idf] = ''; }
+      else if (typeof idv !== 'string') {
+        c.investigator[idf] = String(idv);
+        warn('investigator.' + idf + ' coerced to string');
+      }
+    }
+
+    // ── background: coagir campos texto que podem ter vindo como array ─────────
+    // c.background já é objeto (OBJECT_SECTIONS acima). Array → texto multi-linha.
+    for (var bi = 0; bi < BG_TEXT_FIELDS.length; bi++) {
+      var bf = BG_TEXT_FIELDS[bi];
+      var bv = c.background[bf];
+      if (bv == null) continue;            // ausente: UI usa '' — não cria warning
+      if (Array.isArray(bv)) {
+        c.background[bf] = bv
+          .filter(function (x) { return x != null && x !== ''; })
+          .join('\n');
+        warn('background.' + bf + ' era array — convertido para texto multi-linha');
+      } else if (typeof bv !== 'string') {
+        c.background[bf] = String(bv);
+        warn('background.' + bf + ' coerced to string');
       }
     }
 

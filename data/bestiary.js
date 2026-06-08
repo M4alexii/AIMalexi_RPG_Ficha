@@ -423,6 +423,242 @@ window.CoCData.bestiary = [
       "Servo de cultistas. Aparece em ruínas, cemitérios, ruas escuras."
     ],
     tags: ["mythos", "enxame", "ambiente"]
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // MYTHOS CLÁSSICO — Pacote Padrão (descrições ORIGINAIS; stats = regra aberta)
+  // Nada aqui reproduz texto/arte de obras protegidas; são fichas mecânicas +
+  // resumos próprios de criaturas consagradas (em sua maioria de domínio público).
+  // ═══════════════════════════════════════════════════════════════════════
+
+  {
+    schemaVersion: 1,
+    id: "magro-noturno",
+    name: "Magro Noturno (Nightgaunt)",
+    type: "mythos",
+    category: "nightgaunt",
+    stats: { str: 65, con: 65, siz: 65, dex: 70, int: 50, pow: 65 },
+    derived: { hp: 13, mov: 8, db: "1D4", build: 1 },
+    armor: 0,
+    sanLoss: "0/1D6",
+    attacks: [
+      { name: "Garras", type: "melee", chance: 40, damage: "1D6+DB" },
+      { name: "Agarrar e Erguer", type: "melee", chance: 40, damage: "agarra", note: "Em sucesso, ergue a vítima no ar e a subjuga com a cauda farpada." }
+    ],
+    skills: [ { name: "Voar", value: 60 }, { name: "Furtividade", value: 50 } ],
+    notes: [
+      "Humanoide negro e liso, sem rosto, com asas membranosas e cauda farpada (voo 12).",
+      "Silencioso; não mata por escolha — captura e carrega para longe.",
+      "Servo de entidades maiores; recua diante de sinais e símbolos antigos."
+    ],
+    tags: ["mythos", "voador", "servo"]
+  },
+
+  {
+    schemaVersion: 1,
+    id: "errante-dimensional",
+    name: "Errante Dimensional",
+    type: "mythos",
+    category: "shambler",
+    stats: { str: 75, con: 60, siz: 75, dex: 60, int: 50, pow: 65 },
+    derived: { hp: 13, mov: 7, db: "1D6", build: 2 },
+    armor: 3,
+    sanLoss: "0/1D10",
+    attacks: [
+      { name: "Garras", type: "melee", chance: 45, damage: "1D6+DB" },
+      { name: "Arrastar entre Dimensões", type: "melee", chance: 25, damage: "especial", note: "Agarra e tenta levar a vítima para outra dimensão (resistência POD×POD)." }
+    ],
+    skills: [ { name: "Caminhar entre Mundos", value: 75 } ],
+    notes: [
+      "Bípede simiesco e angular que aparece e some 'dobrando' o espaço.",
+      "Surge de cantos e sombras; ignora paredes ao transitar entre realidades.",
+      "Caçador a serviço de feiticeiros e de inteligências do Mythos."
+    ],
+    tags: ["mythos", "caçador", "translação"]
+  },
+
+  {
+    schemaVersion: 1,
+    id: "vampiro-estelar",
+    name: "Vampiro Estelar",
+    type: "mythos",
+    category: "star-vampire",
+    stats: { str: 90, con: 75, siz: 90, dex: 65, int: 50, pow: 70 },
+    derived: { hp: 16, mov: 8, db: "1D6", build: 2 },
+    armor: 0,
+    sanLoss: "1/1D10",
+    attacks: [
+      { name: "Tentáculos", type: "melee", chance: 50, damage: "1D6+DB", note: "Agarra; em rodadas seguintes drena sangue automaticamente." },
+      { name: "Drenar Sangue", type: "melee", chance: 0, damage: "1D6 PV/rodada", note: "Após agarrar — fica visível e avermelhado ao se fartar." }
+    ],
+    skills: [ { name: "Furtividade", value: 70 } ],
+    notes: [
+      "Invisível até se alimentar; revela-se como massa de tentáculos e ventosas.",
+      "Risada borbulhante anuncia sua presença antes do bote.",
+      "Convocado por rituais; voa e foge se saciado ou ferido demais."
+    ],
+    tags: ["mythos", "invisível", "convocado"]
+  },
+
+  {
+    schemaVersion: 1,
+    id: "jovem-sombrio",
+    name: "Jovem Sombrio de Shub-Niggurath",
+    type: "mythos",
+    category: "dark-young",
+    stats: { str: 145, con: 125, siz: 150, dex: 50, int: 50, pow: 70 },
+    derived: { hp: 27, mov: 8, db: "4D6", build: 5 },
+    armor: 0,
+    sanLoss: "1D3/1D10",
+    attacks: [
+      { name: "Tentáculos (×2)", type: "melee", chance: 50, damage: "1D6 + drena 2D6 PV", note: "Agarra e suga; pode prender vários alvos." },
+      { name: "Pisotear", type: "melee", chance: 35, damage: "DB", note: "Contra alvos derrubados." }
+    ],
+    skills: [],
+    notes: [
+      "Massa arbórea e escura, coberta de bocas, com patas em casco e tentáculos.",
+      "Cheiro de cova aberta; deixa o solo apodrecido por onde passa.",
+      "Adorada como 'a prole'; surge em clareiras de culto e pedras erguidas."
+    ],
+    tags: ["mythos", "colosso", "culto"]
+  },
+
+  {
+    schemaVersion: 1,
+    id: "coisa-ancia",
+    name: "Coisa Anciã (Antigo)",
+    type: "mythos",
+    category: "elder-thing",
+    stats: { str: 65, con: 80, siz: 75, dex: 50, int: 90, pow: 65, edu: 90 },
+    derived: { hp: 15, mov: 8, db: "1D4", build: 1 },
+    armor: 3,
+    sanLoss: "0/1D6",
+    attacks: [
+      { name: "Tentáculos (×5)", type: "melee", chance: 35, damage: "1D6 + agarra", note: "Múltiplos apêndices; segura e imobiliza." }
+    ],
+    skills: [ { name: "Ciência (várias)", value: 90 }, { name: "Mythos de Cthulhu", value: 30 } ],
+    notes: [
+      "Barril vegetal com asas membranosas, cinco olhos e estrela na 'cabeça'.",
+      "Cientista alienígena de civilização pré-humana; raciona, negocia, vivisseca.",
+      "Resistente a frio e pressão; volta à vida após eras de hibernação."
+    ],
+    tags: ["mythos", "inteligente", "antigo"]
+  },
+
+  {
+    schemaVersion: 1,
+    id: "polipo-voador",
+    name: "Pólipo Voador",
+    type: "mythos",
+    category: "flying-polyp",
+    stats: { str: 105, con: 95, siz: 120, dex: 60, int: 75, pow: 80 },
+    derived: { hp: 21, mov: 10, db: "2D6", build: 3 },
+    armor: 0,
+    sanLoss: "1/1D10",
+    attacks: [
+      { name: "Vento Cortante", type: "ranged", chance: 50, damage: "2D6", note: "Rajada de ar que suga e dilacera; alcança vários metros." },
+      { name: "Esmagar", type: "melee", chance: 40, damage: "DB" }
+    ],
+    skills: [ { name: "Furtividade", value: 80 } ],
+    notes: [
+      "Forma parcialmente visível, half-poliposa, que controla o vento.",
+      "Vulnerável a ataques elétricos; teme luz forte e ambientes fechados.",
+      "Aprisionado em criptas seladas por civilizações antigas."
+    ],
+    tags: ["mythos", "vento", "selado"]
+  },
+
+  {
+    schemaVersion: 1,
+    id: "horror-cacador",
+    name: "Horror Caçador",
+    type: "mythos",
+    category: "hunting-horror",
+    stats: { str: 95, con: 80, siz: 110, dex: 75, int: 60, pow: 75 },
+    derived: { hp: 19, mov: 10, db: "2D6", build: 3 },
+    armor: 0,
+    sanLoss: "1/1D8",
+    attacks: [
+      { name: "Mordida", type: "melee", chance: 50, damage: "1D8+DB" },
+      { name: "Constringir", type: "melee", chance: 40, damage: "DB/rodada", note: "Enrola o corpo serpentino no alvo e aperta." }
+    ],
+    skills: [ { name: "Voar", value: 70 } ],
+    notes: [
+      "Serpente negra e alada, retorcida, que repele a luz ao redor.",
+      "Enviado de Nyarlathotep para caçar um alvo específico até o fim.",
+      "A luz do dia o destrói; só age na escuridão ou sob invocação."
+    ],
+    tags: ["mythos", "caçador", "voador"]
+  },
+
+  {
+    schemaVersion: 1,
+    id: "povo-serpente",
+    name: "Povo Serpente",
+    type: "mythos",
+    category: "serpent-folk",
+    stats: { str: 60, con: 65, siz: 65, dex: 70, int: 90, pow: 65, edu: 80 },
+    derived: { hp: 13, mov: 9, db: "0", build: 0 },
+    armor: 1,
+    sanLoss: "0/1D6",
+    attacks: [
+      { name: "Mordida Venenosa", type: "melee", chance: 45, damage: "1D4 + veneno", note: "Veneno: POT 70; falha = 2D10 dano, sucesso = 1D10." },
+      { name: "Cimitarra", type: "melee", chance: 40, damage: "1D8+DB" }
+    ],
+    skills: [ { name: "Ocultismo", value: 75 }, { name: "Mythos de Cthulhu", value: 25 }, { name: "Disfarce", value: 60 } ],
+    notes: [
+      "Humanoide reptiliano de civilização pré-humana; feiticeiros natos.",
+      "Usa magia de ilusão para passar por humano e se infiltrar.",
+      "Despreza a humanidade; busca reerguer seu império perdido."
+    ],
+    tags: ["mythos", "feiticeiro", "infiltrador"]
+  },
+
+  {
+    schemaVersion: 1,
+    id: "prole-estelar-cthulhu",
+    name: "Prole Estelar de Cthulhu",
+    type: "mythos",
+    category: "star-spawn",
+    stats: { str: 160, con: 140, siz: 170, dex: 50, int: 110, pow: 110 },
+    derived: { hp: 31, mov: 10, db: "5D6", build: 6 },
+    armor: 6,
+    sanLoss: "1D6/1D20",
+    attacks: [
+      { name: "Tentáculos Faciais", type: "melee", chance: 50, damage: "1D6 + agarra", note: "Em agarrão, drena 1D6 PV/rodada." },
+      { name: "Esmagar / Pisotear", type: "melee", chance: 40, damage: "DB" }
+    ],
+    skills: [ { name: "Mythos de Cthulhu", value: 50 } ],
+    notes: [
+      "Versão menor da forma de Cthulhu: cabeça de polvo, asas, corpo escamoso.",
+      "Regenera ferimentos; recompõe-se mesmo após ser 'destruída'.",
+      "Dorme em cidades afundadas, à espera do alinhamento certo."
+    ],
+    tags: ["mythos", "colosso", "regenera"]
+  },
+
+  {
+    schemaVersion: 1,
+    id: "cthulhu-avatar",
+    name: "Cthulhu (avatar — escala de encontro)",
+    type: "mythos",
+    category: "great-old-one",
+    stats: { str: 210, con: 200, siz: 290, dex: 50, int: 200, pow: 200 },
+    derived: { hp: 49, mov: 12, db: "12D6", build: 11 },
+    armor: 10,
+    sanLoss: "1D10/1D100",
+    attacks: [
+      { name: "Tentáculo / Apêndice", type: "melee", chance: 75, damage: "1D6 + agarra; engolfa 1D3 alvos", note: "Engolfados perdem PV automaticamente por rodada." },
+      { name: "Pisotear", type: "melee", chance: 50, damage: "DB" }
+    ],
+    skills: [ { name: "Mythos de Cthulhu", value: 100 } ],
+    notes: [
+      "Estatura de montanha; sua mera visão já fragmenta a mente (perda de SAN no encontro).",
+      "Não pode ser 'morto' por meios mortais: dispersa-se e se reconstitui em rodadas.",
+      "ESCALA SIMBÓLICA — ajuste à sua mesa. Ideal para confronto narrativo, não combate vencível.",
+      "Atravessar/contê-lo exige feitiços, artefatos ou o adormecer das estrelas, não armas."
+    ],
+    tags: ["mythos", "grande-antigo", "narrativo", "invencível"]
   }
 
 ];

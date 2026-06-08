@@ -40,10 +40,13 @@ window.CoC.views = window.CoC.views || {};
     return Number(c && c.skills && c.skills['Nível de Crédito'] && c.skills['Nível de Crédito'].value) || 0;
   }
 
-  function _setCreditRating(c, v) {
-    c.skills = c.skills || {};
-    c.skills['Nível de Crédito'] = c.skills['Nível de Crédito'] || {};
-    c.skills['Nível de Crédito'].value = v;
+  // Crédito é a perícia "Nível de Crédito" — fonte ÚNICA da verdade. Escreve via
+  // SET_SKILL (mesmo caminho da aba Perícias) para nunca dessincronizar as views.
+  function _setCreditRating(v) {
+    var exec = window.CoC.core && window.CoC.core.executor;
+    if (exec && exec.execute) {
+      exec.execute({ type: 'SET_SKILL', payload: { name: 'Nível de Crédito', value: v } });
+    }
   }
 
   function _formatMoney(n) {
@@ -119,24 +122,16 @@ window.CoC.views = window.CoC.views || {};
       '</div>'
     );
 
-    // Crédito: recalcula derivados sem full re-render
+    // Crédito: escreve via SET_SKILL. O render-pipeline re-renderiza 'skills' e
+    // 'finances' (render map) e o persist-middleware salva — sem mutação direta,
+    // sem render manual, sem dessincronia entre as abas.
     var crInput = $s('#fin-cr', host);
     crInput.onchange = function() {
       var v = Math.round(Number(crInput.value));
       if (!isFinite(v) || v < 0) v = 0;
       if (v > 99) v = 99;
       crInput.value = v;
-      _setCreditRating(c, v);
-      var d = window.CoC.rules.calcFinances(v);
-      $s('#fin-tier',   host).textContent = d.tierLabel;
-      $s('#fin-spend',  host).textContent = _formatMoney(d.spending);
-      $s('#fin-assets', host).textContent = _formatMoney(d.assets);
-      // "Nível de Crédito" é perícia — sincroniza a aba de perícias
-      if (window.CoC.views.skills && window.CoC.views.skills.render) {
-        window.CoC.views.skills.render();
-      }
-      // Reutiliza subscriber skill:persist-requested em boot() (Crédito é perícia)
-      if (_bus) _bus.publish('skill:persist-requested', {});
+      _setCreditRating(v);
     };
 
     // Semente de caixa inicial

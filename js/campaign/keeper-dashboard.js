@@ -44,6 +44,7 @@ window.CoC.campaign = window.CoC.campaign || {};
       _cs.markStale();
     }
     _renderDashboard(_cs.getState());
+    _mountChat();
   }
 
   // ── Buttons ───────────────────────────────────────────────────────────────
@@ -175,9 +176,31 @@ window.CoC.campaign = window.CoC.campaign || {};
       case 'EXECUTION_TRACE':
         _handleExecutionTrace(event);
         break;
+      case 'CHAT_MESSAGE':
+        // Encaminha ao chat (cobre o caso de a campanha iniciar APÓS o mount,
+        // quando o onEvent interno do chat ainda não estava registrado). O chat
+        // deduplica por msgId, então não há mensagem repetida.
+        if (window.CoC.views && window.CoC.views.chat && window.CoC.views.chat.receive) {
+          window.CoC.views.chat.receive(event);
+        }
+        return;
     }
 
     _renderDashboard(_cs.getState());
+  }
+
+  function _mountChat() {
+    var chat = window.CoC.views && window.CoC.views.chat;
+    var listEl = document.getElementById('chat-list');
+    if (!chat || !chat.mount || !listEl) return;
+    chat.mount({
+      listEl:    listEl,
+      inputEl:   document.getElementById('chat-input'),
+      sendBtnEl: document.getElementById('chat-send'),
+      hintEl:    document.getElementById('chat-hint'),
+      getAuthor: function () { return 'Guardião'; },
+      getRole:   function () { return 'keeper'; }
+    });
   }
 
   function _handleExecutionTrace(event) {
@@ -189,6 +212,19 @@ window.CoC.campaign = window.CoC.campaign || {};
     var cls   = 'ev-roll';
 
     function _amt(v) { return v != null ? v : '?'; }
+    function _lvlLabel(level) {
+      return ({ critical: 'Crítico', crit: 'Crítico', extreme: 'Extremo', hard: 'Bom',
+                regular: 'Regular', fail: 'Falha', fumble: 'Desastre' })[level] || (level || '—');
+    }
+    function _mark(met, level) {
+      if (level === 'critical' || level === 'crit') return '★';
+      if (level === 'fumble') return '💀';
+      return (met === false || level === 'fail') ? '✗' : '✓';
+    }
+    function _diffTag(difficulty) {
+      if (!difficulty || difficulty === 'regular') return '';
+      return ' [' + (difficulty === 'hard' ? 'Difícil' : difficulty === 'extreme' ? 'Extremo' : difficulty) + ']';
+    }
 
     switch (entry.type) {
       case 'APPLY_DAMAGE':
@@ -212,13 +248,22 @@ window.CoC.campaign = window.CoC.campaign || {};
         cls  = 'ev-magic';
         break;
       case 'ROLL_SKILL':
-        text = '<b>' + actor + '</b> rolou ' + _esc(p.skillName || 'perícia') +
-               ': ' + _amt(p.roll) + '% vs ' +
-               _amt(p.value) + '% → ' + _esc(p.outcome != null ? String(p.outcome) : '?');
+        text = _mark(p.met, p.level) + ' <b>' + actor + '</b> · ' + _esc(p.skillName || 'perícia') +
+               ' ' + _amt(p.skillValue) + '%' + _diffTag(p.difficulty) +
+               ' → ' + _amt(p.roll) + ' (' + _esc(_lvlLabel(p.level)) + ')' +
+               (p.pushed ? ' ⟳ forçada' : '');
+        cls  = (p.met === false || p.level === 'fail' || p.level === 'fumble') ? 'ev-roll' : 'ev-roll';
+        break;
+      case 'ROLL_ATTRIBUTE':
+        text = _mark(p.met, p.level) + ' <b>' + actor + '</b> · teste de ' + _esc(p.attribute || 'atributo') +
+               ' ' + _amt(p.result) + '%' + _diffTag(p.difficulty) +
+               ' → ' + _amt(p.roll) + ' (' + _esc(_lvlLabel(p.level)) + ')';
         cls  = 'ev-roll';
         break;
       case 'ATTACK_RESOLVED':
-        text = '<b>' + actor + '</b> atacou com ' + _esc(p.weaponName || '?') + '.';
+        text = '<b>' + actor + '</b> ' + (p.hit ? 'acertou' : 'errou') + ' o ataque' +
+               (p.level ? ' (' + _esc(_lvlLabel(p.level)) + ')' : '') +
+               (p.hit && p.damage != null ? ' · ' + p.damage + ' de dano' : '') + '.';
         cls  = 'ev-combat';
         break;
       default:
@@ -279,6 +324,18 @@ window.CoC.campaign = window.CoC.campaign || {};
     _renderTimeline(state.timeline || []);
   }
 
+  // Grade chave→valor (atributos/perícias) para o detalhe do investigador.
+  function _kvGrid(obj, cls, sortDesc) {
+    if (!obj || typeof obj !== 'object') return '';
+    var keys = Object.keys(obj);
+    if (!keys.length) return '';
+    if (sortDesc) keys.sort(function (a, b) { return (obj[b] || 0) - (obj[a] || 0); });
+    return '<div class="' + cls + '">' + keys.map(function (k) {
+      return '<span class="inv-kv"><span class="inv-kv-k">' + _esc(k) +
+             '</span><span class="inv-kv-v">' + _esc(obj[k]) + '</span></span>';
+    }).join('') + '</div>';
+  }
+
   function _renderInvestigatorCards(investigators) {
     var container = $s('#investigators-cards');
     var countEl   = $s('#is-count');
@@ -301,6 +358,11 @@ window.CoC.campaign = window.CoC.campaign || {};
       var sanPct  = Math.max(0, Math.min(100, Math.round((s.san || 0) / sanMax * 100)));
       var mpPct   = Math.max(0, Math.min(100, Math.round((s.mp  || 0) / mpMax  * 100)));
 
+      var armor      = Number(s.armor) || 0;
+      var conditions = Array.isArray(s.conditions) ? s.conditions : [];
+      var attrsHtml  = _kvGrid(s.attrs,  'inv-attrs');
+      var skillsHtml = _kvGrid(s.skills, 'inv-skills', true);
+
       return '<div class="inv-card ' + (inv.online ? 'online' : 'offline') + '">' +
         '<div class="inv-card-header">' +
           '<span class="inv-card-online-dot"></span>' +
@@ -312,12 +374,25 @@ window.CoC.campaign = window.CoC.campaign || {};
           '<div class="inv-stat san"><span class="inv-stat-label">SAN</span><span class="inv-stat-value">' + (s.san != null ? s.san : '?') + '</span></div>' +
           '<div class="inv-stat mp"><span class="inv-stat-label">PM</span><span class="inv-stat-value">' + (s.mp != null ? s.mp : '?') + '</span></div>' +
           '<div class="inv-stat luck"><span class="inv-stat-label">SOR</span><span class="inv-stat-value">' + (s.luck != null ? s.luck : '?') + '</span></div>' +
+          (armor > 0 ? '<div class="inv-stat armor"><span class="inv-stat-label">ARM</span><span class="inv-stat-value">' + armor + '</span></div>' : '') +
         '</div>' +
         '<div class="inv-card-bars">' +
           '<div class="inv-bar hp"><div class="inv-bar-fill" style="width:' + hpPct + '%"></div></div>' +
           '<div class="inv-bar san"><div class="inv-bar-fill" style="width:' + sanPct + '%"></div></div>' +
           '<div class="inv-bar mp"><div class="inv-bar-fill" style="width:' + mpPct + '%"></div></div>' +
         '</div>' +
+        (conditions.length
+          ? '<div class="inv-card-conditions">' + conditions.map(function (co) {
+              return '<span class="inv-cond-chip">' + _esc(co) + '</span>';
+            }).join('') + '</div>'
+          : '') +
+        ((attrsHtml || skillsHtml)
+          ? '<details class="inv-card-detail">' +
+              '<summary>Atributos &amp; Perícias</summary>' +
+              (attrsHtml  ? '<div class="inv-detail-sec"><h5>Atributos</h5>' + attrsHtml  + '</div>' : '') +
+              (skillsHtml ? '<div class="inv-detail-sec"><h5>Perícias</h5>'  + skillsHtml + '</div>' : '') +
+            '</details>'
+          : '') +
       '</div>';
     }).join('');
   }

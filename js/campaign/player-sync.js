@@ -17,6 +17,19 @@ window.CoC.campaign = window.CoC.campaign || {};
   var _playerName = '';
   var _seqNo      = 0;   // monotonic per-session counter for EXECUTION_TRACE ordering
 
+  var _ATTR_ORDER = ['FOR', 'CON', 'TAM', 'DES', 'APA', 'INT', 'POD', 'EDU', 'Sorte'];
+  // Flags booleanas de condição em c.status → rótulos para o painel do Mestre.
+  var _CONDITION_FLAGS = {
+    majorWound:  'Ferimento Grave',
+    unconscious: 'Inconsciente',
+    dying:       'Morrendo',
+    dead:        'Morto',
+    sangrando:   'Sangrando',
+    envenenado:  'Envenenado',
+    atordoado:   'Atordoado',
+    exausto:     'Exausto'
+  };
+
   function $s(sel) { return document.querySelector(sel); }
 
   function init() {
@@ -153,10 +166,32 @@ window.CoC.campaign = window.CoC.campaign || {};
     var c = charState.character;
     var inv = c.investigator || {};
     var der = c.derived     || {};
+    var st  = c.status      || {};
+    var attrs  = c.attributes || {};
+    var skills = c.skills     || {};
+
+    // Condições ativas → rótulos legíveis (o Mestre vê o estado da mesa de relance).
+    var conditions = [];
+    Object.keys(_CONDITION_FLAGS).forEach(function (k) {
+      if (st[k]) conditions.push(_CONDITION_FLAGS[k]);
+    });
+    if (st.temporaryInsanity)  conditions.push('Loucura Temporária');
+    if (st.indefiniteInsanity) conditions.push('Loucura Indefinida');
+
+    // Atributos (compactos) e TODAS as perícias com valor → painel de visão geral.
+    var attrsOut = {};
+    _ATTR_ORDER.forEach(function (code) { if (attrs[code]) attrsOut[code] = Number(attrs[code].value) || 0; });
+    var skillsOut = {};
+    Object.keys(skills).forEach(function (name) {
+      var v = skills[name] && skills[name].value;
+      if (v != null) skillsOut[name] = Number(v) || 0;
+    });
 
     var ontology = window.CoC.campaign && window.CoC.campaign.ontology;
     var statusPayload = {
-      playerName:    _playerName || inv.playerName || 'Jogador',
+      // Prefere o nome ATUAL da ficha (vivo) sobre o _playerName capturado no join
+      // (que ficava obsoleto ao trocar de personagem). Prompt do join = fallback.
+      playerName:    inv.playerName || _playerName || 'Jogador',
       characterName: inv.name || '?',
       seqNo:         _seqNo,
       status: {
@@ -166,7 +201,11 @@ window.CoC.campaign = window.CoC.campaign || {};
         sanMax: der.SAN ? (der.SAN.max     || 1) : 1,
         mp:     der.PM  ? (der.PM.current  != null ? der.PM.current  : der.PM.value  || 0) : 0,
         mpMax:  der.PM  ? (der.PM.value    || 1) : 1,
-        luck:   c.attributes && c.attributes.Sorte ? (c.attributes.Sorte.value || 0) : 0
+        luck:   attrs.Sorte ? (attrs.Sorte.value || 0) : 0,
+        armor:      Number(st.armor) || 0,
+        conditions: conditions,
+        attrs:      attrsOut,
+        skills:     skillsOut
       }
     };
     var statusEvt = ontology
@@ -210,7 +249,7 @@ window.CoC.campaign = window.CoC.campaign || {};
       var seq = ++_seqNo;
       var tracePayload = {
         characterName: inv.name    || '?',
-        playerName:    _playerName || inv.playerName || '?',
+        playerName:    inv.playerName || _playerName || '?',
         entry:         { type: data.type, payload: data.payload },
         seqNo:         seq,
         eventId:       (_tp.getPeerId() || '?') + ':' + seq

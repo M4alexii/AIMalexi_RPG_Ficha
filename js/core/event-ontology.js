@@ -144,7 +144,9 @@ window.CoC.core = window.CoC.core || {};
     // ── Perícias ──────────────────────────────────────────────────────────────
     SET_SKILL: {
       aggregate: 'character', domain: 'skills',
-      renders: ['skills'], persists: true, sacred: false,
+      // 'finances' incluída: "Nível de Crédito" é perícia E aparece no card de
+      // Finanças — re-render conjunto evita dessincronia entre as duas abas.
+      renders: ['skills', 'finances'], persists: true, sacred: false,
       effects: [],
       status: 'live',
     },
@@ -167,7 +169,7 @@ window.CoC.core = window.CoC.core || {};
       status: 'live',
       boundary_randomness: true,
       // difficulty e met são opcionais para compatibilidade com logs antigos
-      // (ausentes → difficulty="regular", met=true)
+      // (ausentes → difficulty="regular", met=true) — fora dos campos obrigatórios.
       resolved_fields: ['roll', 'skillValue', 'level'],
     },
     SKILL_IMPROVED: {
@@ -229,6 +231,8 @@ window.CoC.core = window.CoC.core || {};
       effects: ['roll:logged', 'roll:pushed'],
       status: 'live',
       boundary_randomness: true,
+      // 'difficulty'/'met' são opcionais (compat. com logs antigos: ausentes →
+      // difficulty="regular", met=true), por isso fora dos campos OBRIGATÓRIOS.
       resolved_fields: ['roll', 'skillValue', 'level'],
     },
     REGISTER_FUMBLE: {
