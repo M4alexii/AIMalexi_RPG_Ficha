@@ -37,7 +37,11 @@ window.CoC.views = window.CoC.views || {};
   }
   function _uuid() {
     if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
-    return 'm-' + Date.now() + '-' + Math.floor(Math.random() * 1e6);
+    if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+      var b = crypto.getRandomValues(new Uint8Array(8));
+      return 'm-' + Array.prototype.map.call(b, function (x) { return x.toString(16).padStart(2, '0'); }).join('');
+    }
+    return 'm-' + Date.now().toString(36);
   }
 
   // ── Histórico (sessionStorage) ──────────────────────────────────────────────
@@ -75,12 +79,34 @@ window.CoC.views = window.CoC.views || {};
     '</div>';
   }
 
+  // Placeholder no chat vazio (evita o vazião). Some quando chega a 1ª mensagem.
+  function _renderEmptyState() {
+    if (!_ctx || !_ctx.listEl) return;
+    if (_ctx.listEl.querySelector('.chat-msg')) return;   // já tem mensagem
+    var active = _campaignActive();
+    _ctx.listEl.innerHTML =
+      '<div class="chat-empty">' +
+        '<span class="chat-empty-ico" aria-hidden="true">💬</span>' +
+        '<p>' + (active
+          ? 'Sem mensagens ainda. Fale com a mesa pelo campo abaixo.'
+          : 'O chat da mesa aparece aqui. Entre numa campanha em <b>🌐 Campanha</b> para conversar com os outros jogadores.') +
+        '</p>' +
+      '</div>';
+  }
+
+  function _clearEmptyState() {
+    if (!_ctx || !_ctx.listEl) return;
+    var e = _ctx.listEl.querySelector('.chat-empty');
+    if (e) e.remove();
+  }
+
   function _append(m, opts) {
     opts = opts || {};
     if (m.msgId && _seen[m.msgId]) return;   // dedup
     if (m.msgId) _seen[m.msgId] = true;
 
     if (_ctx && _ctx.listEl) {
+      _clearEmptyState();
       var div = document.createElement('div');
       div.innerHTML = _msgHTML(m);
       _ctx.listEl.appendChild(div.firstChild);
@@ -105,6 +131,7 @@ window.CoC.views = window.CoC.views || {};
       div.innerHTML = _msgHTML(m);
       _ctx.listEl.appendChild(div.firstChild);
     });
+    if (!hist.length) _renderEmptyState();
     _ctx.listEl.scrollTop = _ctx.listEl.scrollHeight;
   }
 
