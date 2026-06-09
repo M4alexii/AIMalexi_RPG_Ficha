@@ -209,11 +209,21 @@
       <!-- Tracker de Encontro -->
       <div class="encounter-panel">
         <h3>
-          ⚔️ Encontro
+          <span>⚔️ Encontro <span class="enc-count" id="enc-count"></span></span>
           <button class="btn-ghost btn-icon" id="btn-clear-encounter" title="Limpar tracker">✕</button>
         </h3>
+        <div class="enc-round-bar">
+          <button class="btn-ghost btn-icon" id="btn-round-prev" title="Round anterior">◀</button>
+          <span class="enc-round">Round <b id="enc-round-num">1</b></span>
+          <button class="btn-ghost btn-icon" id="btn-round-next" title="Próximo round">▶</button>
+          <button class="btn-ghost btn-sm" id="btn-round-reset" title="Reiniciar contagem de rounds">⟲ Reiniciar</button>
+        </div>
         <div class="encounter-list" id="encounter-list">
-          <div class="encounter-empty">Nenhuma criatura ativa.<br>Use <b>+ Encontro</b>.</div>
+          <div class="encounter-empty">
+            <span class="enc-empty-ico" aria-hidden="true">⚔️</span>
+            <p>Nenhuma criatura no encontro.</p>
+            <p class="enc-empty-hint">Abra uma criatura no <b>Bestiário</b> (aba NPCs) e use <b>⚔ Encontro</b>, ou clique <b>+ Encontro</b>.</p>
+          </div>
         </div>
       </div>
 

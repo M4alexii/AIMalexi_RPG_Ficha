@@ -25,8 +25,19 @@
     libraryTab: "all",       // "all" | "bestiary" | "saved"
     librarySearch: "",
     encounter: [],           // criaturas no tracker {id, name, hp, hpMax, armor, sanLoss, type}
+    encounterRound: 1,       // contador de rounds do encontro ativo
     rollHistory: []
   };
+
+  // ID estável sem Math.random (Constituição) — usa Web Crypto.
+  function _encId() {
+    if (typeof crypto !== "undefined" && crypto.randomUUID) return "enc-" + crypto.randomUUID();
+    if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+      const b = crypto.getRandomValues(new Uint8Array(6));
+      return "enc-" + Array.from(b).map(x => x.toString(16).padStart(2, "0")).join("");
+    }
+    return "enc-" + Date.now().toString(36);
+  }
 
   // A disponibilidade real do storage só é conhecida após store.ready (IndexedDB é
   // assíncrono). A checagem correta vive no boot(), depois do await — evita o
@@ -854,7 +865,11 @@
   function rollAttr(formula) {
     return dice.rollAttribute(formula).total;
   }
-  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+  // Sorteio sem Math.random (Constituição): índice via RNG criptográfico do dado.
+  function pick(arr) {
+    if (!arr || !arr.length) return undefined;
+    return arr[dice.rollDie(arr.length) - 1];
+  }
 
   // ═════════════════════════════════════════════════════════════════════
   // CRIAR DO ZERO
@@ -892,7 +907,7 @@
     const c = state.active;
     if (!c) return;
     const entry = {
-      id: `enc-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+      id: _encId(),
       name: c.name,
       hpCur: Number(c.derived?.hp) || 0,
       hpMax: Number(c.derived?.hp) || 0,
@@ -911,27 +926,50 @@
   function renderEncounter() {
     const list = $("#encounter-list");
     if (!list) return;
+
+    // Cabeçalho: contador + round tracker (vivem fora da lista, atualizados aqui).
+    const countEl = $("#enc-count");
+    const alive   = state.encounter.filter(e => !e.dead).length;
+    if (countEl) countEl.textContent = state.encounter.length
+      ? `${alive}/${state.encounter.length} ${state.encounter.length === 1 ? "criatura" : "criaturas"}`
+      : "";
+    const roundNum = $("#enc-round-num");
+    if (roundNum) roundNum.textContent = String(state.encounterRound);
+
     list.innerHTML = "";
     if (state.encounter.length === 0) {
-      list.innerHTML = `<div class="encounter-empty">Nenhuma criatura ativa.<br>Use <b>+ Encontro</b>.</div>`;
+      list.innerHTML = `<div class="encounter-empty">
+        <span class="enc-empty-ico" aria-hidden="true">⚔️</span>
+        <p>Nenhuma criatura no encontro.</p>
+        <p class="enc-empty-hint">Abra uma criatura no <b>Bestiário</b> (aba NPCs) e use <b>⚔ Encontro</b>, ou clique <b>+ Encontro</b>.</p>
+      </div>`;
       return;
     }
+
     state.encounter.forEach((e, idx) => {
       const ratio = e.hpMax > 0 ? Math.max(0, Math.min(1, e.hpCur / e.hpMax)) : 1;
-      const node = el("div", {
-        class: "encounter-item" + (e.dead ? " dead" : "")
-      });
+      const pct   = Math.round(ratio * 100);
+      const hpCls = e.dead ? "hp-dead" : ratio > 0.5 ? "hp-good" : ratio > 0.25 ? "hp-warn" : "hp-crit";
+      const node = el("div", { class: "encounter-item" + (e.dead ? " dead" : "") });
       node.innerHTML = `
-        <div>
-          <div class="ei-name">${escapeHtml(e.name)}</div>
-          <div class="ei-meta">MOV ${escapeHtml(String(e.mov))} · Arm ${e.armor} · SAN ${escapeHtml(e.sanLoss)}</div>
+        <div class="ei-head">
+          <span class="ei-name">${escapeHtml(e.name)}</span>
+          ${e.type ? `<span class="ei-type">${escapeHtml(String(e.type))}</span>` : ""}
         </div>
-        <div class="ei-hp">PV ${e.hpCur}<span style="font-size:0.75em;color:var(--ink-faded)"> /${e.hpMax}</span></div>
+        <div class="ei-hpbar" title="PV ${e.hpCur} de ${e.hpMax}">
+          <div class="ei-hpbar-fill ${hpCls}" style="width:${pct}%"></div>
+          <span class="ei-hp-label">${e.dead ? "💀 Morto" : `PV ${e.hpCur}<span class="ei-hp-max"> / ${e.hpMax}</span>`}</span>
+        </div>
+        <div class="ei-chips">
+          <span class="ei-chip" title="Movimento">🏃 ${escapeHtml(String(e.mov))}</span>
+          <span class="ei-chip" title="Armadura">🛡 ${e.armor}</span>
+          <span class="ei-chip" title="Perda de Sanidade">🧠 ${escapeHtml(String(e.sanLoss))}</span>
+        </div>
         <div class="ei-controls">
-          <button data-enc="${idx}" data-op="-1">-1</button>
-          <button data-enc="${idx}" data-op="-X">-X</button>
-          <button data-enc="${idx}" data-op="+1">+1</button>
-          <button data-enc="${idx}" data-op="kill" title="Marcar como morto">💀</button>
+          <button data-enc="${idx}" data-op="-1" title="Tirar 1 PV">−1</button>
+          <button data-enc="${idx}" data-op="-X" title="Tirar X PV (número ou dado, ex: 1d6)">−X</button>
+          <button data-enc="${idx}" data-op="+1" title="Curar 1 PV">+1</button>
+          <button data-enc="${idx}" data-op="kill" title="Alternar morto">💀</button>
           <button data-enc="${idx}" data-op="remove" title="Remover do encontro">✕</button>
         </div>
       `;
@@ -941,6 +979,14 @@
     $$("[data-enc]", list).forEach(b => {
       b.onclick = (e) => { e.stopPropagation(); adjustEncounter(parseInt(b.dataset.enc, 10), b.dataset.op); };
     });
+  }
+
+  // Avança/retrocede/zera o contador de rounds do encontro.
+  function setRound(op) {
+    if (op === "reset") state.encounterRound = 1;
+    else state.encounterRound = Math.max(1, state.encounterRound + (op === "next" ? 1 : -1));
+    const roundNum = $("#enc-round-num");
+    if (roundNum) roundNum.textContent = String(state.encounterRound);
   }
 
   async function adjustEncounter(idx, op) {
@@ -980,9 +1026,13 @@
       if (state.encounter.length === 0) return;
       if (await confirm("Limpar todo o tracker de encontro?", { title: "Limpar encontro" })) {
         state.encounter = [];
+        state.encounterRound = 1;
         renderEncounter();
       }
     });
+    $("#btn-round-prev")?.addEventListener("click", () => setRound("prev"));
+    $("#btn-round-next")?.addEventListener("click", () => setRound("next"));
+    $("#btn-round-reset")?.addEventListener("click", () => setRound("reset"));
   }
 
   // ═════════════════════════════════════════════════════════════════════
