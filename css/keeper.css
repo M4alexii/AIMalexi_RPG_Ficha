@@ -702,57 +702,137 @@
   align-items: baseline;
 }
 
-.encounter-empty {
-  font-style: italic;
+.enc-count {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
   color: var(--ink-faded);
-  font-size: 0.85rem;
-  padding: 0.5rem 0;
-  text-align: center;
+  letter-spacing: 0.04em;
+  margin-left: 0.35rem;
 }
 
-.encounter-list { display: flex; flex-direction: column; gap: 0.35rem; }
+/* Barra de rounds */
+.enc-round-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.7rem;
+  padding: 0.35rem 0.5rem;
+  background: var(--bg-deep);
+  border: 1px solid var(--ink-faded);
+  border-radius: var(--radius);
+}
+.enc-round {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-dim);
+}
+.enc-round b { color: var(--keeper-accent-bright); font-size: 1.05rem; }
+.enc-round-bar #btn-round-reset { margin-left: auto; font-size: 0.7rem; }
+
+.encounter-empty {
+  color: var(--ink-faded);
+  font-size: 0.85rem;
+  padding: 1.5rem 0.5rem;
+  text-align: center;
+}
+.enc-empty-ico { font-size: 2rem; opacity: 0.35; display: block; margin-bottom: 0.4rem; }
+.encounter-empty p { margin: 0.2rem 0; }
+.enc-empty-hint { font-size: 0.78rem; color: var(--ink-dim); line-height: 1.5; }
+
+/* Grade de criaturas — preenche a largura da aba (antes: lista de 1 coluna). */
+.encounter-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.5rem;
+  align-items: start;
+}
 
 .encounter-item {
   background: var(--bg-card-hi);
   border: 1px solid var(--ink-faded);
+  border-left: 3px solid var(--keeper-accent);
   border-radius: var(--radius);
-  padding: 0.45rem 0.6rem;
-  display: grid;
-  grid-template-columns: 1fr auto;
+  padding: 0.55rem 0.65rem;
+  display: flex;
+  flex-direction: column;
   gap: 0.4rem;
-  align-items: center;
-  font-size: 0.88rem;
 }
-.encounter-item.dead { opacity: 0.4; text-decoration: line-through; }
+.encounter-item.dead { opacity: 0.5; border-left-color: var(--ink-faded); }
+.encounter-item.dead .ei-name { text-decoration: line-through; }
 
+.ei-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.4rem; }
 .encounter-item .ei-name {
   font-family: var(--font-serif);
-  font-size: 0.95rem;
+  font-size: 1rem;
   line-height: 1.15;
+  color: var(--ink);
 }
-.encounter-item .ei-meta {
+.ei-type {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--ink-dim);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-faded);
+  background: var(--bg-deep);
+  border-radius: 999px;
+  padding: 0.1rem 0.45rem;
+  white-space: nowrap;
 }
-.encounter-item .ei-hp {
+
+/* Barra de PV com cor por faixa de vida */
+.ei-hpbar {
+  position: relative;
+  height: 1.2rem;
+  background: var(--bg-deep);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.ei-hpbar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.2s ease;
+}
+.ei-hpbar-fill.hp-good { background: var(--ok, #5a8a5a); }
+.ei-hpbar-fill.hp-warn { background: var(--brass, #c89b3c); }
+.ei-hpbar-fill.hp-crit { background: var(--keeper-accent-bright, #c92929); }
+.ei-hpbar-fill.hp-dead { background: var(--ink-faded); }
+.ei-hp-label {
+  position: relative;
+  z-index: 1;
+  display: block;
+  text-align: center;
   font-family: var(--font-mono);
-  color: var(--keeper-accent-bright);
+  font-size: 0.74rem;
   font-weight: 700;
-  font-size: 0.95rem;
+  line-height: 1.2rem;
+  color: var(--paper, #f0e6d2);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+}
+.ei-hp-max { font-weight: 400; opacity: 0.8; }
+
+.ei-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.ei-chip {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--ink-dim);
+  background: var(--bg-deep);
+  border-radius: var(--radius);
+  padding: 0.12rem 0.4rem;
 }
 
 .encounter-item .ei-controls {
-  grid-column: 1 / -1;
   display: flex;
   gap: 0.2rem;
-  margin-top: 0.25rem;
-  padding-top: 0.25rem;
+  padding-top: 0.35rem;
   border-top: 1px dashed var(--ink-faded);
 }
 .encounter-item .ei-controls button {
-  font-size: 0.7rem;
-  padding: 0.2rem 0.35rem;
+  font-size: 0.72rem;
+  padding: 0.22rem 0.3rem;
   flex: 1;
 }
 
