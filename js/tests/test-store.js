@@ -399,6 +399,19 @@ store.dispatch({ type: 'RECALC_DERIVED' });
 assertEq(store.getState().character.derived.PV.current, 12,
   'RECALC_DERIVED: PV.current clampado quando novo máximo (12) < current (15)');
 
+// Ficha NOVA: máximo anterior 0 (atributos recém-definidos) → vitais nascem CHEIOS.
+// Regressão do bug em que o personagem criado aparecia com 0/10 PV (parecia morto).
+_loadRecalcChar({ derived: {
+  PV:  { value: 0, current: 0, label: 'PV' },
+  PM:  { value: 0, current: 0, label: 'PM' },
+  SAN: { value: 0, current: 0, max: 99, label: 'SAN' }
+} });
+store.dispatch({ type: 'RECALC_DERIVED' });
+var fresh = store.getState().character.derived;
+assertEq(fresh.PV.current,  fresh.PV.value,  'RECALC_DERIVED: ficha nova nasce com PV cheio (current = max)');
+assertEq(fresh.PM.current,  fresh.PM.value,  'RECALC_DERIVED: ficha nova nasce com PM cheio');
+assertEq(fresh.SAN.current, fresh.SAN.value, 'RECALC_DERIVED: ficha nova nasce com SAN cheia (= POD)');
+
 // Imutabilidade: estado anterior não mutado
 _loadRecalcChar();
 var beforeRecalc = store.getState();
