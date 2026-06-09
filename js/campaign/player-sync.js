@@ -16,6 +16,7 @@ window.CoC.campaign = window.CoC.campaign || {};
   var _str        = null;
   var _playerName = '';
   var _seqNo      = 0;   // monotonic per-session counter for EXECUTION_TRACE ordering
+  var _snapTimer  = null;
 
   var _ATTR_ORDER = ['FOR', 'CON', 'TAM', 'DES', 'APA', 'INT', 'POD', 'EDU', 'Sorte'];
   // Flags booleanas de condição em c.status → rótulos para o painel do Mestre.
@@ -49,8 +50,17 @@ window.CoC.campaign = window.CoC.campaign || {};
       _tp.init(saved.id, saved.role);
       _tp.onEvent(_onTransportEvent);
       _cs.markActive();
+      _connectDurable(saved.pin || saved.id, saved.role || 'player');
       _broadcastStatus();
     }
+  }
+
+  // Liga (best-effort) a persistência durável: o broadcast já cobre a sessão
+  // viva; o banco é o lastro p/ reload/late-join. Falha aqui não afeta o jogo.
+  function _connectDurable(pin, role) {
+    var sync = window.CoC.campaign && window.CoC.campaign.sync;
+    if (!sync || !sync.isEnabled()) return;
+    try { sync.connect({ pin: pin, role: role || 'player', peerId: _tp.getPeerId() }); } catch (e) {}
   }
 
   function _bindPlayerUI() {
@@ -110,6 +120,7 @@ window.CoC.campaign = window.CoC.campaign || {};
     _cs.joinCampaign(pin.trim(), pin.trim(), 'player');
     _tp.init(pin.trim(), 'player');
     _tp.onEvent(_onTransportEvent);
+    _connectDurable(pin.trim(), 'player');
 
     var ontology = window.CoC.campaign && window.CoC.campaign.ontology;
     _broadcastStatus();
@@ -212,6 +223,28 @@ window.CoC.campaign = window.CoC.campaign || {};
       ? ontology.make('INVESTIGATOR_STATUS', statusPayload)
       : Object.assign({ type: 'INVESTIGATOR_STATUS' }, statusPayload);
     _tp.broadcast(statusEvt);
+
+    _persistSnapshot(statusPayload);
+  }
+
+  // Checkpoint durável do investigador (debounced — não martela o banco a cada
+  // tecla; o broadcast já dá o tempo-real). vitals = o `status` rico do roster.
+  function _persistSnapshot(statusPayload) {
+    var sync = window.CoC.campaign && window.CoC.campaign.sync;
+    if (!sync || !sync.isLive()) return;
+    if (_snapTimer) clearTimeout(_snapTimer);
+    _snapTimer = setTimeout(function () {
+      try {
+        sync.snapshot({
+          peerId:        _tp.getPeerId(),
+          playerName:    statusPayload.playerName,
+          characterName: statusPayload.characterName,
+          character:     {},
+          vitals:        statusPayload.status || {},
+          lastSeq:       _seqNo
+        });
+      } catch (e) {}
+    }, 1500);
   }
 
   function _onTransportEvent(event) {
@@ -259,6 +292,14 @@ window.CoC.campaign = window.CoC.campaign || {};
         : Object.assign({ type: 'EXECUTION_TRACE' }, tracePayload);
 
       _tp.broadcast(traceEvt);
+
+      // Lastro durável: grava o evento de domínio (type+payload) com o ator
+      // embutido, para o replay no reload reconstruir a timeline sem o vivo.
+      var sync = window.CoC.campaign && window.CoC.campaign.sync;
+      if (sync && sync.isLive()) {
+        var durablePayload = Object.assign({ _actor: inv.name || _playerName || '?' }, data.payload || {});
+        sync.record({ type: data.type, payload: durablePayload });
+      }
     });
   }
 

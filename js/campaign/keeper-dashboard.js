@@ -37,14 +37,66 @@ window.CoC.campaign = window.CoC.campaign || {};
     _bindButtons();
     _cs.subscribe(_onCampaignChange);
 
-    // On page load, any saved session is stale — transport channel is always gone.
-    // Mark it so the UI shows the recovery panel instead of the active dashboard.
+    // On page load the transport channel is always gone. Com persistência durável,
+    // reconstruímos a mesa do banco e reativamos sozinhos; sem ela, caímos no
+    // fluxo "stale" (botão Reativar) como antes.
     var saved = _cs.getState();
     if (saved.connected && saved.id) {
-      _cs.markStale();
+      var sync = window.CoC.campaign && window.CoC.campaign.sync;
+      if (sync && sync.isEnabled() && saved.pin) {
+        _rehydrateFromDb(saved);
+      } else {
+        _cs.markStale();
+      }
     }
     _renderDashboard(_cs.getState());
     _mountChat();
+  }
+
+  // Best-effort: liga a persistência durável da campanha (host/player).
+  function _connectDurable(pin, role, name) {
+    var sync = window.CoC.campaign && window.CoC.campaign.sync;
+    if (!sync || !sync.isEnabled()) return;
+    try { sync.connect({ pin: pin, role: role || 'host', name: name, peerId: _tp.getPeerId() }); } catch (e) {}
+  }
+
+  // Reconstrói roster + timeline a partir do banco no reload e reativa a sessão.
+  // Qualquer falha recai no fluxo "stale" (não trava o Guardião).
+  function _rehydrateFromDb(saved) {
+    var sync = window.CoC.campaign.sync;
+    _tp.init(saved.pin, saved.role || 'host');
+    _tp.onEvent(_onTransportEvent);
+
+    sync.connect({ pin: saved.pin, name: saved.name, role: saved.role || 'host', peerId: _tp.getPeerId() })
+      .then(function (res) {
+        if (!res) { _cs.markStale(); _renderDashboard(_cs.getState()); return; }
+        return sync.rehydrate().then(function (data) {
+          (data.snapshots || []).forEach(function (snap) {
+            var inv = sync.snapshotToInvestigator(snap);
+            if (inv && inv.peerId) {
+              _cs.upsertInvestigator(inv.peerId, {
+                playerName: inv.playerName, characterName: inv.characterName,
+                status: inv.status, online: false
+              });
+            }
+          });
+          (data.events || []).forEach(function (row) {
+            var p = row.payload || {};
+            var fmt = sync.formatTraceEntry({ type: row.type, payload: p }, p._actor || '?');
+            _cs.pushTimeline({ type: row.type, text: fmt.text, cls: fmt.cls });
+          });
+          _cs.markActive();
+          // Re-anuncia presença e pede status fresco a quem ainda estiver aberto.
+          _tp.broadcast(_ontology
+            ? _ontology.make('HOST_ONLINE', { campaignId: saved.pin, pin: saved.pin, campaignName: saved.name })
+            : { type: 'HOST_ONLINE', pin: saved.pin });
+          _tp.broadcast(_ontology
+            ? _ontology.make('REQUEST_STATUS', { pin: saved.pin })
+            : { type: 'REQUEST_STATUS', pin: saved.pin });
+          _renderDashboard(_cs.getState());
+        });
+      })
+      .catch(function () { _cs.markStale(); _renderDashboard(_cs.getState()); });
   }
 
   // ── Buttons ───────────────────────────────────────────────────────────────
@@ -82,6 +134,7 @@ window.CoC.campaign = window.CoC.campaign || {};
     _tp.onEvent(_onTransportEvent);
     var peerId = _tp.getPeerId();
     _cs.createCampaign(name, pin, peerId);
+    _connectDurable(pin, 'host', name);
 
     // Broadcast presença do host
     var hostEvent = _ontology
@@ -105,6 +158,7 @@ window.CoC.campaign = window.CoC.campaign || {};
     _cs.joinCampaign(pin, pin, 'player');
     _tp.init(pin, 'player');
     _tp.onEvent(_onTransportEvent);
+    _connectDurable(pin, 'player');
     var joinEvent = _ontology
       ? _ontology.make('PLAYER_CONNECTED', { playerName: 'Guardião', pin: pin })
       : { type: 'PLAYER_CONNECTED', playerName: 'Guardião', pin: pin };
@@ -206,71 +260,13 @@ window.CoC.campaign = window.CoC.campaign || {};
   function _handleExecutionTrace(event) {
     if (!event.entry) return;
     var entry = event.entry;
-    var actor = _esc(event.characterName || event.playerName || '?');
-    var p     = entry.payload || {};
-    var text  = '';
-    var cls   = 'ev-roll';
-
-    function _amt(v) { return v != null ? v : '?'; }
-    function _lvlLabel(level) {
-      return ({ critical: 'Crítico', crit: 'Crítico', extreme: 'Extremo', hard: 'Bom',
-                regular: 'Regular', fail: 'Falha', fumble: 'Desastre' })[level] || (level || '—');
-    }
-    function _mark(met, level) {
-      if (level === 'critical' || level === 'crit') return '★';
-      if (level === 'fumble') return '💀';
-      return (met === false || level === 'fail') ? '✗' : '✓';
-    }
-    function _diffTag(difficulty) {
-      if (!difficulty || difficulty === 'regular') return '';
-      return ' [' + (difficulty === 'hard' ? 'Difícil' : difficulty === 'extreme' ? 'Extremo' : difficulty) + ']';
-    }
-
-    switch (entry.type) {
-      case 'APPLY_DAMAGE':
-        text = '<b>' + actor + '</b> sofreu ' + _amt(p.amount) + ' de dano.';
-        cls  = 'ev-damage';
-        break;
-      case 'LOSE_SANITY':
-        text = '<b>' + actor + '</b> perdeu ' + _amt(p.amount) + ' SAN.';
-        cls  = 'ev-sanity';
-        break;
-      case 'HEAL_DAMAGE':
-        text = '<b>' + actor + '</b> recuperou ' + _amt(p.amount) + ' PV.';
-        cls  = 'ev-roll';
-        break;
-      case 'RECOVER_SANITY':
-        text = '<b>' + actor + '</b> recuperou ' + _amt(p.amount) + ' SAN.';
-        cls  = 'ev-sanity';
-        break;
-      case 'SPEND_MAGIC':
-        text = '<b>' + actor + '</b> gastou ' + _amt(p.amount) + ' PM.';
-        cls  = 'ev-magic';
-        break;
-      case 'ROLL_SKILL':
-        text = _mark(p.met, p.level) + ' <b>' + actor + '</b> · ' + _esc(p.skillName || 'perícia') +
-               ' ' + _amt(p.skillValue) + '%' + _diffTag(p.difficulty) +
-               ' → ' + _amt(p.roll) + ' (' + _esc(_lvlLabel(p.level)) + ')' +
-               (p.pushed ? ' ⟳ forçada' : '');
-        cls  = (p.met === false || p.level === 'fail' || p.level === 'fumble') ? 'ev-roll' : 'ev-roll';
-        break;
-      case 'ROLL_ATTRIBUTE':
-        text = _mark(p.met, p.level) + ' <b>' + actor + '</b> · teste de ' + _esc(p.attribute || 'atributo') +
-               ' ' + _amt(p.result) + '%' + _diffTag(p.difficulty) +
-               ' → ' + _amt(p.roll) + ' (' + _esc(_lvlLabel(p.level)) + ')';
-        cls  = 'ev-roll';
-        break;
-      case 'ATTACK_RESOLVED':
-        text = '<b>' + actor + '</b> ' + (p.hit ? 'acertou' : 'errou') + ' o ataque' +
-               (p.level ? ' (' + _esc(_lvlLabel(p.level)) + ')' : '') +
-               (p.hit && p.damage != null ? ' · ' + p.damage + ' de dano' : '') + '.';
-        cls  = 'ev-combat';
-        break;
-      default:
-        text = '<b>' + actor + '</b>: ' + _esc(entry.type.toLowerCase().replace(/_/g, ' '));
-    }
-
-    _cs.pushTimeline({ type: entry.type, text: text, cls: cls });
+    var actor = event.characterName || event.playerName || '?';
+    // Fonte única de formatação (compartilhada com o replay durável).
+    var sync = window.CoC.campaign && window.CoC.campaign.sync;
+    var fmt  = (sync && sync.formatTraceEntry)
+      ? sync.formatTraceEntry(entry, actor)
+      : { text: '<b>' + _esc(actor) + '</b>: ' + _esc(String(entry.type).toLowerCase().replace(/_/g, ' ')), cls: 'ev-roll' };
+    _cs.pushTimeline({ type: entry.type, text: fmt.text, cls: fmt.cls });
   }
 
   // ── Render ─────────────────────────────────────────────────────────────────
