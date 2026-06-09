@@ -518,8 +518,10 @@ label {
   font-weight: 700;
   text-align: center;
 }
-.roll-entry .roll-marker.ok  { color: var(--ok, #6a9a6a); }
-.roll-entry .roll-marker.bad { color: var(--err, #b34a4a); }
+.roll-entry .roll-marker.ok   { color: var(--ok, #6a9a6a); }
+.roll-entry .roll-marker.bad  { color: var(--err, #b34a4a); }
+.roll-entry .roll-marker.crit,
+.roll-entry .roll-marker.great { color: var(--crit, #d4a960); }   /* crítico / sucesso extremo → dourado */
 .roll-entry .roll-target {
   font-family: var(--font-mono);
   font-size: 0.8em;

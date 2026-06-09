@@ -413,8 +413,9 @@ window.CoC = window.CoC || {};
     // Marcador de resultado — leitura instantânea (estilo Roll20)
     const lvl = e.level || "";
     let marker = "•", markCls = "neutral";
-    if (lvl === "critical" || lvl === "crit") { marker = "★"; markCls = "ok"; }
-    else if (lvl === "fumble")                { marker = "💀"; markCls = "bad"; }
+    if (lvl === "critical" || lvl === "crit") { marker = "★"; markCls = "crit"; }    // crítico → dourado
+    else if (lvl === "extreme" && e.met !== false) { marker = "★"; markCls = "great"; } // sucesso extremo → dourado
+    else if (lvl === "fumble")                { marker = "💀"; markCls = "bad"; }    // desastre → vermelho
     else if (e.met === false || lvl === "fail") { marker = "✗"; markCls = "bad"; }
     else if (lvl)                             { marker = "✓"; markCls = "ok"; }
 

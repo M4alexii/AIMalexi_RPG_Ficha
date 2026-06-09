@@ -128,11 +128,12 @@
 }
 .sattr-value {
   font-family: var(--font-serif);
-  font-size: 0.92rem;
-  font-weight: bold;
-  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);            /* contraste máximo — é o número que se lê primeiro */
   min-width: 1.6rem;
   cursor: default;
+  letter-spacing: 0.01em;
 }
 .sattr-value[contenteditable="true"] {
   cursor: text;
@@ -140,12 +141,17 @@
   outline: none;
   padding: 0 1px;
 }
+/* Frações ½/⅕ recuadas (tom-sobre-tom) — claramente secundárias ao valor total. */
 .sattr-fracs {
   margin-left: auto;
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  color: var(--ink-faded);
+  color: var(--ink-dim);
+  opacity: 0.82;
   white-space: nowrap;
+  background: color-mix(in srgb, var(--ink) 7%, transparent);
+  border-radius: 0.4rem;
+  padding: 0.02rem 0.32rem;
 }
 
 /* ── Edição inline dos atributos (Modo Editar): steppers ± nas próprias cartas ── */
@@ -2642,3 +2648,114 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   .character-sidebar { width: 240px; }
   .derived-bar { grid-template-columns: repeat(4, 1fr); }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ASSISTENTE DE CRIAÇÃO (wizard) — overlay guiado
+   ═══════════════════════════════════════════════════════════════════════════ */
+#wizard-root[hidden] { display: none; }
+.wz-backdrop { position: fixed; inset: 0; background: rgba(8,6,5,0.82); z-index: 400; }
+.wz-panel {
+  position: fixed; z-index: 401;
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: min(960px, 96vw); max-height: 92vh;
+  display: flex; flex-direction: column;
+  background: var(--bg-card); border: 1px solid var(--brass);
+  border-radius: var(--radius-lg); box-shadow: 0 24px 80px rgba(0,0,0,0.7);
+  overflow: hidden;
+}
+.wz-head { display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1.1rem; border-bottom: 1px solid var(--ink-faded); }
+.wz-title { font-family: var(--font-serif); font-size: 1.25rem; color: var(--brass-bright); }
+.wz-exit { background: none; border: 1px solid var(--ink-faded); color: var(--ink-dim); border-radius: var(--radius); padding: 0.3rem 0.6rem; cursor: pointer; font-size: 0.82rem; }
+.wz-exit:hover { border-color: var(--brass); color: var(--brass); }
+.wz-progress { height: 3px; background: var(--bg-deep); }
+.wz-progress-bar { height: 100%; background: var(--brass); transition: width 0.3s ease; }
+.wz-stepper { display: flex; flex-wrap: wrap; gap: 0.3rem; padding: 0.6rem 1.1rem; border-bottom: 1px solid var(--ink-faded); }
+.wz-step-dot { display: inline-flex; align-items: center; gap: 0.35rem; background: none; border: none; color: var(--ink-faded); font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; cursor: default; padding: 0.2rem 0.4rem; }
+.wz-step-dot i { width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--ink-faded); display: inline-block; }
+.wz-step-dot.done { color: var(--ink-dim); cursor: pointer; }
+.wz-step-dot.done i { background: var(--ok, #6a9a6a); }
+.wz-step-dot.on { color: var(--brass-bright); }
+.wz-step-dot.on i { background: var(--brass); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brass) 30%, transparent); }
+.wz-body { display: grid; grid-template-columns: 1fr 280px; gap: 0; flex: 1 1 auto; min-height: 0; }
+.wz-main { padding: 1.1rem 1.25rem; overflow-y: auto; }
+.wz-tip { background: var(--bg-card-hi); border-left: 1px solid var(--ink-faded); padding: 1.1rem; overflow-y: auto; }
+.wz-tip-h { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--brass); margin-bottom: 0.5rem; }
+.wz-tip p { font-size: 0.88rem; line-height: 1.5; color: var(--ink-dim); margin: 0; }
+.wz-nav { display: flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1.1rem; border-top: 1px solid var(--ink-faded); }
+.wz-nav .wz-skip { margin-left: auto; }
+.wz-nav button { min-height: 40px; }
+
+.wz-q { font-family: var(--font-serif); font-size: 1.05rem; color: var(--ink); margin: 0.4rem 0 0.5rem; }
+.wz-cards { display: grid; gap: 0.5rem; margin-bottom: 1rem; }
+.wz-cards-arq { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.wz-chips { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+.wz-card { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 0.15rem; text-align: left; background: var(--bg-card-hi); border: 1px solid var(--ink-faded); border-radius: var(--radius); color: var(--ink); padding: 0.6rem 0.7rem; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+.wz-card:hover { border-color: var(--brass); }
+.wz-card.on { border-color: var(--brass); background: color-mix(in srgb, var(--brass) 12%, var(--bg-card-hi)); }
+.wz-card-ico { font-size: 1.3rem; }
+.wz-card-t { font-weight: 600; }
+.wz-card-desc { font-size: 0.74rem; color: var(--ink-faded); line-height: 1.3; }
+.wz-diff { position: absolute; top: 0.4rem; right: 0.5rem; font-size: 0.62rem; letter-spacing: -1px; }
+
+.wz-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
+.wz-field { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.8rem; color: var(--ink-dim); }
+.wz-field input { background: var(--bg-deep); border: 1px solid var(--ink-faded); border-radius: var(--radius); color: var(--ink); padding: 0.45rem 0.55rem; font-size: 0.95rem; }
+.wz-callout-trigger { color: var(--brass); cursor: help; }
+.wz-age-note { margin-top: 0.9rem; font-size: 0.82rem; color: var(--ink-faded); line-height: 1.5; border-left: 2px solid var(--brass); padding-left: 0.6rem; }
+
+.wz-budget { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; font-size: 0.82rem; color: var(--ink-dim); }
+.wz-budget-badge { font-family: var(--font-mono); font-size: 0.78rem; padding: 0.1rem 0.5rem; border-radius: 0.6rem; border: 1px solid var(--ink-faded); color: var(--ink-dim); }
+.wz-budget-badge.ok { color: #7bbf7b; border-color: #3f6b3f; }
+.wz-budget-badge.warn { color: #d8b86a; border-color: #6b5a2f; }
+.wz-budget-badge.err { color: #d88a8a; border-color: #6b3434; }
+.wz-attrs { display: grid; grid-template-columns: 1fr 1fr; gap: 0.3rem 1rem; }
+.wz-attr { display: flex; align-items: center; gap: 0.4rem; padding: 0.2rem 0; }
+.wz-attr-name { flex: 1 1 auto; font-size: 0.85rem; color: var(--ink); }
+.wz-attr-name small { color: var(--ink-faded); font-size: 0.72rem; }
+.wz-step { width: 1.6rem; height: 1.6rem; line-height: 1; font-size: 1rem; padding: 0; border: 1px solid var(--ink-faded); background: var(--bg-card-hi); color: var(--ink); border-radius: 0.25rem; cursor: pointer; }
+.wz-step:hover { border-color: var(--brass); color: var(--brass); }
+.wz-attr-val { font-family: var(--font-serif); font-weight: 700; font-size: 1.05rem; min-width: 2rem; text-align: center; color: var(--ink); }
+.wz-attr-cap { font-family: var(--font-mono); font-size: 0.68rem; color: var(--ink-faded); min-width: 3rem; }
+.wz-attr-luck { margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed var(--ink-faded); }
+.wz-roll-luck { margin-left: 0.3rem; }
+.wz-dv-title { font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-faded); margin: 1rem 0 0.4rem; }
+.wz-derived { display: grid; grid-template-columns: repeat(auto-fit, minmax(72px, 1fr)); gap: 0.5rem; }
+.wz-dv { background: var(--bg-deep); border: 1px solid var(--ink-faded); border-radius: var(--radius); padding: 0.4rem; text-align: center; }
+.wz-dv b { display: block; font-family: var(--font-serif); font-size: 1.3rem; color: var(--brass-bright); line-height: 1; }
+.wz-dv span { font-size: 0.66rem; color: var(--ink-faded); text-transform: uppercase; letter-spacing: 0.03em; }
+
+.wz-summary { display: flex; flex-direction: column; gap: 0.5rem; }
+.wz-sum-row { font-size: 1rem; color: var(--ink); }
+.wz-sum-row.dim { color: var(--ink-dim); font-size: 0.9rem; }
+.wz-sum-row.mono { font-family: var(--font-mono); font-size: 0.85rem; color: var(--ink-dim); }
+.wz-sum-next { margin-top: 0.6rem; font-size: 0.85rem; color: var(--ink-faded); border-top: 1px solid var(--ink-faded); padding-top: 0.6rem; }
+
+@media (max-width: 720px) {
+  .wz-body { grid-template-columns: 1fr; }
+  .wz-tip { border-left: none; border-top: 1px solid var(--ink-faded); }
+  .wz-grid2, .wz-attrs { grid-template-columns: 1fr; }
+}
+
+/* Wizard — passo Ocupação */
+.wz-occ-sugg { font-size: 0.85rem; color: var(--ink-dim); margin: 0 0 0.6rem; }
+.wz-occ-pick { background: color-mix(in srgb, var(--brass) 14%, var(--bg-card-hi)); border: 1px solid var(--brass); color: var(--brass-bright); border-radius: var(--radius); padding: 0.2rem 0.6rem; cursor: pointer; font-weight: 600; }
+.wz-occ-select { width: 100%; background: var(--bg-deep); border: 1px solid var(--ink-faded); border-radius: var(--radius); color: var(--ink); padding: 0.45rem 0.55rem; font-size: 0.95rem; }
+.wz-occ-card { margin-top: 0.9rem; background: var(--bg-card-hi); border: 1px solid var(--ink-faded); border-left: 3px solid var(--brass); border-radius: var(--radius); padding: 0.8rem 0.9rem; }
+.wz-occ-desc { font-size: 0.88rem; color: var(--ink-dim); margin: 0 0 0.6rem; line-height: 1.45; }
+.wz-occ-meta { display: flex; flex-wrap: wrap; gap: 0.5rem 1.2rem; font-size: 0.85rem; color: var(--ink); margin-bottom: 0.6rem; }
+.wz-occ-meta small { color: var(--ink-faded); }
+.wz-occ-skills { font-size: 0.85rem; color: var(--ink-dim); line-height: 1.5; }
+.wz-occ-skills b { color: var(--ink); }
+.wz-occ-skills i { color: var(--brass); }
+
+/* Wizard — passo Equipamento (kit) */
+.wz-kit-toggle { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--ink); cursor: pointer; margin: 0.2rem 0 0.7rem; }
+.wz-kit-toggle input { width: 1.05rem; height: 1.05rem; accent-color: var(--brass); }
+.wz-kit-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem 0.8rem; transition: opacity 0.15s; }
+.wz-kit-list li { font-size: 0.9rem; color: var(--ink-dim); background: var(--bg-card-hi); border: 1px solid var(--ink-faded); border-radius: var(--radius); padding: 0.4rem 0.6rem; }
+.wz-kit-list.off { opacity: 0.4; }
+@media (max-width: 720px) { .wz-kit-list { grid-template-columns: 1fr; } }
+
+/* Wizard — passo História (ganchos de background) */
+.wz-bg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
+@media (max-width: 720px) { .wz-bg-grid { grid-template-columns: 1fr; } }

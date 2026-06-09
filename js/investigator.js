@@ -748,6 +748,94 @@
   // ═════════════════════════════════════════════════════════════════════
 
   function openWizard() {
+    const wiz = window.CoC.views && window.CoC.views.wizard;
+    if (wiz && wiz.open) {
+      wiz.open({ onFinish: _finishWizard, onCancel: function () {} });
+      return;
+    }
+    _openWizardFallback();
+  }
+
+  // IDs estáveis p/ itens montados fora do store (kit do assistente). Usa o
+  // crypto nativo; cai num fallback determinístico-o-suficiente sem Math.random.
+  function _wizUuid() {
+    if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
+    if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+      const b = crypto.getRandomValues(new Uint8Array(8));
+      return "kit-" + Array.from(b).map(x => x.toString(16).padStart(2, "0")).join("");
+    }
+    return "kit-" + Date.now().toString(16);
+  }
+
+  // Monta o personagem (schema REAL, a partir do preset "empty") com o que o
+  // assistente coletou e carrega na ficha. Ocupação/perícias/kit ficam para o
+  // jogador completar na ficha (próxima fatia do assistente).
+  function _finishWizard(data) {
+    const presets = window.CoCData.presets || {};
+    const base = presets.empty ? JSON.parse(JSON.stringify(presets.empty)) : { investigator: {}, attributes: {} };
+    base.id = null;
+    base._meta = base._meta || {};
+    base._meta.createdAt = new Date().toISOString();
+
+    const inv = base.investigator = base.investigator || {};
+    const i = data.identidade || {};
+    if (i.nome)       inv.name       = i.nome;
+    if (i.jogador)    inv.playerName = i.jogador;
+    if (i.idade)      inv.age        = String(i.idade);
+    if (i.pronomes)   inv.pronouns   = i.pronomes;
+    if (i.residencia) inv.residence  = i.residencia;
+    if (i.nascimento) inv.birthplace = i.nascimento;
+
+    const con = data.conceito || {};
+    base.background = base.background || {};
+    if (con.traco)     base.background.traits = con.traco;
+    if (con.motivacao && !base.background.ideology) base.background.ideology = "Busca: " + con.motivacao;
+
+    base.attributes = base.attributes || {};
+    Object.keys(data.atributos || {}).forEach((code) => {
+      base.attributes[code] = Object.assign({}, base.attributes[code], {
+        value: data.atributos[code], rolled: "Assistente (point-buy)"
+      });
+    });
+
+    // Ocupação: já marca perícias profissionais + faixa de Crédito (o jogador
+    // distribui os pontos na aba Perícias da ficha, que tem a UI de pools).
+    const occName = (data.ocupacao && data.ocupacao.nome) || "";
+    if (occName) {
+      inv.occupation = occName;
+      const occ = window.CoCData.findOccupation ? window.CoCData.findOccupation(occName) : null;
+      if (occ) {
+        base.occupationSkills = (occ.skills || []).filter((s, ix, arr) => arr.indexOf(s) === ix);
+        const credMin = (occ.credit && occ.credit[0]) || 0;
+        base.skills = base.skills || {};
+        base.skills["Nível de Crédito"] = Object.assign({}, base.skills["Nível de Crédito"], { value: credMin });
+      }
+    }
+
+    // História guiada (ganchos do assistente → campos de background da ficha CoC 7e).
+    const bg = data.background || {};
+    if (bg.medo)   base.background.phobiasManias       = bg.medo;
+    if (bg.pessoa) base.background.significantPeople    = bg.pessoa;
+    if (bg.lugar)  base.background.meaningfulLocations  = bg.lugar;
+    if (bg.posse)  base.background.treasuredPossessions = bg.posse;
+    if (bg.evento) base.background.description          = bg.evento;
+
+    // Kit inicial sugerido → inventário (categoria "equipamento"). O jogador
+    // ajusta itens e formaliza armas (dano/alcance) na própria ficha.
+    if (data.arsenal && data.arsenal.incluir && Array.isArray(data.arsenal.kit)) {
+      base.inventory = Array.isArray(base.inventory) ? base.inventory : [];
+      data.arsenal.kit.forEach((name) => {
+        base.inventory.push({ id: _wizUuid(), name, category: "equipamento", quantity: 1, notes: "" });
+      });
+    }
+
+    loadCharacter(base);   // normaliza + SET_CHARACTER → RECALC_DERIVED + renderAll
+    persistCurrent();
+    toast("Investigador criado! Agora escolha Ocupação e Perícias na ficha.", { type: "success" });
+    setTimeout(() => $("#id-name")?.focus(), 250);
+  }
+
+  function _openWizardFallback() {
     const body = el("div", {});
     body.innerHTML = `
       <p style="margin-bottom: 1rem; color: var(--ink-dim);">Como você quer começar?</p>
