@@ -234,14 +234,6 @@
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.7);
 }
 
-/* Correção: nome do item de encontro não quebra/“vira vertical” em coluna estreita */
-.encounter-item .ei-name {
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 /* ═══════════════════════════════════════════════════════════════════════════
    FASE D — Dashboard executivo do Guardião (acima das abas)
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -823,6 +815,11 @@
   font-size: 1rem;
   line-height: 1.15;
   color: var(--ink);
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .ei-type {
   font-family: var(--font-mono);
