@@ -715,15 +715,16 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   resize: vertical;
 }
 
-/* Grid de cards narrativos: 1 → 2 (≥1600px) → 3 (≥1900px) colunas */
+/* Grid de cards narrativos: preenche a largura cedo (laptops 1280–1536 ficavam
+   com uma coluna alta e muito espaço lateral ocioso). 1 → 2 (≥1200px) → 3 (≥1700px). */
 .persona-cards {
   display: grid;
   grid-template-columns: 1fr;
   gap: 24px;
   margin-top: 24px;
 }
-@media (min-width: 1600px) { .persona-cards { grid-template-columns: 1fr 1fr; } }
-@media (min-width: 1900px) { .persona-cards { grid-template-columns: 1fr 1fr 1fr; } }
+@media (min-width: 1200px) { .persona-cards { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1700px) { .persona-cards { grid-template-columns: 1fr 1fr 1fr; } }
 .persona-card--wide { grid-column: 1 / -1; }
 .persona-card--wide textarea { min-height: 170px; }
 
@@ -1790,6 +1791,15 @@ body[data-difficulty="extreme"] .skill-frac-sep {
 
 .inv-group { margin-bottom: 1rem; }
 
+/* Itens em grade que preenche a largura no desktop (antes: lista de uma coluna,
+   itens curtos ocupando a linha inteira → muito espaço lateral ocioso). */
+.inv-rows {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.4rem;
+  align-items: start;
+}
+
 .inv-group-header {
   font-family: var(--font-mono);
   font-size: 0.72rem;
@@ -1820,9 +1830,11 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   gap: 0.5rem;
   padding: 0.45rem 0.5rem;
   border-radius: var(--radius);
-  transition: background 0.15s;
+  background: var(--bg-card-hi);
+  border: 1px solid var(--ink-faded);
+  transition: background 0.15s, border-color 0.15s;
 }
-.inv-item:hover { background: var(--bg-card-hi); }
+.inv-item:hover { border-color: var(--brass); }
 
 .inv-item-main {
   display: flex;
@@ -1929,6 +1941,14 @@ body[data-difficulty="extreme"] .skill-frac-sep {
 .journal-rows { display: flex; flex-direction: column; gap: 0.25rem; }
 .journal-group.collapsed .journal-rows { display: none; }
 
+/* Entradas em grade que preenche a largura no desktop (mesmo motivo do inventário). */
+.journal-rows {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 0.45rem;
+  align-items: start;
+}
+
 .journal-entry {
   display: flex;
   align-items: flex-start;
@@ -1936,9 +1956,11 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   gap: 0.5rem;
   padding: 0.5rem 0.5rem;
   border-radius: var(--radius);
-  transition: background 0.15s;
+  background: var(--bg-card-hi);
+  border: 1px solid var(--ink-faded);
+  transition: background 0.15s, border-color 0.15s;
 }
-.journal-entry:hover { background: var(--bg-card-hi); }
+.journal-entry:hover { border-color: var(--brass); }
 
 .journal-entry-main { flex: 1; min-width: 0; }
 
