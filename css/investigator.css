@@ -2747,3 +2747,15 @@ body[data-difficulty="extreme"] .skill-frac-sep {
 .wz-occ-skills { font-size: 0.85rem; color: var(--ink-dim); line-height: 1.5; }
 .wz-occ-skills b { color: var(--ink); }
 .wz-occ-skills i { color: var(--brass); }
+
+/* Wizard — passo Equipamento (kit) */
+.wz-kit-toggle { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--ink); cursor: pointer; margin: 0.2rem 0 0.7rem; }
+.wz-kit-toggle input { width: 1.05rem; height: 1.05rem; accent-color: var(--brass); }
+.wz-kit-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem 0.8rem; transition: opacity 0.15s; }
+.wz-kit-list li { font-size: 0.9rem; color: var(--ink-dim); background: var(--bg-card-hi); border: 1px solid var(--ink-faded); border-radius: var(--radius); padding: 0.4rem 0.6rem; }
+.wz-kit-list.off { opacity: 0.4; }
+@media (max-width: 720px) { .wz-kit-list { grid-template-columns: 1fr; } }
+
+/* Wizard — passo História (ganchos de background) */
+.wz-bg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
+@media (max-width: 720px) { .wz-bg-grid { grid-template-columns: 1fr; } }

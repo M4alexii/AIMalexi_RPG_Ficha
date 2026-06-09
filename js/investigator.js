@@ -756,6 +756,17 @@
     _openWizardFallback();
   }
 
+  // IDs estáveis p/ itens montados fora do store (kit do assistente). Usa o
+  // crypto nativo; cai num fallback determinístico-o-suficiente sem Math.random.
+  function _wizUuid() {
+    if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
+    if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+      const b = crypto.getRandomValues(new Uint8Array(8));
+      return "kit-" + Array.from(b).map(x => x.toString(16).padStart(2, "0")).join("");
+    }
+    return "kit-" + Date.now().toString(16);
+  }
+
   // Monta o personagem (schema REAL, a partir do preset "empty") com o que o
   // assistente coletou e carrega na ficha. Ocupação/perícias/kit ficam para o
   // jogador completar na ficha (próxima fatia do assistente).
@@ -799,6 +810,23 @@
         base.skills = base.skills || {};
         base.skills["Nível de Crédito"] = Object.assign({}, base.skills["Nível de Crédito"], { value: credMin });
       }
+    }
+
+    // História guiada (ganchos do assistente → campos de background da ficha CoC 7e).
+    const bg = data.background || {};
+    if (bg.medo)   base.background.phobiasManias       = bg.medo;
+    if (bg.pessoa) base.background.significantPeople    = bg.pessoa;
+    if (bg.lugar)  base.background.meaningfulLocations  = bg.lugar;
+    if (bg.posse)  base.background.treasuredPossessions = bg.posse;
+    if (bg.evento) base.background.description          = bg.evento;
+
+    // Kit inicial sugerido → inventário (categoria "equipamento"). O jogador
+    // ajusta itens e formaliza armas (dano/alcance) na própria ficha.
+    if (data.arsenal && data.arsenal.incluir && Array.isArray(data.arsenal.kit)) {
+      base.inventory = Array.isArray(base.inventory) ? base.inventory : [];
+      data.arsenal.kit.forEach((name) => {
+        base.inventory.push({ id: _wizUuid(), name, category: "equipamento", quantity: 1, notes: "" });
+      });
     }
 
     loadCharacter(base);   // normaliza + SET_CHARACTER → RECALC_DERIVED + renderAll

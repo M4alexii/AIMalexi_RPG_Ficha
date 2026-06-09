@@ -42,6 +42,8 @@ window.CoC.views = window.CoC.views || {};
     { id: 'pessoa',    label: 'Personagem', tip: 'Quem é o investigador. A IDADE tem efeito mecânico: jovens são mais sortudos mas menos preparados; mais velhos sabem mais, mas o corpo cobra o preço.' },
     { id: 'atributos', label: 'Atributos', tip: 'Valores são percentuais (0–99). Distribua os pontos — repare os DERIVADOS (Vida, Sanidade, Magia) mudando ao vivo: é CON+TAM que te dá Vida, e POD que te dá Sanidade.' },
     { id: 'ocupacao',  label: 'Ocupação',  tip: 'Sua ocupação define onde você foi treinado — e quantos pontos você terá para gastar em perícias. Ela já marca as perícias profissionais e a faixa de Crédito para você.' },
+    { id: 'arsenal',   label: 'Equipamento', tip: 'Não precisa ser perfeito agora — pegue o kit base da sua ocupação e ajuste depois com seu Guardião. Itens entram no Inventário da ficha.' },
+    { id: 'background', label: 'História',  tip: 'Agora que o personagem ganhou forma, responda em poucas palavras. Esses ganchos são o que o Guardião usa para te puxar para a trama.' },
     { id: 'resumo',    label: 'Resumo',    tip: 'Confira e finalize. Na ficha você distribui os pontos de perícia (Ocupação + Interesse), que já vêm calculados aqui.' }
   ];
 
@@ -66,8 +68,28 @@ window.CoC.views = window.CoC.views || {};
       conceito:   { arquetipo: '', traco: '', motivacao: '' },
       identidade: { nome: '', jogador: '', idade: 28, pronomes: '', residencia: '', nascimento: '' },
       atributos:  attrs,
-      ocupacao:   { nome: '' }
+      ocupacao:   { nome: '' },
+      arsenal:    { incluir: true },
+      background: { medo: '', pessoa: '', lugar: '', posse: '', evento: '' }
     };
+  }
+
+  // Kit inicial por palavra-chave da ocupação/arquétipo (base p/ todos + extras).
+  var BASE_KIT = ['Caderno de anotações', 'Caneta tinteiro', 'Lanterna', 'Caixa de fósforos', 'Carteira'];
+  var KIT_RULES = [
+    { re: /m[ée]dic|enfermeir|cirurgi/i,        items: ['Bolsa médica', 'Estetoscópio', 'Kit de primeiros socorros'] },
+    { re: /pol[íi]c|detetive|investigador|lei/i, items: ['Revólver .38', 'Algemas', 'Distintivo'] },
+    { re: /jornal|rep[óo]rter|escritor/i,        items: ['Câmera fotográfica', 'Gravador portátil', 'Bloco de repórter'] },
+    { re: /professor|acad[êe]mic|antiqu[áa]r|bibliotec|cientista|engenheir/i, items: ['Livros de referência', 'Óculos de leitura'] },
+    { re: /soldado|militar|fuzileiro|mercen[áa]r/i, items: ['Faca de combate', 'Cantil', 'Kit de campanha'] },
+    { re: /criminos|ladr[ãa]o|contraband|gangster/i, items: ['Gazuas', 'Pé-de-cabra', 'Faca'] },
+    { re: /artista|m[úu]sic|ator|atriz|pintor/i, items: ['Material de arte', 'Caderno de esboços'] }
+  ];
+  function suggestKit(occName, arquetipoLabel) {
+    var key = (occName || '') + ' ' + (arquetipoLabel || '');
+    var extras = [];
+    KIT_RULES.forEach(function (r) { if (r.re.test(key)) extras = extras.concat(r.items); });
+    return BASE_KIT.concat(extras);
   }
 
   // ── Derivados ao vivo (só exibição) ──────────────────────────────────────────
@@ -206,6 +228,36 @@ window.CoC.views = window.CoC.views || {};
       details;
   }
 
+  function _arqLabel() {
+    var arq = ARQUETIPOS.filter(function (x) { return x.id === W.conceito.arquetipo; })[0];
+    return arq ? arq.label : '';
+  }
+
+  function _renderArsenal() {
+    var kit = suggestKit(W.ocupacao.nome, _arqLabel());
+    var on = W.arsenal.incluir;
+    return '<p class="wz-q">Kit inicial sugerido' + (W.ocupacao.nome ? ' para <b>' + _esc(W.ocupacao.nome) + '</b>' : '') + '</p>' +
+      '<label class="wz-kit-toggle"><input type="checkbox" class="wz-kit-check"' + (on ? ' checked' : '') + ' /> Incluir este kit no inventário</label>' +
+      '<ul class="wz-kit-list' + (on ? '' : ' off') + '">' + kit.map(function (it) { return '<li>📦 ' + _esc(it) + '</li>'; }).join('') + '</ul>' +
+      '<p class="wz-age-note">Você ajusta itens e formaliza armas (dano/alcance) na ficha depois.</p>';
+  }
+
+  function _renderBackground() {
+    var b = W.background;
+    function q(lbl, key, ph) {
+      return '<label class="wz-field"><span>' + lbl + '</span>' +
+        '<input type="text" data-bg="' + key + '" value="' + _esc(b[key]) + '" placeholder="' + _esc(ph) + '" /></label>';
+    }
+    return '<div class="wz-bg-grid">' +
+      q('Qual seu maior medo?', 'medo', 'ex.: o escuro, perder a razão…') +
+      q('Quem é a pessoa mais importante?', 'pessoa', 'ex.: minha irmã Clara') +
+      q('Qual lugar te marca?', 'lugar', 'ex.: a velha biblioteca da cidade') +
+      q('O que você não larga?', 'posse', 'ex.: o relógio do meu pai') +
+      q('Qual evento mudou sua vida?', 'evento', 'ex.: o desaparecimento em 1918') +
+    '</div>' +
+    '<p class="wz-age-note">Pode pular — nada aqui é obrigatório. Vira o texto de antecedentes na ficha.</p>';
+  }
+
   function _renderResumo() {
     var i = W.identidade, a = W.atributos, dv = _derived(_numAttrs());
     var arq = ARQUETIPOS.filter(function (x) { return x.id === W.conceito.arquetipo; })[0];
@@ -213,12 +265,16 @@ window.CoC.views = window.CoC.views || {};
     var occName = W.ocupacao.nome || '';
     var occ = occName && window.CoCData.findOccupation ? window.CoCData.findOccupation(occName) : null;
     var pts = occ ? _occPoints(occ) : null;
+    var kitCount = (W.arsenal && W.arsenal.incluir) ? suggestKit(occName, _arqLabel()).length : 0;
+    var bgFilled = ['medo', 'pessoa', 'lugar', 'posse', 'evento'].filter(function (k) { return W.background && W.background[k]; }).length;
     return '<div class="wz-summary">' +
       '<div class="wz-sum-row"><b>' + (_esc(i.nome) || '(sem nome)') + '</b>' + (i.idade ? ' · ' + _esc(i.idade) + ' anos' : '') + (arq ? ' · ' + arq.icon + ' ' + _esc(arq.label) : '') + '</div>' +
       (W.conceito.traco || W.conceito.motivacao ? '<div class="wz-sum-row dim">' + _esc(W.conceito.traco) + (W.conceito.motivacao ? ' · busca ' + _esc(W.conceito.motivacao) : '') + '</div>' : '') +
       (occName ? '<div class="wz-sum-row">💼 <b>' + _esc(occName) + '</b>' + (occ && occ.credit ? ' · Crédito ' + occ.credit[0] + '–' + occ.credit[1] + '%' : '') + '</div>' : '<div class="wz-sum-row dim">Sem ocupação — escolha no passo anterior ou depois na ficha.</div>') +
       '<div class="wz-sum-row mono">' + attrLine + '</div>' +
       '<div class="wz-sum-row">Vida ' + dv.pv + ' · Sanidade ' + dv.san + ' · Magia ' + dv.pm + ' · Esquiva ' + dv.esquiva + '%</div>' +
+      (kitCount ? '<div class="wz-sum-row dim">📦 ' + kitCount + ' itens de equipamento vão para o inventário</div>' : '') +
+      (bgFilled ? '<div class="wz-sum-row dim">📖 ' + bgFilled + ' gancho(s) de história preenchido(s)</div>' : '') +
       (pts ? '<p class="wz-sum-next">Ao concluir, a ficha já vem com a ocupação e as perícias marcadas. Você distribui <b>' + pts.occ + '</b> pontos de Ocupação + <b>' + pts.pi + '</b> de Interesse na aba <b>Perícias</b>.</p>'
            : '<p class="wz-sum-next">Ao concluir, você completa Ocupação, Perícias e Equipamento na ficha.</p>') +
     '</div>';
@@ -230,6 +286,8 @@ window.CoC.views = window.CoC.views || {};
       case 'pessoa':    return _renderPessoa();
       case 'atributos': return _renderAtributos();
       case 'ocupacao':  return _renderOcupacao();
+      case 'arsenal':   return _renderArsenal();
+      case 'background': return _renderBackground();
       case 'resumo':    return _renderResumo();
     }
     return '';
@@ -315,6 +373,20 @@ window.CoC.views = window.CoC.views || {};
       var d = window.CoC.dice;
       if (d && d.rollAttribute) { W.atributos.Sorte = d.rollAttribute('3d6x5').total; _saveResume(); _render(); }
     };
+
+    // Equipamento: incluir kit (toggle só repinta a lista)
+    var kitChk = $('.wz-kit-check');
+    if (kitChk) kitChk.onchange = function () {
+      W.arsenal.incluir = !!kitChk.checked;
+      var list = $('.wz-kit-list');
+      if (list) list.classList.toggle('off', !W.arsenal.incluir);
+      _saveResume();
+    };
+
+    // História: ganchos de background (texto livre, sem repintar a cada tecla)
+    $$('[data-bg]').forEach(function (inp) {
+      inp.oninput = function () { W.background[inp.dataset.bg] = inp.value; };
+    });
   }
 
   function _advance(skip) {
@@ -324,7 +396,14 @@ window.CoC.views = window.CoC.views || {};
   }
 
   function _finish() {
-    var data = { conceito: W.conceito, identidade: W.identidade, atributos: _numAttrs(), ocupacao: W.ocupacao };
+    var data = {
+      conceito:   W.conceito,
+      identidade: W.identidade,
+      atributos:  _numAttrs(),
+      ocupacao:   W.ocupacao,
+      arsenal:    { incluir: !!(W.arsenal && W.arsenal.incluir), kit: suggestKit(W.ocupacao.nome, _arqLabel()) },
+      background: W.background
+    };
     _clearResume();
     _close();
     if (_opts && _opts.onFinish) _opts.onFinish(data);
@@ -341,6 +420,9 @@ window.CoC.views = window.CoC.views || {};
     _opts = opts || {};
     var resumed = _loadResume();
     W = resumed && resumed.identidade ? resumed : _defaultData();
+    // Compat: progresso salvo antes de arsenal/background ainda precisa desses campos.
+    if (!W.arsenal)    W.arsenal    = { incluir: true };
+    if (!W.background) W.background = { medo: '', pessoa: '', lugar: '', posse: '', evento: '' };
     if (W.step == null) W.step = 0;
     _root = document.getElementById('wizard-root');
     if (!_root) { _root = document.createElement('div'); _root.id = 'wizard-root'; document.body.appendChild(_root); }
