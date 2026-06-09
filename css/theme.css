@@ -226,6 +226,23 @@ body.high-contrast .skill-row,
 body.high-contrast .weapon-card,
 body.high-contrast .chat-msg { border-color: var(--ink-faded) !important; }
 
+/* Estado vazio do chat — evita o vazião quando não há mensagens (ambas as páginas) */
+.chat-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-align: center;
+  height: 100%;
+  min-height: 8rem;
+  padding: 1.5rem;
+  color: var(--ink-faded);
+}
+.chat-empty .chat-empty-ico { font-size: 2.2rem; opacity: 0.35; }
+.chat-empty p { margin: 0; font-size: 0.88rem; line-height: 1.55; max-width: 28rem; }
+.chat-empty b { color: var(--ink-dim); }
+
 /* Reduzir animações — acessibilidade / preferência do usuário */
 body.reduce-motion *,
 body.reduce-motion *::before,
