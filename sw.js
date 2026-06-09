@@ -13,7 +13,7 @@
    Para forçar atualização imediata: incremente CACHE_VERSION abaixo.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const CACHE_VERSION = "v68";
+const CACHE_VERSION = "v69";
 const CACHE_NAME = "aimalexi-rpg-" + CACHE_VERSION;
 
 // Assets que devem estar disponíveis offline imediatamente após instalação.
@@ -104,6 +104,10 @@ const PRECACHE_URLS = [
   "./js/campaign/keeper-dashboard.js",
   "./js/campaign/player-sync.js",
   "./js/campaign/supabase-transport.js",
+  "./js/campaign/campaign-persistence.js",
+  "./js/campaign/outbox-indexeddb.js",
+  "./js/campaign/supabase-persistence-adapter.js",
+  "./js/campaign/campaign-sync.js",
 ];
 
 // ─── Instalação: pré-cacheia o shell ────────────────────────────────────────

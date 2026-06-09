@@ -56,6 +56,9 @@ load('js/views/combat.js');
 // Campaign — camada de persistência durável (lógica pura; Fase M)
 load('js/campaign/campaign-persistence.js');
 load('js/campaign/outbox-indexeddb.js');
+load('js/campaign/supabase-persistence-adapter.js');
+load('js/core/actions.js');           // isSacred — usado por campaign-sync
+load('js/campaign/campaign-sync.js');
 load('js/keeper-dashboard-summary.js');
 
 // ── Framework de assertions ───────────────────────────────────────────────
@@ -115,6 +118,7 @@ load('js/tests/test-architecture.js');
 load('js/tests/test-occupation.js');
 load('js/tests/test-campaign-persistence.js');
 load('js/tests/test-outbox.js');
+load('js/tests/test-campaign-sync.js');
 load('js/tests/test-keeper-dashboard.js');
 const elapsed = Date.now() - t0;
 

@@ -25,7 +25,7 @@ window.CoC.campaign = window.CoC.campaign || {};
       throw new Error('Supabase SDK ausente — vendar o build ESM em js/vendor/supabase.js.');
     }
     return sdk.createClient(config.supabaseUrl, config.supabaseKey, {
-      auth: { persistSession: true, autoRefreshToken: true },
+      auth: { persistSession: true, autoRefreshToken: true, storageKey: 'aimalexi-campaign-auth' },
       realtime: { params: { eventsPerSecond: 10 } }
     });
   }
