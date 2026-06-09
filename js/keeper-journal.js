@@ -109,6 +109,7 @@
     });
     order.sort(function (a, b) { return a.localeCompare(b); });
 
+    _releaseImages(container);   // revoga ObjectURLs antigos antes de trocar o HTML
     container.innerHTML = order.map(function (f) {
       return '<details class="journal-folder" open>' +
         '<summary class="journal-folder-head">📁 ' + _esc(f) +
@@ -118,6 +119,16 @@
     }).join('');
 
     _hydrateImages(container);
+  }
+
+  // Revoga as ObjectURLs dos thumbnails atuais (evita vazamento ao re-renderizar
+  // via innerHTML, que destrói os elementos sem liberar a URL). render(el, null)
+  // chama releaseEl internamente.
+  function _releaseImages(container) {
+    var mp = window.CoC && window.CoC.mediaPicker;
+    if (!mp || !mp.render || !container) return;
+    var thumbs = container.querySelectorAll('.journal-thumb[data-journal-img]');
+    Array.prototype.forEach.call(thumbs, function (el) { mp.render(el, null); });
   }
 
   // Lightbox simples para ver a imagem em tamanho cheio (clique no thumbnail).
@@ -226,9 +237,16 @@
         '<div><label>Ordem (menor aparece antes)</label><input id="jt-order" type="number" value="' + (t.order || 0) + '" style="width:100%" /></div>' +
       '</div>';
 
+    function _releaseStrip() {
+      var strip = body.querySelector('#jt-images');
+      if (!strip || !mp || !mp.render) return;
+      Array.prototype.forEach.call(strip.querySelectorAll('[data-jt-thumb]'), function (el) { mp.render(el, null); });
+    }
+
     function _drawStrip() {
       var strip = body.querySelector('#jt-images');
       if (!strip) return;
+      _releaseStrip();   // revoga URLs antigas antes de repintar
       if (!working.length) {
         strip.innerHTML = '<span class="jt-images-empty">Nenhuma imagem.</span>';
         return;
@@ -273,6 +291,7 @@
       title: isNew ? 'Novo Tópico' : 'Editar Tópico',
       body: body,
       onClose: function () {
+        _releaseStrip();   // revoga as ObjectURLs dos thumbnails do editor
         // Cancelado: descarta blobs recém-adicionados que não foram salvos.
         if (saved || !store || !store.deleteBlob) return;
         working.forEach(function (id) { if (origImages.indexOf(id) === -1) store.deleteBlob(id); });
