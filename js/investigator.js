@@ -748,6 +748,52 @@
   // ═════════════════════════════════════════════════════════════════════
 
   function openWizard() {
+    const wiz = window.CoC.views && window.CoC.views.wizard;
+    if (wiz && wiz.open) {
+      wiz.open({ onFinish: _finishWizard, onCancel: function () {} });
+      return;
+    }
+    _openWizardFallback();
+  }
+
+  // Monta o personagem (schema REAL, a partir do preset "empty") com o que o
+  // assistente coletou e carrega na ficha. Ocupação/perícias/kit ficam para o
+  // jogador completar na ficha (próxima fatia do assistente).
+  function _finishWizard(data) {
+    const presets = window.CoCData.presets || {};
+    const base = presets.empty ? JSON.parse(JSON.stringify(presets.empty)) : { investigator: {}, attributes: {} };
+    base.id = null;
+    base._meta = base._meta || {};
+    base._meta.createdAt = new Date().toISOString();
+
+    const inv = base.investigator = base.investigator || {};
+    const i = data.identidade || {};
+    if (i.nome)       inv.name       = i.nome;
+    if (i.jogador)    inv.playerName = i.jogador;
+    if (i.idade)      inv.age        = String(i.idade);
+    if (i.pronomes)   inv.pronouns   = i.pronomes;
+    if (i.residencia) inv.residence  = i.residencia;
+    if (i.nascimento) inv.birthplace = i.nascimento;
+
+    const con = data.conceito || {};
+    base.background = base.background || {};
+    if (con.traco)     base.background.traits = con.traco;
+    if (con.motivacao && !base.background.ideology) base.background.ideology = "Busca: " + con.motivacao;
+
+    base.attributes = base.attributes || {};
+    Object.keys(data.atributos || {}).forEach((code) => {
+      base.attributes[code] = Object.assign({}, base.attributes[code], {
+        value: data.atributos[code], rolled: "Assistente (point-buy)"
+      });
+    });
+
+    loadCharacter(base);   // normaliza + SET_CHARACTER → RECALC_DERIVED + renderAll
+    persistCurrent();
+    toast("Investigador criado! Agora escolha Ocupação e Perícias na ficha.", { type: "success" });
+    setTimeout(() => $("#id-name")?.focus(), 250);
+  }
+
+  function _openWizardFallback() {
     const body = el("div", {});
     body.innerHTML = `
       <p style="margin-bottom: 1rem; color: var(--ink-dim);">Como você quer começar?</p>
