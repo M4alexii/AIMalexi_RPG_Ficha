@@ -32,7 +32,7 @@ window.CoCData.occupations = [
     name: "Antiquário",
     pointsFormula: "EDU*4",
     skills: ["Avaliação", "Arte/Ofício", "História", "Usar Bibliotecas",
-             "Outra Língua", "Outra Língua", "Encontrar"],
+             "Outra Língua", "Encontrar"],
     anySkillsCount: 1,
     credit: [30, 70],
     era: "any",
@@ -201,7 +201,7 @@ window.CoCData.occupations = [
   {
     name: "Professor",
     pointsFormula: "EDU*4",
-    skills: ["Língua Nativa", "Outra Língua", "Outra Língua", "Usar Bibliotecas",
+    skills: ["Língua Nativa", "Outra Língua", "Usar Bibliotecas",
              "Psicologia", "Arte/Ofício"],
     anySkillsCount: 2,
     credit: [20, 70],

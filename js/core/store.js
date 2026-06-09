@@ -476,16 +476,23 @@ window.CoC = window.CoC || {};
         const newPM    = _r.calcMP(v("POD"));
         const newSANMax = _r.calcSANMax(nc.derived.Mitos.value || 0);
 
+        // Ficha NOVA: quando o máximo anterior era 0 (atributos ainda não definidos),
+        // os vitais atuais devem nascer CHEIOS. Em jogo o máximo é sempre > 0, então
+        // o dano sofrido é preservado (current só é rebaixado se exceder o novo máximo).
+        const prevPVmax  = Number(nc.derived.PV.value)  || 0;
+        const prevPMmax  = Number(nc.derived.PM.value)  || 0;
+        const prevSANval = Number(nc.derived.SAN.value) || 0;
+
         nc.derived.PV.value = newPV;
-        if (nc.derived.PV.current == null || nc.derived.PV.current > newPV) nc.derived.PV.current = newPV;
+        if (nc.derived.PV.current == null || nc.derived.PV.current > newPV || prevPVmax === 0) nc.derived.PV.current = newPV;
 
         nc.derived.PM.value = newPM;
-        if (nc.derived.PM.current == null || nc.derived.PM.current > newPM) nc.derived.PM.current = newPM;
+        if (nc.derived.PM.current == null || nc.derived.PM.current > newPM || prevPMmax === 0) nc.derived.PM.current = newPM;
 
         nc.derived.SAN.max   = newSANMax;
         nc.derived.SAN.value = v("POD");
-        if (nc.derived.SAN.current == null)            nc.derived.SAN.current = v("POD");
-        if (nc.derived.SAN.current > newSANMax)        nc.derived.SAN.current = newSANMax;
+        if (nc.derived.SAN.current == null || prevSANval === 0) nc.derived.SAN.current = v("POD");
+        if (nc.derived.SAN.current > newSANMax)                 nc.derived.SAN.current = newSANMax;
 
         nc.derived.MOV.value   = _r.calcMOV(v("FOR"), v("DES"), v("TAM"), age);
         const db = _r.calcDB(v("FOR"), v("TAM"));

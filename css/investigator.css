@@ -2428,11 +2428,19 @@ body[data-difficulty="extreme"] .skill-frac-sep {
 .sheet-backdrop { display: block; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); z-index: 290; }
 .sheet-backdrop[hidden] { display: none; }
 
+/* Esconde o FAB do dado quando há qualquer overlay aberto (drawer, "Mais",
+   bottom-sheet de rolagem, wizard) — evita o dado sobrepor itens de menu/botões.
+   :has() degrada de boa em navegadores antigos (FAB só fica visível atrás). */
+body:has(#sheet-backdrop:not([hidden])) .fab,
+body:has(#more-backdrop:not([hidden])) .fab,
+body:has(.bottom-sheet-backdrop) .fab,
+body:has(.wz-backdrop) .fab { display: none !important; }
+
 /* ── MOBILE (≤ 767px) ─────────────────────────────────────────────────────── */
 @media (max-width: 767px) {
 
   /* Header compacto: uma linha só, sem quebra */
-  .app { padding: 0.5rem 0.5rem 4.5rem; }            /* espaço p/ bottom nav */
+  .app { padding: 0.5rem 0.5rem 5.5rem; }            /* espaço p/ bottom nav + folga do FAB */
   .app-header { margin-bottom: 0.4rem; text-align: left; }
   .app-title { font-size: 1.15rem; letter-spacing: 0.04em; }
   .app-subtitle { display: none; }                    /* economiza vertical */
