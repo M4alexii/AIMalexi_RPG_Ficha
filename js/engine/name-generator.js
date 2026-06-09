@@ -10,7 +10,13 @@ window.CoC = window.CoC || {};
 
   function pick(arr) {
     if (!Array.isArray(arr) || arr.length === 0) return "";
-    return arr[Math.floor(Math.random() * arr.length)];
+    // Índice via RNG criptográfico (Constituição: zero Math.random).
+    if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+      var a = new Uint32Array(1);
+      crypto.getRandomValues(a);
+      return arr[a[0] % arr.length];
+    }
+    return arr[0];
   }
 
   /**

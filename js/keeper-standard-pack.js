@@ -31,7 +31,11 @@
   }
   function _uuid() {
     if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
-    return 'sp-' + Date.now() + '-' + Math.floor(Math.random() * 1e6);
+    if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+      var b = crypto.getRandomValues(new Uint8Array(6));
+      return 'sp-' + Array.prototype.map.call(b, function (x) { return x.toString(16).padStart(2, '0'); }).join('');
+    }
+    return 'sp-' + Date.now().toString(36) + '-' + (_uuid._seq = (_uuid._seq || 0) + 1);
   }
   function _toast(msg, opts) {
     var ui = window.CoC && window.CoC.ui;

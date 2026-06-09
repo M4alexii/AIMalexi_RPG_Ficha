@@ -333,10 +333,21 @@ window.CoC = window.CoC || {};
    * @param {number} value - valor atual da perícia (0–99)
    * @returns {{ rolled: number, gain: number, before: number, after: number, improved: boolean }}
    */
+  // Rola 1dN preferindo o motor (crypto via dice.js). Fallback sem Math.random
+  // (Constituição) para o caso raro de dice.js ainda não estar carregado.
+  function _safeRollDie(s) {
+    const d = window.CoC && window.CoC.dice;
+    if (d && d.rollDie) return d.rollDie(s);
+    if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+      const a = new Uint32Array(1); crypto.getRandomValues(a);
+      return (a[0] % s) + 1;
+    }
+    return 1;
+  }
+
   function rollSkillImprovement(value) {
     value = num(value);
-    const diceFns = window.CoC && window.CoC.dice;
-    const rollDie = diceFns ? diceFns.rollDie : (s) => Math.floor(Math.random() * s) + 1;
+    const rollDie = _safeRollDie;
     const rolled = rollDie(100) || 1;
     if (rolled > value) {
       const gain  = rollDie(10) || 1;
@@ -360,8 +371,7 @@ window.CoC = window.CoC || {};
    */
   function rollEduImprovement(edu) {
     edu = num(edu);
-    const dice = window.CoC && window.CoC.dice;
-    const rollDie = dice ? dice.rollDie : (s) => Math.floor(Math.random() * s) + 1;
+    const rollDie = _safeRollDie;
     const rolled = rollDie(100) || 1;  // d100 via engine
     if (rolled > edu) {
       const gain   = rollDie(10) || 1;

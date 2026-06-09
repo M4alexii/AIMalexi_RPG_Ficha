@@ -471,7 +471,12 @@ window.CoC = window.CoC || {};
   }
 
   function genId() {
-    return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 7);
+    // RNG criptográfico (Constituição: zero Math.random).
+    if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+      const b = crypto.getRandomValues(new Uint8Array(5));
+      return Date.now().toString(36) + "-" + Array.prototype.map.call(b, x => x.toString(16).padStart(2, "0")).join("");
+    }
+    return Date.now().toString(36) + "-" + (genId._seq = (genId._seq || 0) + 1);
   }
 
   // ═════════════════════════════════════════════════════════════════════
