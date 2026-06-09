@@ -179,6 +179,61 @@
 }
 .journal-content { font-size: 0.88rem; line-height: 1.5; color: var(--ink-dim); word-break: break-word; }
 
+/* ── Imagens anexadas aos tópicos do diário ──────────────────────────────── */
+.journal-card-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.55rem;
+}
+.journal-thumb {
+  width: 72px;
+  height: 72px;
+  border: 1px solid var(--ink-faded);
+  border-radius: var(--radius);
+  background: var(--bg-deep) center / cover no-repeat;
+  cursor: zoom-in;
+  padding: 0;
+  transition: border-color 0.15s, transform 0.1s;
+}
+.journal-thumb:hover { border-color: var(--keeper-accent); transform: scale(1.04); }
+.journal-thumb:not(.has-image)::after { content: '🖼'; font-size: 1.2rem; opacity: 0.4; }
+
+/* Strip de imagens no editor de tópico */
+.jt-images { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.4rem; }
+.jt-images-empty { font-size: 0.8rem; color: var(--ink-faded); font-style: italic; }
+.jt-thumb-wrap { position: relative; display: inline-block; }
+.jt-thumb-del {
+  position: absolute;
+  top: -6px; right: -6px;
+  width: 18px; height: 18px;
+  line-height: 16px;
+  padding: 0;
+  font-size: 0.7rem;
+  border-radius: 50%;
+  background: var(--keeper-accent-bright, #c92929);
+  color: #fff;
+  border: 1px solid var(--bg-deep);
+  cursor: pointer;
+}
+
+/* Lightbox de visualização cheia */
+.journal-lightbox {
+  position: fixed; inset: 0;
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0, 0, 0, 0.85);
+  cursor: zoom-out;
+  padding: 2rem;
+}
+.journal-lightbox img {
+  max-width: 95vw;
+  max-height: 92vh;
+  border: 1px solid var(--keeper-accent);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.7);
+}
+
 /* Correção: nome do item de encontro não quebra/“vira vertical” em coluna estreita */
 .encounter-item .ei-name {
   min-width: 0;

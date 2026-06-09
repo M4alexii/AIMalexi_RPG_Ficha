@@ -41,7 +41,11 @@
   }
   function _uuid() {
     if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
-    return 'j-' + Date.now() + '-' + Math.floor(Math.random() * 1e6);
+    if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+      var b = crypto.getRandomValues(new Uint8Array(8));
+      return 'j-' + Array.prototype.map.call(b, function (x) { return x.toString(16).padStart(2, '0'); }).join('');
+    }
+    return 'j-' + Date.now().toString(36);
   }
 
   // Migração one-time do diário antigo (texto livre) → tópico de Observações.
@@ -112,10 +116,40 @@
         '<div class="journal-folder-body">' + groups[f].map(_cardHtml).join('') + '</div>' +
       '</details>';
     }).join('');
+
+    _hydrateImages(container);
+  }
+
+  // Lightbox simples para ver a imagem em tamanho cheio (clique no thumbnail).
+  function _openLightbox(blobId) {
+    var store = window.CoC && window.CoC.storage;
+    if (!store || !store.getBlob) return;
+    Promise.resolve(store.getBlob(blobId)).then(function (blob) {
+      if (!(blob instanceof Blob)) return;
+      var url = URL.createObjectURL(blob);
+      var ov = document.createElement('div');
+      ov.className = 'journal-lightbox';
+      ov.innerHTML = '<img alt="Anexo do diário" src="' + url + '" />';
+      function close() {
+        try { URL.revokeObjectURL(url); } catch (e) {}
+        document.removeEventListener('keydown', onKey);
+        ov.remove();
+      }
+      function onKey(e) { if (e.key === 'Escape') close(); }
+      ov.addEventListener('click', close);
+      document.addEventListener('keydown', onKey);
+      document.body.appendChild(ov);
+    });
   }
 
   function _cardHtml(t) {
     var cat = _catMeta(t.category);
+    var imgs = Array.isArray(t.images) ? t.images : [];
+    var imgHtml = imgs.length
+      ? '<div class="journal-card-images">' + imgs.map(function (id) {
+          return '<button type="button" class="journal-thumb" data-journal-img="' + _esc(id) + '" title="Ver imagem"></button>';
+        }).join('') + '</div>'
+      : '';
     return '<article class="journal-card" data-id="' + _esc(t.id) + '">' +
       '<div class="journal-card-head">' +
         '<span class="journal-cat-badge">' + cat.icon + ' ' + _esc(cat.label) + '</span>' +
@@ -127,7 +161,19 @@
       '</div>' +
       '<h4 class="journal-title">' + _esc(t.title || '(sem título)') + '</h4>' +
       '<div class="journal-content">' + _linkify(t.content) + '</div>' +
+      imgHtml +
     '</article>';
+  }
+
+  // Popula os thumbnails (lazy, via Blob no IndexedDB) após o innerHTML. O
+  // media-picker gerencia o ciclo de vida do ObjectURL por elemento.
+  function _hydrateImages(container) {
+    var mp = window.CoC && window.CoC.mediaPicker;
+    if (!mp || !mp.render) return;
+    var thumbs = container.querySelectorAll('.journal-thumb[data-journal-img]');
+    Array.prototype.forEach.call(thumbs, function (el) {
+      mp.render(el, el.getAttribute('data-journal-img'));
+    });
   }
 
   // Converte [[Título]] em links clicáveis para outros tópicos (escapando o resto).
@@ -148,11 +194,18 @@
   function _openEditor(topic) {
     var ui = window.CoC && window.CoC.ui;
     if (!ui || !ui.modal) { _openEditorFallback(topic); return; }
+    var mp = window.CoC && window.CoC.mediaPicker;
+    var store = window.CoC && window.CoC.storage;
     var isNew = !topic;
     var t = topic || {
       id: _uuid(), category: 'sessao', title: '', content: '', folder: '',
-      date: new Date().toISOString().slice(0, 10), order: 0
+      date: new Date().toISOString().slice(0, 10), order: 0, images: []
     };
+
+    // Trabalha numa cópia das imagens: confirma no Salvar, descarta no Cancelar.
+    var origImages = Array.isArray(t.images) ? t.images.slice() : [];
+    var working    = origImages.slice();
+    var saved      = false;
 
     var body = document.createElement('div');
     body.innerHTML =
@@ -166,12 +219,64 @@
         '<div><label>Pasta (use / para subpastas)</label><input id="jt-folder" value="' + _esc(t.folder || '') + '" style="width:100%" placeholder="ex.: Ato 1/Mansão Corbitt" /></div>' +
         '<div><label>Data</label><input id="jt-date" type="date" value="' + _esc(t.date) + '" style="width:100%" /></div>' +
         '<div><label>Conteúdo <span style="color:var(--ink-faded);font-weight:normal">— use [[Título de outro tópico]] para vincular</span></label><textarea id="jt-content" rows="6" style="width:100%">' + _esc(t.content) + '</textarea></div>' +
+        '<div><label>Imagens <span style="color:var(--ink-faded);font-weight:normal">— mapas, handouts, retratos</span></label>' +
+          '<div id="jt-images" class="jt-images"></div>' +
+          '<button type="button" id="jt-add-img" class="btn-ghost btn-sm"' + (mp && mp.pick ? '' : ' disabled title="Armazenamento de imagem indisponível"') + '>🖼 Adicionar imagem</button>' +
+        '</div>' +
         '<div><label>Ordem (menor aparece antes)</label><input id="jt-order" type="number" value="' + (t.order || 0) + '" style="width:100%" /></div>' +
       '</div>';
+
+    function _drawStrip() {
+      var strip = body.querySelector('#jt-images');
+      if (!strip) return;
+      if (!working.length) {
+        strip.innerHTML = '<span class="jt-images-empty">Nenhuma imagem.</span>';
+        return;
+      }
+      strip.innerHTML = working.map(function (id) {
+        return '<span class="jt-thumb-wrap">' +
+          '<button type="button" class="journal-thumb" data-jt-thumb="' + _esc(id) + '" title="Ver"></button>' +
+          '<button type="button" class="jt-thumb-del" data-jt-del="' + _esc(id) + '" title="Remover imagem">✕</button>' +
+        '</span>';
+      }).join('');
+      if (mp && mp.render) {
+        Array.prototype.forEach.call(strip.querySelectorAll('[data-jt-thumb]'), function (el) {
+          mp.render(el, el.getAttribute('data-jt-thumb'));
+        });
+      }
+    }
+
+    body.addEventListener('click', function (e) {
+      var view = e.target.closest('[data-jt-thumb]');
+      if (view) { _openLightbox(view.getAttribute('data-jt-thumb')); return; }
+      var del = e.target.closest('[data-jt-del]');
+      if (del) {
+        var id = del.getAttribute('data-jt-del');
+        working = working.filter(function (x) { return x !== id; });
+        _drawStrip();
+      }
+    });
+
+    var addBtn = body.querySelector('#jt-add-img');
+    if (addBtn && mp && mp.pick) {
+      addBtn.addEventListener('click', function () {
+        addBtn.disabled = true;
+        Promise.resolve(mp.pick({ maxDim: 1280, quality: 0.82 })).then(function (id) {
+          if (id) { working.push(id); _drawStrip(); }
+        }).catch(function () {}).then(function () { addBtn.disabled = false; });
+      });
+    }
+
+    _drawStrip();
 
     ui.modal({
       title: isNew ? 'Novo Tópico' : 'Editar Tópico',
       body: body,
+      onClose: function () {
+        // Cancelado: descarta blobs recém-adicionados que não foram salvos.
+        if (saved || !store || !store.deleteBlob) return;
+        working.forEach(function (id) { if (origImages.indexOf(id) === -1) store.deleteBlob(id); });
+      },
       actions: [
         { label: 'Cancelar' },
         { label: 'Salvar', primary: true, onClick: function () {
@@ -181,6 +286,12 @@
           t.date     = document.getElementById('jt-date').value || t.date;
           t.content  = document.getElementById('jt-content').value || '';
           t.order    = parseInt(document.getElementById('jt-order').value, 10) || 0;
+          t.images   = working.slice();
+          saved      = true;
+          // Limpa blobs realmente removidos (estavam no original, saíram agora).
+          if (store && store.deleteBlob) {
+            origImages.forEach(function (id) { if (working.indexOf(id) === -1) store.deleteBlob(id); });
+          }
           var topics = _getTopics();
           var idx = topics.findIndex(function (x) { return x.id === t.id; });
           if (idx >= 0) topics[idx] = t; else topics.push(t);
@@ -227,7 +338,14 @@
   }
 
   function _deleteTopic(id) {
-    var topics = _getTopics().filter(function (t) { return t.id !== id; });
+    var all = _getTopics();
+    var gone = all.find(function (t) { return t.id === id; });
+    // Libera os blobs das imagens do tópico removido (evita lixo no IndexedDB).
+    var store = window.CoC && window.CoC.storage;
+    if (gone && Array.isArray(gone.images) && store && store.deleteBlob) {
+      gone.images.forEach(function (imgId) { store.deleteBlob(imgId); });
+    }
+    var topics = all.filter(function (t) { return t.id !== id; });
     _save(topics);
     render();
   }
@@ -244,6 +362,8 @@
     if (container && !container._journalDelegated) {
       container._journalDelegated = true;
       container.addEventListener('click', function (e) {
+        var thumb = e.target.closest('[data-journal-img]');
+        if (thumb) { e.preventDefault(); _openLightbox(thumb.getAttribute('data-journal-img')); return; }
         var link = e.target.closest('[data-journal-link]');
         if (link) { e.preventDefault(); _gotoByTitle(link.dataset.journalLink); return; }
         var ed = e.target.closest('[data-journal-edit]');
