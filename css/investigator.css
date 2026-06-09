@@ -2735,3 +2735,15 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   .wz-tip { border-left: none; border-top: 1px solid var(--ink-faded); }
   .wz-grid2, .wz-attrs { grid-template-columns: 1fr; }
 }
+
+/* Wizard — passo Ocupação */
+.wz-occ-sugg { font-size: 0.85rem; color: var(--ink-dim); margin: 0 0 0.6rem; }
+.wz-occ-pick { background: color-mix(in srgb, var(--brass) 14%, var(--bg-card-hi)); border: 1px solid var(--brass); color: var(--brass-bright); border-radius: var(--radius); padding: 0.2rem 0.6rem; cursor: pointer; font-weight: 600; }
+.wz-occ-select { width: 100%; background: var(--bg-deep); border: 1px solid var(--ink-faded); border-radius: var(--radius); color: var(--ink); padding: 0.45rem 0.55rem; font-size: 0.95rem; }
+.wz-occ-card { margin-top: 0.9rem; background: var(--bg-card-hi); border: 1px solid var(--ink-faded); border-left: 3px solid var(--brass); border-radius: var(--radius); padding: 0.8rem 0.9rem; }
+.wz-occ-desc { font-size: 0.88rem; color: var(--ink-dim); margin: 0 0 0.6rem; line-height: 1.45; }
+.wz-occ-meta { display: flex; flex-wrap: wrap; gap: 0.5rem 1.2rem; font-size: 0.85rem; color: var(--ink); margin-bottom: 0.6rem; }
+.wz-occ-meta small { color: var(--ink-faded); }
+.wz-occ-skills { font-size: 0.85rem; color: var(--ink-dim); line-height: 1.5; }
+.wz-occ-skills b { color: var(--ink); }
+.wz-occ-skills i { color: var(--brass); }

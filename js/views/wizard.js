@@ -41,7 +41,8 @@ window.CoC.views = window.CoC.views || {};
     { id: 'conceito',  label: 'Conceito',  tip: 'Crie uma PESSOA antes dos números. Essas escolhas não travam nada — só dão sentido ao personagem e vão sugerir a ocupação depois.' },
     { id: 'pessoa',    label: 'Personagem', tip: 'Quem é o investigador. A IDADE tem efeito mecânico: jovens são mais sortudos mas menos preparados; mais velhos sabem mais, mas o corpo cobra o preço.' },
     { id: 'atributos', label: 'Atributos', tip: 'Valores são percentuais (0–99). Distribua os pontos — repare os DERIVADOS (Vida, Sanidade, Magia) mudando ao vivo: é CON+TAM que te dá Vida, e POD que te dá Sanidade.' },
-    { id: 'resumo',    label: 'Resumo',    tip: 'Confira e finalize. Você cai na ficha completa para escolher Ocupação, Perícias e Equipamento (próxima fatia do assistente).' }
+    { id: 'ocupacao',  label: 'Ocupação',  tip: 'Sua ocupação define onde você foi treinado — e quantos pontos você terá para gastar em perícias. Ela já marca as perícias profissionais e a faixa de Crédito para você.' },
+    { id: 'resumo',    label: 'Resumo',    tip: 'Confira e finalize. Na ficha você distribui os pontos de perícia (Ocupação + Interesse), que já vêm calculados aqui.' }
   ];
 
   var _opts = null, _root = null, W = null;
@@ -64,7 +65,8 @@ window.CoC.views = window.CoC.views || {};
     return {
       conceito:   { arquetipo: '', traco: '', motivacao: '' },
       identidade: { nome: '', jogador: '', idade: 28, pronomes: '', residencia: '', nascimento: '' },
-      atributos:  attrs
+      atributos:  attrs,
+      ocupacao:   { nome: '' }
     };
   }
 
@@ -158,16 +160,67 @@ window.CoC.views = window.CoC.views || {};
       '<h4 class="wz-dv-title">Derivados (atualizam ao vivo)</h4>' + derived;
   }
 
+  function _occPoints(occ) {
+    var r = _rules(), n = _numAttrs();
+    var occRaw = r.calcOccupationPoints ? r.calcOccupationPoints(occ.pointsFormula, n) : null;
+    var occPts = occRaw && occRaw.points != null ? occRaw.points : (occRaw || 0);
+    var piRaw  = r.calcPersonalInterestPoints ? r.calcPersonalInterestPoints(n.INT) : (n.INT * 2);
+    var piPts  = (piRaw && typeof piRaw === 'object') ? (piRaw.points || 0) : piRaw;
+    return { occ: occPts, pi: piPts };
+  }
+
+  function _renderOcupacao() {
+    var occs = (window.CoCData && window.CoCData.occupations) || [];
+    var arq = ARQUETIPOS.filter(function (x) { return x.id === W.conceito.arquetipo; })[0];
+    var suggested = arq && arq.occ ? arq.occ : '';
+    var sel = W.ocupacao.nome || '';
+
+    var options = '<option value="">— escolha uma ocupação —</option>' + occs.map(function (o) {
+      return '<option value="' + _esc(o.name) + '"' + (o.name === sel ? ' selected' : '') + '>' + _esc(o.name) + '</option>';
+    }).join('');
+
+    var details = '';
+    var occ = sel && window.CoCData.findOccupation ? window.CoCData.findOccupation(sel) : null;
+    if (occ) {
+      var pts = _occPoints(occ);
+      var cred = occ.credit ? (occ.credit[0] + '–' + occ.credit[1] + '%') : '—';
+      details = '<div class="wz-occ-card">' +
+        (occ.description ? '<p class="wz-occ-desc">' + _esc(occ.description) + '</p>' : '') +
+        '<div class="wz-occ-meta">' +
+          '<span>💰 Crédito <b>' + cred + '</b></span>' +
+          '<span>🎯 Pts. Ocupação <b>' + pts.occ + '</b> <small>(' + _esc(occ.pointsFormula) + ')</small></span>' +
+          '<span>🧠 Pts. Interesse <b>' + pts.pi + '</b> <small>(INT×2)</small></span>' +
+        '</div>' +
+        '<div class="wz-occ-skills"><b>Perícias da ocupação:</b> ' +
+          (occ.skills || []).map(_esc).join(' · ') +
+          (occ.anySkillsCount ? ' <i>+ ' + occ.anySkillsCount + ' livre(s)</i>' : '') +
+        '</div>' +
+      '</div>';
+    }
+
+    return (suggested
+        ? '<p class="wz-occ-sugg">Combina com <b>' + _esc(arq.label) + '</b>: ' +
+          '<button type="button" class="wz-occ-pick" data-occ="' + _esc(suggested) + '">' + _esc(suggested) + '</button></p>'
+        : '') +
+      '<label class="wz-field"><span>Ocupação</span><select class="wz-occ-select"><!---->' + options + '</select></label>' +
+      details;
+  }
+
   function _renderResumo() {
     var i = W.identidade, a = W.atributos, dv = _derived(_numAttrs());
     var arq = ARQUETIPOS.filter(function (x) { return x.id === W.conceito.arquetipo; })[0];
     var attrLine = POOL.map(function (c) { return c + ' ' + a[c]; }).join(' · ') + ' · Sorte ' + a.Sorte;
+    var occName = W.ocupacao.nome || '';
+    var occ = occName && window.CoCData.findOccupation ? window.CoCData.findOccupation(occName) : null;
+    var pts = occ ? _occPoints(occ) : null;
     return '<div class="wz-summary">' +
       '<div class="wz-sum-row"><b>' + (_esc(i.nome) || '(sem nome)') + '</b>' + (i.idade ? ' · ' + _esc(i.idade) + ' anos' : '') + (arq ? ' · ' + arq.icon + ' ' + _esc(arq.label) : '') + '</div>' +
       (W.conceito.traco || W.conceito.motivacao ? '<div class="wz-sum-row dim">' + _esc(W.conceito.traco) + (W.conceito.motivacao ? ' · busca ' + _esc(W.conceito.motivacao) : '') + '</div>' : '') +
+      (occName ? '<div class="wz-sum-row">💼 <b>' + _esc(occName) + '</b>' + (occ && occ.credit ? ' · Crédito ' + occ.credit[0] + '–' + occ.credit[1] + '%' : '') + '</div>' : '<div class="wz-sum-row dim">Sem ocupação — escolha no passo anterior ou depois na ficha.</div>') +
       '<div class="wz-sum-row mono">' + attrLine + '</div>' +
       '<div class="wz-sum-row">Vida ' + dv.pv + ' · Sanidade ' + dv.san + ' · Magia ' + dv.pm + ' · Esquiva ' + dv.esquiva + '%</div>' +
-      '<p class="wz-sum-next">Ao concluir, você cai na ficha completa para escolher <b>Ocupação</b>, <b>Perícias</b> e <b>Equipamento</b>.</p>' +
+      (pts ? '<p class="wz-sum-next">Ao concluir, a ficha já vem com a ocupação e as perícias marcadas. Você distribui <b>' + pts.occ + '</b> pontos de Ocupação + <b>' + pts.pi + '</b> de Interesse na aba <b>Perícias</b>.</p>'
+           : '<p class="wz-sum-next">Ao concluir, você completa Ocupação, Perícias e Equipamento na ficha.</p>') +
     '</div>';
   }
 
@@ -176,6 +229,7 @@ window.CoC.views = window.CoC.views || {};
       case 'conceito':  return _renderConceito();
       case 'pessoa':    return _renderPessoa();
       case 'atributos': return _renderAtributos();
+      case 'ocupacao':  return _renderOcupacao();
       case 'resumo':    return _renderResumo();
     }
     return '';
@@ -250,6 +304,12 @@ window.CoC.views = window.CoC.views || {};
         _saveResume(); _render();
       };
     });
+    // Ocupação: select + sugestão
+    var occSel = $('.wz-occ-select');
+    if (occSel) occSel.onchange = function () { W.ocupacao.nome = occSel.value; _saveResume(); _render(); };
+    var occPick = $('.wz-occ-pick');
+    if (occPick) occPick.onclick = function () { W.ocupacao.nome = occPick.dataset.occ; _saveResume(); _render(); };
+
     var luck = $('.wz-roll-luck');
     if (luck) luck.onclick = function () {
       var d = window.CoC.dice;
@@ -264,7 +324,7 @@ window.CoC.views = window.CoC.views || {};
   }
 
   function _finish() {
-    var data = { conceito: W.conceito, identidade: W.identidade, atributos: _numAttrs() };
+    var data = { conceito: W.conceito, identidade: W.identidade, atributos: _numAttrs(), ocupacao: W.ocupacao };
     _clearResume();
     _close();
     if (_opts && _opts.onFinish) _opts.onFinish(data);

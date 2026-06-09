@@ -787,6 +787,20 @@
       });
     });
 
+    // Ocupação: já marca perícias profissionais + faixa de Crédito (o jogador
+    // distribui os pontos na aba Perícias da ficha, que tem a UI de pools).
+    const occName = (data.ocupacao && data.ocupacao.nome) || "";
+    if (occName) {
+      inv.occupation = occName;
+      const occ = window.CoCData.findOccupation ? window.CoCData.findOccupation(occName) : null;
+      if (occ) {
+        base.occupationSkills = (occ.skills || []).filter((s, ix, arr) => arr.indexOf(s) === ix);
+        const credMin = (occ.credit && occ.credit[0]) || 0;
+        base.skills = base.skills || {};
+        base.skills["Nível de Crédito"] = Object.assign({}, base.skills["Nível de Crédito"], { value: credMin });
+      }
+    }
+
     loadCharacter(base);   // normaliza + SET_CHARACTER → RECALC_DERIVED + renderAll
     persistCurrent();
     toast("Investigador criado! Agora escolha Ocupação e Perícias na ficha.", { type: "success" });
