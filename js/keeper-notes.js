@@ -44,5 +44,7 @@
   else init();
 
   window.CoC = window.CoC || {};
-  window.CoC.keeperNotes = { init: init };
+  // Renomeado de keeperNotes → keeperLore: este módulo só faz bind da Lore (T6).
+  // window.CoC.keeperNotes agora pertence ao sistema avançado (keeper-notes-advanced.js).
+  window.CoC.keeperLore = { init: init };
 })();

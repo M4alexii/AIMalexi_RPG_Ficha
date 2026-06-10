@@ -41,21 +41,12 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
   var _currentTagFilter = null;
   var _recentNotesKey = "keeper-notes-recent";
   var _recentNotesMax = 5;
+  var _viewMode = "list"; // "list" | "folders" | "timeline" | "trash"
 
   function _getAllNotes() {
-    var allNotes = [];
-    try {
-      var store = window.CoC.storage;
-      if (store && store.getAllCustomData) {
-        var allData = store.getAllCustomData();
-        allData.forEach(function (item) {
-          if (item && item.key && item.key.indexOf("keeper-notes/") === 0) {
-            allNotes.push(item.value);
-          }
-        });
-      }
-    } catch (e) {}
-    return allNotes;
+    // Usa a API do core (exclui notas na lixeira)
+    if (notes && notes.list) return notes.list();
+    return [];
   }
 
   function _getAllTags() {
@@ -116,6 +107,43 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
     });
 
     searchHeader.appendChild(searchBox);
+
+    // View mode selector: lista · pastas · timeline · lixeira
+    var viewModes = [
+      { id: "list", icon: "📄", label: "Lista" },
+      { id: "folders", icon: "📁", label: "Pastas" },
+      { id: "timeline", icon: "📅", label: "Timeline" },
+      { id: "trash", icon: "🗑️", label: "Lixeira" }
+    ];
+    var modeBar = el("div", { style: { display: "flex", gap: "0.2rem", marginBottom: "0.5rem" } });
+    viewModes.forEach(function (mode) {
+      var active = _viewMode === mode.id;
+      var btn = el("button", {
+        title: mode.label,
+        style: {
+          flex: "1",
+          padding: "0.3rem 0.2rem",
+          fontSize: "0.7rem",
+          background: active ? "var(--brass)" : "transparent",
+          color: active ? "var(--bg-deep)" : "var(--ink-dim)",
+          border: "1px solid " + (active ? "var(--brass)" : "var(--ink-faded)"),
+          borderRadius: "var(--radius)",
+          cursor: "pointer"
+        }
+      }, [mode.icon]);
+      btn.addEventListener("click", function () {
+        _viewMode = mode.id;
+        buildNoteList();
+      });
+      modeBar.appendChild(btn);
+    });
+    searchHeader.appendChild(modeBar);
+
+    // Dica de operadores de busca
+    var searchHint = el("div", {
+      style: { fontSize: "0.6rem", color: "var(--ink-faded)", marginBottom: "0.4rem" }
+    }, ['Operadores: tag:pista · folder:ato1 · created:>2026-01-01 · updated:<7d · "frase" · -termo']);
+    searchHeader.appendChild(searchHint);
 
     // Tag filter buttons (Phase C)
     var allTags = _getAllTags();
@@ -184,16 +212,17 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
     var container = document.querySelector("#keeper-notes-list .notes-list");
     if (!container) return;
 
-    var allNotes = _getAllNotes();
-    var filtered = allNotes;
+    // Modo lixeira: lista separada com restore/purge
+    if (_viewMode === "trash") {
+      renderTrashView(container);
+      return;
+    }
 
-    // Apply search filter
+    var filtered = _getAllNotes();
+
+    // Busca com operadores (tag:, created:>, "frase", -excluído) via core
     if (_currentSearchQuery) {
-      var q = _currentSearchQuery.toLowerCase();
-      filtered = filtered.filter(function (note) {
-        return (note.title && note.title.toLowerCase().indexOf(q) !== -1) ||
-               (note.content && note.content.toLowerCase().indexOf(q) !== -1);
-      });
+      filtered = notes.search(_currentSearchQuery);
     }
 
     // Apply tag filter
@@ -203,7 +232,143 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
       });
     }
 
-    renderNoteListResults(filtered, container);
+    if (_viewMode === "folders") {
+      renderFolderView(filtered, container);
+    } else if (_viewMode === "timeline") {
+      renderTimelineView(filtered, container);
+    } else {
+      renderNoteListResults(filtered, container);
+    }
+  }
+
+  // ─── Folder View (Sprint 2) ──────────────────────────────────────────────
+
+  function renderFolderView(notesList, container) {
+    container.innerHTML = "";
+
+    if (notesList.length === 0) {
+      container.appendChild(el("div", { class: "notes-list-empty" }, ["Nenhuma nota encontrada."]));
+      return;
+    }
+
+    // Agrupa por pasta ("/" sugere subpastas, como no diário)
+    var groups = {}, order = [];
+    notesList.forEach(function (note) {
+      var f = (note.folder || "").trim() || "— Sem pasta —";
+      if (!groups[f]) { groups[f] = []; order.push(f); }
+      groups[f].push(note);
+    });
+    order.sort(function (a, b) { return a.localeCompare(b); });
+
+    order.forEach(function (folderName) {
+      var details = document.createElement("details");
+      details.open = true;
+      details.className = "notes-folder";
+
+      var summary = document.createElement("summary");
+      summary.className = "notes-folder-head";
+      summary.textContent = "📁 " + folderName + " (" + groups[folderName].length + ")";
+      details.appendChild(summary);
+
+      var body = el("div", { style: { paddingLeft: "0.6rem" } });
+      groups[folderName].forEach(function (note) {
+        body.appendChild(_noteItemEl(note));
+      });
+      details.appendChild(body);
+      container.appendChild(details);
+    });
+  }
+
+  // ─── Timeline View (Sprint 3) ────────────────────────────────────────────
+
+  function renderTimelineView(notesList, container) {
+    container.innerHTML = "";
+
+    if (notesList.length === 0) {
+      container.appendChild(el("div", { class: "notes-list-empty" }, ["Nenhuma nota encontrada."]));
+      return;
+    }
+
+    // Agrupa por data de atualização (YYYY-MM-DD), mais recente primeiro
+    var groups = {}, order = [];
+    notesList.slice().sort(function (a, b) {
+      return (b.updatedAt || "").localeCompare(a.updatedAt || "");
+    }).forEach(function (note) {
+      var day = (note.updatedAt || "").slice(0, 10) || "sem data";
+      if (!groups[day]) { groups[day] = []; order.push(day); }
+      groups[day].push(note);
+    });
+
+    order.forEach(function (day) {
+      var dayLabel;
+      try {
+        dayLabel = new Date(day + "T12:00:00").toLocaleDateString("pt-BR", {
+          weekday: "short", day: "numeric", month: "short", year: "numeric"
+        });
+      } catch (e) { dayLabel = day; }
+
+      var header = el("div", {
+        style: {
+          fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.08em",
+          color: "var(--brass)", padding: "0.5rem 0 0.3rem",
+          borderBottom: "1px solid var(--ink-faded)", marginBottom: "0.4rem"
+        }
+      }, ["📅 " + dayLabel]);
+      container.appendChild(header);
+
+      groups[day].forEach(function (note) {
+        container.appendChild(_noteItemEl(note));
+      });
+    });
+  }
+
+  // ─── Trash View (Sprint 1) ───────────────────────────────────────────────
+
+  function renderTrashView(container) {
+    container.innerHTML = "";
+
+    var trash = notes.getTrash();
+    if (trash.length === 0) {
+      container.appendChild(el("div", { class: "notes-list-empty" }, ["🗑️ Lixeira vazia."]));
+      return;
+    }
+
+    var hint = el("div", {
+      style: { fontSize: "0.7rem", color: "var(--ink-faded)", marginBottom: "0.6rem" }
+    }, ["Notas removidas são apagadas definitivamente após 30 dias."]);
+    container.appendChild(hint);
+
+    trash.forEach(function (note) {
+      var item = el("div", {
+        class: "note-item",
+        style: { opacity: "0.75" }
+      });
+
+      item.appendChild(el("div", { style: { fontWeight: "700", color: "var(--ink)" } }, [note.title || "(sem título)"]));
+      item.appendChild(el("div", { style: { fontSize: "0.7rem", color: "var(--ink-faded)" } },
+        ["Removida em " + new Date(note.deletedAt).toLocaleDateString("pt-BR")]));
+
+      var btns = el("div", { style: { display: "flex", gap: "0.4rem", marginTop: "0.4rem" } });
+
+      var restoreBtn = el("button", { class: "btn-ghost btn-sm", style: { fontSize: "0.7rem" } }, ["♻️ Restaurar"]);
+      restoreBtn.addEventListener("click", function () {
+        notes.restore(note.id);
+        buildNoteList();
+      });
+      btns.appendChild(restoreBtn);
+
+      var purgeBtn = el("button", { class: "btn-ghost btn-sm", style: { fontSize: "0.7rem", color: "var(--danger, #c0392b)" } }, ["✕ Apagar de vez"]);
+      purgeBtn.addEventListener("click", function () {
+        if (window.confirm("Apagar esta nota DEFINITIVAMENTE? Não há volta.")) {
+          notes.purge(note.id);
+          buildNoteList();
+        }
+      });
+      btns.appendChild(purgeBtn);
+
+      item.appendChild(btns);
+      container.appendChild(item);
+    });
   }
 
   function renderNoteListResults(notesList, container) {
@@ -223,57 +388,62 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
     }
 
     notesList.forEach(function (note) {
-      var item = el("div", {
-        class: "note-item" + (currentNoteId === note.id ? " active" : ""),
-        style: {
-          padding: "0.6rem 0.8rem",
-          borderLeft: currentNoteId === note.id ? "3px solid var(--brass)" : "3px solid transparent",
-          background: currentNoteId === note.id ? "var(--bg-card)" : "var(--bg-card-hi)",
-          cursor: "pointer",
-          marginBottom: "0.4rem",
-          borderRadius: "var(--radius)",
-          transition: "all 0.15s"
-        }
-      });
-
-      var title = el("div", {
-        style: { fontWeight: "700", color: "var(--ink)", marginBottom: "0.2rem" }
-      }, [note.title]);
-
-      var date = el("div", {
-        style: { fontSize: "0.7rem", color: "var(--ink-faded)" }
-      }, [new Date(note.updatedAt).toLocaleDateString("pt-BR")]);
-
-      var tags = el("div", {
-        style: { fontSize: "0.75rem", marginTop: "0.3rem" }
-      });
-
-      (note.tags || []).forEach(function (tag) {
-        var badge = el("span", {
-          style: {
-            display: "inline-block",
-            background: "rgba(184, 146, 79, 0.2)",
-            border: "1px solid var(--brass)",
-            color: "var(--brass)",
-            padding: "0.1rem 0.4rem",
-            borderRadius: "0.3rem",
-            marginRight: "0.3rem",
-            fontSize: "0.65rem"
-          }
-        }, ["#" + tag]);
-        tags.appendChild(badge);
-      });
-
-      item.appendChild(title);
-      item.appendChild(date);
-      item.appendChild(tags);
-
-      item.addEventListener("click", function () {
-        openNote(note.id);
-      });
-
-      container.appendChild(item);
+      container.appendChild(_noteItemEl(note));
     });
+  }
+
+  // Item de nota reutilizável (lista, pastas, timeline)
+  function _noteItemEl(note) {
+    var item = el("div", {
+      class: "note-item" + (currentNoteId === note.id ? " active" : ""),
+      style: {
+        padding: "0.6rem 0.8rem",
+        borderLeft: currentNoteId === note.id ? "3px solid var(--brass)" : "3px solid transparent",
+        background: currentNoteId === note.id ? "var(--bg-card)" : "var(--bg-card-hi)",
+        cursor: "pointer",
+        marginBottom: "0.4rem",
+        borderRadius: "var(--radius)",
+        transition: "all 0.15s"
+      }
+    });
+
+    var title = el("div", {
+      style: { fontWeight: "700", color: "var(--ink)", marginBottom: "0.2rem" }
+    }, [note.title]);
+
+    var date = el("div", {
+      style: { fontSize: "0.7rem", color: "var(--ink-faded)" }
+    }, [new Date(note.updatedAt).toLocaleDateString("pt-BR")]);
+
+    var tags = el("div", {
+      style: { fontSize: "0.75rem", marginTop: "0.3rem" }
+    });
+
+    (note.tags || []).forEach(function (tag) {
+      var badge = el("span", {
+        style: {
+          display: "inline-block",
+          background: "rgba(184, 146, 79, 0.2)",
+          border: "1px solid var(--brass)",
+          color: "var(--brass)",
+          padding: "0.1rem 0.4rem",
+          borderRadius: "0.3rem",
+          marginRight: "0.3rem",
+          fontSize: "0.65rem"
+        }
+      }, ["#" + tag]);
+      tags.appendChild(badge);
+    });
+
+    item.appendChild(title);
+    item.appendChild(date);
+    item.appendChild(tags);
+
+    item.addEventListener("click", function () {
+      openNote(note.id);
+    });
+
+    return item;
   }
 
   // ─── Note Templates (Phase E) ────────────────────────────────────────────
@@ -465,6 +635,14 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
     exportBtn.addEventListener("click", exportCurrentNoteAsMarkdown);
     actions.appendChild(exportBtn);
 
+    // Histórico de versões (Sprint 3)
+    var historyBtn = el("button", {
+      class: "btn-ghost btn-sm",
+      style: { padding: "0.4rem 0.6rem", fontSize: "0.75rem" }
+    }, ["🕐 Histórico"]);
+    historyBtn.addEventListener("click", function () { _showHistoryPanel(noteId); });
+    actions.appendChild(historyBtn);
+
     var deleteBtn = el("button", {
       class: "btn-ghost btn-sm",
       style: { padding: "0.4rem 0.6rem", fontSize: "0.75rem", color: "var(--danger)" }
@@ -504,6 +682,30 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
     });
 
     header.appendChild(tagsInput);
+
+    // Folder input (Sprint 2 — organização por pastas)
+    var folderInput = el("input", {
+      type: "text",
+      placeholder: "📁 Pasta (use / para subpastas): Ato 1/Mansão",
+      value: note.folder || "",
+      style: {
+        fontSize: "0.85rem",
+        width: "100%",
+        padding: "0.4rem",
+        marginTop: "0.4rem",
+        border: "1px solid var(--ink-faded)",
+        borderRadius: "var(--radius)",
+        background: "var(--bg-deep)",
+        color: "var(--ink)"
+      }
+    });
+
+    folderInput.addEventListener("change", function () {
+      notes.update(noteId, { folder: this.value.trim() });
+      buildNoteList();
+    });
+
+    header.appendChild(folderInput);
     editor.appendChild(header);
 
     // Content editor
@@ -704,6 +906,82 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
     openNote(note.id);
   }
 
+  // ─── Version History Panel (Sprint 3) ────────────────────────────────────
+
+  function _showHistoryPanel(noteId) {
+    var history = notes.getHistory(noteId);
+    var modalUi = window.CoC.ui;
+
+    var body = document.createElement("div");
+
+    if (history.length === 0) {
+      body.innerHTML = "<p style='color:var(--ink-faded);font-style:italic'>Nenhuma versão anterior. Snapshots são criados a cada alteração de conteúdo.</p>";
+    } else {
+      history.forEach(function (snap, idx) {
+        var entry = el("div", {
+          style: {
+            padding: "0.6rem",
+            marginBottom: "0.5rem",
+            border: "1px solid var(--ink-faded)",
+            borderRadius: "var(--radius)",
+            background: "var(--bg-deep)"
+          }
+        });
+
+        var when;
+        try { when = new Date(snap.savedAt).toLocaleString("pt-BR"); }
+        catch (e) { when = snap.savedAt || "?"; }
+
+        entry.appendChild(el("div", {
+          style: { fontSize: "0.75rem", color: "var(--brass)", marginBottom: "0.3rem" }
+        }, ["v-" + (history.length - idx) + " · " + when + " · " + (snap.title || "")]));
+
+        var previewText = (snap.content || "").slice(0, 200);
+        if ((snap.content || "").length > 200) previewText += "…";
+        entry.appendChild(el("div", {
+          style: { fontSize: "0.75rem", color: "var(--ink-dim)", whiteSpace: "pre-wrap", maxHeight: "80px", overflow: "hidden" }
+        }, [previewText]));
+
+        var restoreBtn = el("button", {
+          class: "btn-ghost btn-sm",
+          style: { marginTop: "0.4rem", fontSize: "0.7rem" }
+        }, ["♻️ Restaurar esta versão"]);
+        restoreBtn.addEventListener("click", function () {
+          if (window.confirm("Restaurar esta versão? A versão atual vira um snapshot no histórico.")) {
+            notes.restoreVersion(noteId, idx);
+            // Fecha modal (se houver) e reabre a nota
+            var overlay = document.querySelector(".modal-overlay:not([id])");
+            if (overlay) overlay.remove();
+            openNote(noteId);
+          }
+        });
+        entry.appendChild(restoreBtn);
+
+        body.appendChild(entry);
+      });
+    }
+
+    if (modalUi && modalUi.modal) {
+      modalUi.modal({
+        title: "🕐 Histórico de Versões",
+        body: body,
+        actions: [{ label: "Fechar" }]
+      });
+    } else {
+      // Fallback sem modal: injeta no editor
+      var editor = $("keeper-notes-editor");
+      if (editor) {
+        var panel = el("div", { style: { marginTop: "1rem", borderTop: "2px solid var(--brass)", paddingTop: "1rem" } });
+        panel.appendChild(el("h3", {}, ["🕐 Histórico de Versões"]));
+        panel.appendChild(body);
+        var closeBtn = el("button", { class: "btn-ghost btn-sm" }, ["Fechar"]);
+        closeBtn.addEventListener("click", function () { panel.remove(); });
+        panel.appendChild(closeBtn);
+        editor.appendChild(panel);
+      }
+    }
+  }
+
   // ─── Keyboard Shortcuts (Phase F) ────────────────────────────────────────
 
   function _setupKeyboardShortcuts() {
@@ -742,6 +1020,12 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
       console.warn("[keeper-notes-ui] DOM containers não encontrados (keeper-notes-list, keeper-notes-editor)");
       return;
     }
+
+    // Limpeza automática: purga notas na lixeira há mais de 30 dias
+    try {
+      var purged = notes.purgeExpired();
+      if (purged > 0) console.log("[keeper-notes-ui] " + purged + " nota(s) expirada(s) removida(s) da lixeira");
+    } catch (e) {}
 
     // Renderiza a lista de notas
     buildNoteList();

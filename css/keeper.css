@@ -2464,3 +2464,23 @@
 textarea {
   font-family: var(--font-mono);
 }
+
+/* Folder view (Notas Avançadas) */
+.notes-folder {
+  margin-bottom: 0.5rem;
+}
+
+.notes-folder-head {
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--brass);
+  padding: 0.4rem 0.2rem;
+  border-bottom: 1px solid var(--ink-faded);
+  margin-bottom: 0.4rem;
+  user-select: none;
+}
+
+.notes-folder-head:hover {
+  color: var(--keeper-accent-bright, var(--brass));
+}
