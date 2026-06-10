@@ -28,8 +28,14 @@ Para detalhes históricos de arquitetura e fases antigas, consulte também
   (a versão atual vira snapshot ao restaurar).
 - **Export/Import**: exporta nota atual ou todas em Markdown, backup completo
   em JSON e importa arquivos `.md` (títulos `#`/`##` viram notas).
-- **Suíte de testes nova** (`js/tests/test-keeper-notes.js`, 59 assertions):
-  CRUD, wikilinks/backlinks, operadores de busca, lixeira e versionamento.
+- **Campos customizados por nota** (chave=valor, ex.: PV, SAN, Região):
+  seção "Campos" no editor com adicionar/remover; operador de busca
+  `campo:chave=valor` (alias `field:`); incluídos como tabela no export
+  Markdown; modelos já vêm com campos típicos (PNJ → PV/SAN/Ocupação).
+- **Guia do usuário** das Notas Avançadas: `docs/GUIA_NOTAS_AVANCADAS.md`.
+- **Suíte de testes nova** (`js/tests/test-keeper-notes.js`, 75 assertions):
+  CRUD, wikilinks/backlinks, operadores de busca, campos customizados,
+  lixeira e versionamento.
 
 ### Corrigido
 
