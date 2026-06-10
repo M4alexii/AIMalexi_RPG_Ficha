@@ -5,6 +5,33 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-10 - Loop de combate do Guardião e endurecimento do PWA
+
+### Adicionado
+
+- **Loop de combate fechado no Guardião** (`rollAttack` em `js/keeper.js`):
+  após um acerto, o dano é aplicado automaticamente ao PV da criatura no
+  tracker de encontro (match por `sourceId`). A **armadura absorve** dano
+  (`líquido = max(0, dano − armadura)`, com toast informativo), **Ferimento
+  Grave** é detectado quando o dano bruto ≥ metade do PV máximo (toast de
+  aviso) e a criatura é marcada como morta automaticamente ao chegar a 0 PV.
+  Antes, o ataque só logava o roll e o Guardião aplicava tudo à mão.
+- **Detecção de múltiplas abas** (`js/shared/multi-tab-warning.js`): em modo
+  local, abas duplicadas do investigador/guardião dessincronizam o store em
+  memória — agora um aviso é exibido via BroadcastChannel.
+
+### Alterado
+
+- **Ícone PWA real**: `manifest.json` deixou o emoji data-URI e passou a usar
+  `assets/icon-512.png` (512×512, `purpose` any + maskable) — instalação como
+  app passa a ter ícone válido em todas as plataformas.
+- **Content-Security-Policy** via `<meta>` nas 5 páginas HTML: `default-src
+  'self'`, imagens/mídia locais + `blob:`/`data:`, scripts locais +
+  `cdn.jsdelivr.net` (SDK Supabase interino), `object-src 'none'`,
+  `frame-ancestors 'none'`. `'unsafe-inline'` permanece necessário pelos
+  scripts inline de registro do SW.
+- `sw.js`: precache de `multi-tab-warning.js`; `CACHE_VERSION` v77 → v78.
+
 ## 2026-06-10 - UX Grimório: tutorial do Guardião, diário Obsidian e UI game-style
 
 ### Adicionado
