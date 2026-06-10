@@ -5,6 +5,30 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-10 - Títulos e estatísticas derivadas legíveis + destaque nítido nos números
+
+### Corrigido
+
+- **Títulos de seção invisíveis em todas as abas** ("Identidade", "Perícias",
+  "Estatísticas Derivadas"…): `.app-shell .section-title` usava `--ink-doc`
+  (tinta de papel) sobre o fundo escuro de `.section` — contraste 1.3:1.
+  Agora `--candle-bright` com sombra de recorte nítida.
+- **Valores das Estatísticas Derivadas invisíveis** (aba Combate): PV/PM/SAN/
+  Movimento/Bônus de Dano/Corpo/Armadura em `.derived-card` usavam tinta de
+  documento sobre card escuro. Agora creme claro com sombra nítida.
+- **Botão "Editar Investigador" ilegível**: brass claro sobre parchment claro
+  (1.57:1). Agora tinta de documento, com hover âmbar translúcido.
+
+### Melhorado
+
+- **Destaque nítido em números e títulos**: text-shadows tipo "glow" difuso
+  (que davam aparência desfocada/apagada) substituídos por sombras de recorte
+  (`0 1px 2px`) e cores mais brilhantes (`--candle-bright`, `#f5ecd8`) em
+  atributos, vitais, estatísticas derivadas e títulos de seção.
+- Varredura automatizada de contraste (Puppeteer, 6 abas, 375px): 0 elementos
+  abaixo de 2.5:1 após as correções.
+- `CACHE_VERSION` v80 → v81.
+
 ## 2026-06-10 - Correção de visibilidade dos atributos no mobile + dark mode do SO
 
 ### Corrigido

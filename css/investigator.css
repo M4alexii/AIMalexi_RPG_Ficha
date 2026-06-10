@@ -608,7 +608,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
 }
 /* dark card bg — ink-doc (parchment ink) would be invisible here */
 .svital .svital-label { color: var(--ink-dim); }
-.svital .svital-value { color: var(--ink); }
+.svital .svital-value { color: #f5ecd8; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85); }
 .svital .svital-max   { color: var(--ink-dim); }
 .svital-pv   { border-left-color: var(--blood); }
 .svital-san  { border-left-color: #5a8fb5; }
@@ -622,13 +622,14 @@ body[data-difficulty="extreme"] .skill-frac-sep {
 .svital-pm   .svital-label::before { content: "\2726"; }   /* ✦ */
 .svital-luck .svital-label::before { content: "\1F340"; }  /* 🍀 */
 
-/* Botão "Editar Investigador" no rodapé da sidebar */
+/* Botão "Editar Investigador" no rodapé da sidebar — assenta sobre parchment,
+   então usa tinta de documento (brass claro seria ilegível aqui) */
 .sidebar-edit-btn {
   margin-top: 0.2rem;
   width: 100%;
   border: 1px solid var(--brass);
   background: transparent;
-  color: var(--brass-bright);
+  color: var(--ink-doc);
   border-radius: var(--radius);
   padding: 0.45rem;
   font-family: var(--font-mono);
@@ -637,7 +638,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   cursor: pointer;
   transition: background 0.15s;
 }
-.sidebar-edit-btn:hover { background: var(--bg-card-hi); }
+.sidebar-edit-btn:hover { background: rgba(184, 146, 79, 0.2); }
 
 /* Atributos em grade 2 colunas — cards centrados limpos (≥901px, sidebar vertical) */
 @media (min-width: 901px) {
@@ -661,7 +662,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
     font-size: var(--text-xs);
     color: var(--ink-dim);
   }
-  .sidebar-attributes .sattr-value { font-size: 1.4rem; line-height: 1.1; color: var(--brass-bright); }
+  .sidebar-attributes .sattr-value { font-size: 1.4rem; line-height: 1.1; color: var(--candle-bright); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85); }
   .sidebar-attributes .sattr-fracs { margin-left: 0; font-size: var(--text-xs); }
 }
 
@@ -750,8 +751,8 @@ body[data-difficulty="extreme"] .skill-frac-sep {
 .app-shell .section-title {
   font-size: 1.9rem;
   font-family: var(--font-display);
-  color: var(--ink-doc);
-  text-shadow: 0 0 8px rgba(184, 146, 79, 0.15);
+  color: var(--candle-bright);
+  text-shadow: 0 2px 2px rgba(0, 0, 0, 0.9), 0 0 16px var(--brass-glow);
   margin-bottom: 1rem;
   padding-bottom: 0.8rem;
   border-bottom: 2px solid var(--parchment-dim);
@@ -1026,7 +1027,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
 .derived-card .derived-label {
   font-family: var(--font-typewriter);
   font-size: 0.72rem;
-  color: var(--ink-doc-faded);
+  color: var(--ink-dim);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   font-weight: 500;
@@ -1035,14 +1036,14 @@ body[data-difficulty="extreme"] .skill-frac-sep {
 .derived-card .derived-value {
   font-family: var(--font-serif);
   font-size: 1.8rem;
-  color: var(--ink-doc);
+  color: #f5ecd8;
   font-weight: 700;
   line-height: 1.1;
-  text-shadow: 0 0 6px rgba(184, 146, 79, 0.25);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
 }
 .derived-card .derived-max {
   font-size: 0.85rem;
-  color: var(--ink-faded);
+  color: var(--ink-dim);
 }
 
 .derived-card .derived-actions {
@@ -2801,7 +2802,7 @@ body:has(.wz-backdrop) .fab { display: none !important; }
   }
   /* dark card bg — switch to light-theme ink vars */
   .sattr-row .sattr-label { color: var(--ink-dim); }
-  .sattr-row .sattr-value { color: var(--brass-bright); }
+  .sattr-row .sattr-value { color: var(--candle-bright); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85); }
   .sattr-fracs { margin-left: 0; }
 
   /* ── Bottom navigation fixa ── */
