@@ -6,6 +6,8 @@
 @import url('https://fonts.googleapis.com/css2?family=IM+Fell+English+SC:wght@400&family=Cormorant+Garamond:wght@400;500;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Courier+Prime:wght@400;700&family=Special+Elite:wght@400&family=Caveat:wght@400;600&family=JetBrains+Mono:wght@400;700&display=swap');
 
 :root {
+  color-scheme: dark;
+
   /* === Cores base === */
   --bg-deep:        #0a0807;
   --bg-mid:         #15110d;

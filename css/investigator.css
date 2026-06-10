@@ -657,7 +657,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
     font-size: var(--text-xs);
     color: var(--ink-dim);
   }
-  .sidebar-attributes .sattr-value { font-size: 1.4rem; line-height: 1.1; }
+  .sidebar-attributes .sattr-value { font-size: 1.4rem; line-height: 1.1; color: var(--brass-bright); }
   .sidebar-attributes .sattr-fracs { margin-left: 0; font-size: var(--text-xs); }
 }
 
@@ -2795,6 +2795,9 @@ body:has(.wz-backdrop) .fab { display: none !important; }
     background: var(--bg-card-hi);
     border-radius: var(--radius);
   }
+  /* dark card bg — switch to light-theme ink vars */
+  .sattr-row .sattr-label { color: var(--ink-dim); }
+  .sattr-row .sattr-value { color: var(--brass-bright); }
   .sattr-fracs { margin-left: 0; }
 
   /* ── Bottom navigation fixa ── */
