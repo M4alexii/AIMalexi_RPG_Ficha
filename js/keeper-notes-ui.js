@@ -906,6 +906,21 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
     openNote(note.id);
   }
 
+  // Integração Keeper↔Investigador: abre (ou cria) a nota com este título e
+  // troca para a aba de notas. Usado pelo botão 📝 nos cards de investigador.
+  function openOrCreateByTitle(title) {
+    if (!title) return;
+    var existing = notes.resolveWikilink(title);
+    var note = existing || notes.create(title, "## Dossiê do Investigador\n\n_Anotações do Guardião sobre [[" + title + "]]._\n", "Investigadores", ["investigador"]);
+
+    // Ativa a aba de notas (mesmo mecanismo do keeper-tabs)
+    var tabBtn = document.querySelector('.keeper-tab[data-ktab="notas"]');
+    if (tabBtn) tabBtn.click();
+
+    _viewMode = "list";
+    openNote(note.id);
+  }
+
   // ─── Version History Panel (Sprint 3) ────────────────────────────────────
 
   function _showHistoryPanel(noteId) {
@@ -1180,7 +1195,8 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
     init: init,
     openNote: openNote,
     createNewNote: createNewNote,
-    buildNoteList: buildNoteList
+    buildNoteList: buildNoteList,
+    openOrCreateByTitle: openOrCreateByTitle
   };
 
   console.log("[keeper-notes-ui] UI Components loaded");

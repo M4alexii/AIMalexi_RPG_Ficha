@@ -2484,3 +2484,21 @@ textarea {
 .notes-folder-head:hover {
   color: var(--keeper-accent-bright, var(--brass));
 }
+
+/* Botão 📝 no card do investigador (Keeper↔Investigador) */
+.inv-note-btn {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid var(--ink-faded);
+  border-radius: var(--radius);
+  padding: 0.1rem 0.4rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.15s, border-color 0.15s;
+}
+
+.inv-note-btn:hover {
+  opacity: 1;
+  border-color: var(--brass);
+}
