@@ -5,6 +5,46 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-10 - Notas Avançadas do Guardião: lixeira, busca com operadores, pastas, timeline e versionamento
+
+### Adicionado
+
+- **Aba "📝 Notas Avançadas" no Guardião** (`js/keeper-notes-advanced.js` +
+  `js/keeper-notes-ui.js`): sistema de notas estilo Obsidian com editor
+  split-pane (lista → editor + preview + backlinks), wikilinks `[[Título]]`
+  com autocomplete ao digitar `[[`, backlinks automáticos, tags com tag-cloud
+  clicável, 5 modelos prontos (PNJ, Local, Encontro, Mistério, Sessão),
+  acesso rápido às 3 últimas notas e atalhos (Ctrl+K busca, Ctrl+N nova).
+- **Lixeira com retenção de 30 dias** (soft delete): remover uma nota a manda
+  para a lixeira (view 🗑️); pode ser restaurada ou apagada de vez. Notas
+  expiradas (>30 dias) são purgadas automaticamente ao abrir o painel.
+- **Busca com operadores**: `tag:pista`, `folder:ato1`,
+  `created:>2026-01-01`, `updated:<7d` (janelas relativas d/w/m/y),
+  `"frase exata"` e `-termo` (exclusão), combináveis com AND implícito.
+- **Modos de visualização da lista**: Lista, Pastas (agrupa por `folder`,
+  com `/` para subpastas), Timeline (agrupa por data de edição) e Lixeira.
+- **Versionamento de notas**: cada edição de conteúdo guarda um snapshot
+  (máx. 10); botão "🕐 Histórico" permite ver e restaurar versões anteriores
+  (a versão atual vira snapshot ao restaurar).
+- **Export/Import**: exporta nota atual ou todas em Markdown, backup completo
+  em JSON e importa arquivos `.md` (títulos `#`/`##` viram notas).
+- **Suíte de testes nova** (`js/tests/test-keeper-notes.js`, 59 assertions):
+  CRUD, wikilinks/backlinks, operadores de busca, lixeira e versionamento.
+
+### Corrigido
+
+- **Persistência das notas avançadas**: o módulo gravava via API inexistente
+  (`storage.setCustomData`) e falhava em silêncio — nada era salvo. Agora
+  persiste em localStorage (`aimalexi-rpg/keeper-notes-v1`), mesmo padrão do
+  diário do Guardião.
+- **Colisão de namespace** `window.CoC.keeperNotes`: o módulo legado de Lore
+  (`js/keeper-notes.js`) sobrescrevia a API do sistema avançado por carregar
+  depois; renomeado para `window.CoC.keeperLore`.
+- **IDs de nota via `crypto`** em vez de `Math.random` (constraint do
+  projeto).
+- `sw.js`: precache de `keeper-notes-advanced.js` e `keeper-notes-ui.js`
+  (faltavam — quebraria offline); `CACHE_VERSION` v78 → v79.
+
 ## 2026-06-10 - Loop de combate do Guardião e endurecimento do PWA
 
 ### Adicionado
