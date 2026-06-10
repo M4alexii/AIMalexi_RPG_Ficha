@@ -675,6 +675,29 @@
       const d = dice.rollDamage(a.damage || "0", db, impale);
       const diceStr = d.rolls.map(x => `(${x.dice.join("+")})`).join("+");
       dmgStr = `${a.damage} → ${d.total}${impale ? " ⚡EMPALA" : ""} ${diceStr}`;
+
+      // Auto-apply damage to encounter tracker if this creature is tracked.
+      const enc = state.encounter.find(e =>
+        !e.dead && e.sourceId &&
+        (e.sourceId === state.activeSavedId || e.sourceId === state.activeSourceId)
+      );
+      if (enc) {
+        const armor = Number(enc.armor) || 0;
+        const net = Math.max(0, d.total - armor);
+        const isMajorWound = d.total >= Math.floor(enc.hpMax / 2);
+        enc.hpCur = Math.max(-10, enc.hpCur - net);
+        if (enc.hpCur <= 0) enc.dead = true;
+        renderEncounter();
+        if (armor > 0 && net < d.total) {
+          toast(`🛡 Armadura absorveu ${d.total - net} de ${d.total} dano (${net} líquido).`, { type: "info", duration: 3500 });
+        }
+        if (isMajorWound) {
+          toast(`⚠ Ferimento Grave! ${escapeHtml(enc.name)} sofreu ${d.total} dano — ≥ metade do PV máximo (${enc.hpMax}).`, { type: "warn", duration: 6000 });
+        }
+        if (enc.dead) {
+          toast(`💀 ${escapeHtml(enc.name)} foi abatido!`, { type: "warn", duration: 4000 });
+        }
+      }
     }
     logRoll({
       skill: `⚔ ${c.name} · ${a.name}`,
