@@ -132,7 +132,10 @@ window.CoC = window.CoC || {};
       // Toggles
       '<div class="settings-row toggle"><label><input type="checkbox" id="set-motion"' + (s.reduceMotion ? ' checked' : '') + ' /> ' + T('settings.reduceMotion') + '</label></div>' +
       '<div class="settings-row toggle"><label><input type="checkbox" id="set-contrast"' + (s.highContrast ? ' checked' : '') + ' /> ' + T('settings.highContrast') + '</label></div>' +
-      '<div class="settings-row toggle"><label><input type="checkbox" id="set-rollfx"' + (s.rollEffects ? ' checked' : '') + ' /> ' + T('settings.rollEffects') + '</label></div>';
+      '<div class="settings-row toggle"><label><input type="checkbox" id="set-rollfx"' + (s.rollEffects ? ' checked' : '') + ' /> ' + T('settings.rollEffects') + '</label></div>' +
+      // Sanity FX Modo Lúcido (safe mode)
+      '<div class="settings-row toggle"><label><input type="checkbox" id="set-sanity-lucid" /> 🌀 Modo Lúcido (sem efeitos de insanidade)</label></div>' +
+      '<div class="settings-row"><button type="button" id="set-sanity-settings" class="btn-ghost">Configurar Efeitos de Insanidade...</button></div>';
 
     function $(id) { return body.querySelector('#' + id); }
 
@@ -149,6 +152,32 @@ window.CoC = window.CoC || {};
     $('set-motion').onchange   = function () { set('reduceMotion', this.checked); };
     $('set-contrast').onchange = function () { set('highContrast', this.checked); };
     $('set-rollfx').onchange   = function () { set('rollEffects', this.checked); };
+
+    // Sanity FX Modo Lúcido: se marcado, desativa efeitos; senão abre o modal
+    $('set-sanity-lucid').onchange = function () {
+      var fx = window.CoC.sanityFx;
+      if (!fx) return;
+      if (this.checked) {
+        fx.setMode('off', true);
+      } else {
+        fx.setMode('reduced', true);
+      }
+    };
+
+    // Botão para abrir o modal completo de Sanidade FX
+    $('set-sanity-settings').onclick = function () {
+      var fx = window.CoC.sanityFx;
+      if (fx && fx.openSettings) {
+        fx.openSettings();
+      }
+    };
+
+    // Sincroniza estado do checkbox com o modo atual
+    var fx = window.CoC.sanityFx;
+    if (fx) {
+      var mode = fx.getMode ? fx.getMode() : 'off';
+      $('set-sanity-lucid').checked = (mode === 'off');
+    }
 
     ui.modal({
       title: '⚙️ ' + T('settings.title'),

@@ -27,13 +27,15 @@ window.CoC = window.CoC || {};
   };
 
   // Limiares de SAN (atual/máx) → nível visual.
-  // 0: ≥50% · 1: <50% · 2: <30% · 3: <15% · 4: <5%
+  // Nomes: lucid (≥50%) · uneasy (<50%) · shaken (<30%) · fraying (<15%) · breaking (<5%)
+  // Também suporta números 0-4 para backward compat.
   const THRESHOLDS = [
-    { max: 0.05, level: 4 },
-    { max: 0.15, level: 3 },
-    { max: 0.30, level: 2 },
-    { max: 0.50, level: 1 }
+    { max: 0.05, level: "breaking",  numeric: 4 },
+    { max: 0.15, level: "fraying",   numeric: 3 },
+    { max: 0.30, level: "shaken",    numeric: 2 },
+    { max: 0.50, level: "uneasy",    numeric: 1 }
   ];
+  const TIER_NAMES = ["lucid", "uneasy", "shaken", "fraying", "breaking"];
 
   const store = window.CoC.storage || null;
 
@@ -92,17 +94,18 @@ window.CoC = window.CoC || {};
 
   // ─── Aplicação do nível por SAN ───────────────────────────────────────
   function ratioToLevel(ratio) {
-    if (!isFinite(ratio) || ratio >= 0.5) return 0;
+    if (!isFinite(ratio) || ratio >= 0.5) return "lucid";
     for (const t of THRESHOLDS) {
       if (ratio < t.max) return t.level;
     }
-    return 0;
+    return "lucid";
   }
 
   function applyRatio(ratio) {
     lastRatio = isFinite(ratio) ? ratio : 1;
     const level = ratioToLevel(lastRatio);
-    document.body.setAttribute("data-sanity", String(level));
+    // Suporta tanto nomes quanto números para backward compat com CSS
+    document.body.setAttribute("data-sanity", level);
   }
 
   /**
@@ -228,7 +231,8 @@ window.CoC = window.CoC || {};
     getMode,
     openSettings,
     ratioToLevel,   // exposto para testes
-    MODES
+    MODES,
+    TIER_NAMES      // nomes dos 5 tiers de sanidade
   };
 
 })();
