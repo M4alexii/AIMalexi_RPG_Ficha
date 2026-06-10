@@ -362,3 +362,53 @@ group('atributos — point-buy (orçamento + caps)');
 function calcMOV(forca, des, tam, age) {
   return rules.calcMOV(forca, des, tam, age);
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  validateCharacter — cap de perícias nas DUAS formas de skills
+//
+//  Regressão (auditoria 2026-06): a função só validava skills em ARRAY
+//  (criaturas do keeper). A ficha do investigador usa OBJETO
+//  { "Nome": { value } } — o check de cap silenciosamente não rodava,
+//  mesmo depois de conectada no boot/persist (BUG-01).
+// ─────────────────────────────────────────────────────────────────────────────
+group('validateCharacter — duas formas de skills + Nível de Crédito + zeros');
+
+(function () {
+  // Forma OBJETO (ficha do investigador) — antes do fix, nada disso era visto.
+  const vFicha = rules.validateCharacter({
+    skills: {
+      'Furtividade':      { value: 95 },   // > 90 → issue
+      'Psicologia':       { value: 80 },   // 76–90 → warning
+      'Nível de Crédito': { value: 99 },   // teto próprio (Ricaço) → legal
+      'Escutar':          { value: 40 }    // dentro do cap → nada
+    },
+    attributes: {
+      FOR: { value: 0 },     // 0 = não rolado → NÃO alerta (ruído)
+      DES: { value: 120 },   // fora da faixa → warning
+      INT: { value: 65 }     // ok
+    }
+  });
+  assertEq(vFicha.valid, false,        'objeto: ficha com skill >90 é inválida');
+  assertEq(vFicha.issues.length, 1,    'objeto: só Furtividade 95 vira issue (Crédito 99 é legal)');
+  assert(vFicha.issues[0].indexOf('Furtividade') !== -1, 'objeto: issue cita a perícia certa');
+  assertEq(vFicha.warnings.length, 2,  'objeto: Psicologia 80 + DES 120 (FOR=0 não gera ruído)');
+
+  // Forma ARRAY (criatura do keeper) — comportamento original preservado.
+  const vCriatura = rules.validateCharacter({
+    skills: [ { name: 'Escutar', value: 92 }, { name: 'Esquivar', value: 50 } ],
+    attributes: {}
+  });
+  assertEq(vCriatura.issues.length, 1, 'array: skill 92 vira issue (forma antiga preservada)');
+
+  // Ficha limpa: válida, sem avisos.
+  const vOk = rules.validateCharacter({
+    skills: { 'Escutar': { value: 60 } },
+    attributes: { FOR: { value: 50 } }
+  });
+  assertEq(vOk.valid, true,            'ficha dentro das regras é válida');
+  assertEq(vOk.warnings.length, 0,     'ficha dentro das regras não gera avisos');
+
+  // Robustez: entrada nula não explode (validação NUNCA derruba o load).
+  const vNull = rules.validateCharacter(null);
+  assertEq(vNull.valid, false,         'null → invalid sem lançar exceção');
+})();

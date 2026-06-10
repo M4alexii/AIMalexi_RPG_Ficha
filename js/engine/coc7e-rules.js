@@ -497,29 +497,57 @@ window.CoC = window.CoC || {};
 
   /**
    * Valida criação de personagem contra limites do CoC 7E.
-   * @param {Object} character - estrutura padrão da ficha
+   *
+   * Aceita as DUAS formas de skills que coexistem no app:
+   *   - ficha do investigador: objeto { "Nome": { value, base?, note? } }
+   *   - criatura do keeper:    array  [{ name, value }]
+   * (a versão anterior só validava o array — para fichas, o check de cap
+   * silenciosamente não rodava, mesmo depois de wired no boot/persist.)
+   *
+   * @param {Object} character - estrutura padrão da ficha ou criatura
    * @returns {{ valid: boolean, issues: string[], warnings: string[] }}
    */
   function validateCharacter(character) {
     const issues = [];
     const warnings = [];
-
-    // Limite de 75 por perícia na criação (regra do livro)
-    if (Array.isArray(character.skills)) {
-      character.skills.forEach((s) => {
-        if (num(s.value) > 90) {
-          issues.push(`${s.name}: ${s.value}% excede o cap absoluto (90% mesmo com aprovação do Guardião)`);
-        } else if (num(s.value) > 75) {
-          warnings.push(`${s.name}: ${s.value}% acima do cap padrão (75) — exige aprovação do Guardião`);
-        }
-      });
+    if (!character || typeof character !== "object") {
+      return { valid: false, issues: ["Personagem inválido (objeto ausente)"], warnings };
     }
 
-    // Atributos dentro da faixa esperada (15-90 = 3-18 × 5)
+    // Normaliza skills para [{name, value}] independente da forma de origem.
+    const skillEntries = [];
+    if (Array.isArray(character.skills)) {
+      for (const s of character.skills) {
+        if (s && s.name != null) skillEntries.push({ name: String(s.name), value: num(s.value) });
+      }
+    } else if (character.skills && typeof character.skills === "object") {
+      for (const [name, s] of Object.entries(character.skills)) {
+        skillEntries.push({ name, value: num(s && typeof s === "object" ? s.value : s) });
+      }
+    }
+
+    // Limite de 75 por perícia na criação (regra do livro); 90 com aprovação.
+    for (const s of skillEntries) {
+      // Nível de Crédito tem teto próprio (99 — "Ricaço"); a faixa real depende
+      // da ocupação. Fica fora do cap 75/90 de criação.
+      if (s.name === "Nível de Crédito") {
+        if (s.value > 99) issues.push(`${s.name}: ${s.value}% excede o máximo (99)`);
+        continue;
+      }
+      if (s.value > 90) {
+        issues.push(`${s.name}: ${s.value}% excede o cap absoluto (90% mesmo com aprovação do Guardião)`);
+      } else if (s.value > 75) {
+        warnings.push(`${s.name}: ${s.value}% acima do cap padrão (75) — exige aprovação do Guardião`);
+      }
+    }
+
+    // Atributos dentro da faixa esperada (15-90 = 3-18 × 5).
+    // Valor 0 = "ainda não rolado": coberto pelo aviso de ficha zerada em
+    // validators.js — alertar os 9 atributos um a um aqui seria só ruído.
     if (character.attributes) {
       for (const [name, attr] of Object.entries(character.attributes)) {
         const v = num(typeof attr === "object" ? attr.value : attr);
-        if (v < 15 || v > 90) {
+        if (v !== 0 && (v < 15 || v > 90)) {
           warnings.push(`${name}: ${v} fora da faixa típica (15-90)`);
         }
       }
