@@ -63,6 +63,7 @@ load('js/campaign/supabase-persistence-adapter.js');
 load('js/core/actions.js');           // isSacred — usado por campaign-sync
 load('js/campaign/campaign-sync.js');
 load('js/keeper-dashboard-summary.js');
+load('js/keeper-notes-advanced.js'); // sistema de notas do Guardião (lógica pura)
 
 // ── Framework de assertions ───────────────────────────────────────────────
 let _passed = 0, _failed = 0;
@@ -124,6 +125,7 @@ load('js/tests/test-outbox.js');
 load('js/tests/test-campaign-sync.js');
 load('js/tests/test-keeper-dashboard.js');
 load('js/tests/test-minimd.js');
+load('js/tests/test-keeper-notes.js');
 const elapsed = Date.now() - t0;
 
 // ── Relatório final ───────────────────────────────────────────────────────
