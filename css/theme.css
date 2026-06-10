@@ -521,6 +521,7 @@ label {
   padding-bottom: 0.4rem;
 }
 
+/* Roll entry with stamp animation on new rolls */
 .roll-entry {
   padding: 0.5rem 0.6rem;
   margin-bottom: 0.4rem;
@@ -528,28 +529,102 @@ label {
   border-left: 3px solid var(--ink-faded);
   border-radius: var(--radius);
   font-size: 0.85rem;
+  animation: roll-stamp-slam 150ms cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
 }
-.roll-entry.crit    { border-left-color: var(--crit);    background: linear-gradient(90deg, rgba(212,169,96,0.15), var(--bg-card-hi)); }
-.roll-entry.extreme { border-left-color: var(--extreme); }
-.roll-entry.hard    { border-left-color: var(--hard); }
-.roll-entry.regular { border-left-color: var(--regular); }
-.roll-entry.fail    { border-left-color: var(--fail);    color: var(--ink-dim); }
-.roll-entry.fumble  { border-left-color: var(--fumble);  background: linear-gradient(90deg, rgba(58,10,10,0.4), var(--bg-card-hi)); }
 
-.roll-entry .skill { font-weight: 600; color: var(--ink); }
+@keyframes roll-stamp-slam {
+  0% { transform: scale(0.85) rotate(-3deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+/* Semantic stamp colors — each level labeled clearly */
+.roll-entry.crit {
+  border-left-color: var(--candle-bright);
+  background: linear-gradient(90deg, rgba(227, 182, 90, 0.12), var(--bg-card-hi));
+}
+.roll-entry.crit .level {
+  color: var(--bg-deep);
+  background: var(--candle-bright);
+  border-color: var(--candle-bright);
+}
+
+.roll-entry.extreme {
+  border-left-color: var(--eldritch);
+  background: linear-gradient(90deg, rgba(78, 122, 92, 0.12), var(--bg-card-hi));
+}
+.roll-entry.extreme .level {
+  color: var(--ink);
+  background: transparent;
+  border-color: var(--eldritch);
+  color: var(--eldritch);
+}
+
+.roll-entry.hard {
+  border-left-color: var(--hard);
+}
+.roll-entry.hard .level {
+  color: var(--ink);
+  background: transparent;
+  border-color: var(--hard);
+  color: var(--hard);
+}
+
+.roll-entry.regular {
+  border-left-color: var(--regular);
+}
+.roll-entry.regular .level {
+  color: var(--ink);
+  background: transparent;
+  border-color: var(--regular);
+  color: var(--regular);
+}
+
+.roll-entry.fail {
+  border-left-color: var(--fail);
+  color: var(--ink-dim);
+}
+.roll-entry.fail .level {
+  color: var(--fail);
+  background: transparent;
+  border-color: var(--fail);
+}
+
+.roll-entry.fumble {
+  border-left-color: var(--blood);
+  background: linear-gradient(90deg, rgba(139, 26, 26, 0.15), var(--bg-card-hi));
+}
+.roll-entry.fumble .level {
+  color: var(--bg-deep);
+  background: var(--blood);
+  border-color: var(--blood);
+}
+
+/* Roll result styling — semantic stamps with labels (never color-alone) */
+.roll-entry .skill {
+  font-weight: 600;
+  color: var(--ink);
+}
+
 .roll-entry .result {
   font-family: var(--font-mono);
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: var(--brass-bright);
   display: inline-block;
   margin: 0 0.5rem;
+  font-weight: 700;
 }
+
 .roll-entry .level {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-family: var(--font-typewriter);
+  font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--ink-dim);
+  letter-spacing: 0.12em;
+  color: var(--ink);
+  font-weight: 600;
+  padding: 0.15rem 0.35rem;
+  border: 1px solid;
+  border-radius: var(--radius);
+  display: inline-block;
+  margin-left: 0.3rem;
 }
 .roll-entry .ts {
   font-family: var(--font-mono);
