@@ -5,6 +5,42 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-10 - Auditoria residual: empala, XSS no log, validação de ficha, boot IDB
+
+### Corrigido
+
+- **Empala fiel ao PDF (Cap. 6, p. 104)** em `dice.rollDamage`: dano máximo de
+  arma+DB **mais uma rolagem extra da arma** (sem DB). A versão anterior parava
+  no máximo. Constantes agora calculadas por diferença exata em vez de regex —
+  cobre DB plano (`-2`) e dados multi-dígito (`+10D6`). Validado contra o
+  exemplo do livro (1D4 + DB 1D4 → faixa 9–12).
+- **XSS no roll log** (`ui-components.appendRoll`): `target`, `d100` e `level`
+  agora passam por `escapeHtml` como os demais campos. Relevante porque nomes
+  de arma/criatura são controláveis pelo usuário — e em campanha, por outros
+  participantes.
+- **`validateCharacter` agora valida fichas de verdade**: só aceitava skills
+  em array (criaturas); a ficha usa objeto `{ "Nome": { value } }`, então o
+  check de cap (75/90) silenciosamente não rodava mesmo após o BUG-01 wiring.
+  Aceita as duas formas; Nível de Crédito tem teto próprio (99); atributos
+  zerados (não rolados) não geram ruído de aviso.
+
+### Alterado
+
+- **Boot do IndexedDB em paralelo** (`storage.loadAllFromIDB`): `Promise.all`
+  no lugar de `await` sequencial por chave (era 1 round-trip por entrada).
+- `sw.js`: `CACHE_VERSION` v75 → v76.
+
+### Adicionado
+
+- Testes de regressão: empala (4 cenários de faixa exata) em `test-dice.js` e
+  `validateCharacter` (formas objeto/array, Crédito, zeros, null) em
+  `test-rules.js` — suíte em 971 asserções.
+- Job `integrity` no CI: `node --check` em todos os .js, manifest válido,
+  `PRECACHE_URLS` do SW e referências locais dos HTML apontando para arquivos
+  existentes (anti-regressão do bug do banner, cc75117).
+- `Melhorias/AUDITORIA_RESIDUAL_2026-06-10.md` com o registro do que foi
+  verificado, corrigido e do que permanece em aberto.
+
 ## 2026-06-07 - Auditoria clean code, testes e PWA
 
 ### Adicionado
