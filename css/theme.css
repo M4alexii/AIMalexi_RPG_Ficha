@@ -3,7 +3,7 @@
    theme.css — variáveis, tipografia, reset e componentes compartilhados
    ═══════════════════════════════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IM+Fell+English+SC:wght@400&family=Cormorant+Garamond:wght@400;500;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Courier+Prime:wght@400;700&family=Special+Elite:wght@400&family=Caveat:wght@400;600&family=JetBrains+Mono:wght@400;700&display=swap');
 
 :root {
   /* === Cores base === */
@@ -17,16 +17,28 @@
   --ink-dim:        #a89580;
   --ink-faded:      #6b5d4a;
 
+  /* === Parchment world (documento de jogo) === */
+  --parchment:      #E7DABA;
+  --parchment-dim:  #CDBC97;
+  --ink-doc:        #2B241A;
+  --ink-doc-faded:  #6B5F49;
+
   /* === Acentos === */
   --brass:          #b8924f;
   --brass-bright:   #d4a960;
   --brass-glow:     rgba(184, 146, 79, 0.45);
+  --candle:         #C28E2D;
+  --candle-bright:  #E3B65A;
   --burgundy:       #4a1c1c;
   --burgundy-hi:    #6b2a2a;
   --blood:          #8b1a1a;
+  --blood-deep:     #5E1310;
   --blood-glow:     rgba(139, 26, 26, 0.6);
+  --eldritch:       #4E7A5C;
+  --eldritch-glow:  #86AE8F;
   --mist:           #5a7a8a;
   --mist-glow:      rgba(90, 122, 138, 0.5);
+  --spectral:       #6E8585;
 
   /* === Resultado de testes === */
   --crit:           #d4a960;
@@ -41,12 +53,13 @@
   --warn:           #c8924f;
   --err:            #8b1a1a;
 
-  /* === Tipografia === */
-  /* §21 — tipografia: Cormorant para títulos (display atmosférico),
-     Spectral para corpo (serif literária otimizada p/ leitura em tela). */
-  --font-serif:     'Cormorant Garamond', 'Times New Roman', serif;
-  --font-body:      'Spectral', 'Crimson Text', Georgia, serif;
-  --font-mono:      'JetBrains Mono', 'Courier New', monospace;
+  /* === Tipografia (spec 1920s archive) === */
+  --font-display:   'IM Fell English SC', 'Times New Roman', serif;    /* títulos occult-only */
+  --font-serif:     'Cormorant Garamond', Georgia, serif;              /* headings H2–H4 */
+  --font-body:      'Crimson Pro', Georgia, serif;                     /* corpo principal */
+  --font-mono:      'Courier Prime', monospace;                        /* stats, data, inputs */
+  --font-typewriter: 'Special Elite', 'Courier New', monospace;        /* stamps, labels */
+  --font-marginalia: 'Caveat', 'Comic Sans', cursive;                  /* anotações, notas */
 
   /* === Escala tipográfica === */
   --text-xs:   0.72rem;   /* ~11.5px — mínimo legível (frações, tags) */
@@ -69,6 +82,22 @@
   /* === Gradiente de fundo do body (override por tema) === */
   --body-grad-top:    rgba(74, 28, 28, 0.15);
   --body-grad-bottom: rgba(90, 122, 138, 0.08);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PARCHMENT WORLD — Two-world strategy
+   ───────────────────────────────────────────────────────────────────────────
+   Dark archive room (--abyss/--charcoal): Keeper view, system UI, settings.
+   Paper documents (--parchment): Investigator sheet, character data, dossiers.
+   The separation IS the information hierarchy (who-sees-what in multiplayer).
+
+   Usage:
+   .investigator-section { background: var(--parchment); color: var(--ink-doc); }
+   .keeper-panel { background: var(--charcoal); color: var(--ink); }
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --charcoal:       #171310;  /* keeper behind-screen world */
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -927,38 +956,64 @@ body[data-theme="eldritch"] {
 /* ── Graduação de cor + tremor no conteúdo (.app), não no <body> ── */
 .app { transition: filter 1.2s ease-out; }
 
-/* ─────────────────── NÍVEIS ─────────────────── */
+/* ─────────────────── NÍVEIS (valores de data-sanity) ─────────────────── */
+/* Backward compat: code still uses 0-4; CSS rules support both numeric and named */
 
-/* Nível 1 — ~50%: leve escurecimento + vinheta sutil + respiração lenta */
-/* --b = base da respiração: a vinheta pulsa em torno dessa opacidade (ver @keyframes sfx-breathe) */
-body[data-sanity="1"] .app { filter: saturate(0.86) contrast(1.03); }
-body[data-sanity="1"] #sanity-fx .sfx-vignette { --b: 0.45; opacity: var(--b); animation: sfx-breathe 9s ease-in-out infinite; }
+/* Nível 0 (lucid) — ≥80%: sem efeitos (baseline) */
+body[data-sanity="0"],
+body[data-sanity="lucid"] { /* sem regras — é o padrão */ }
 
-/* Nível 2 — ~30%: blur periférico + aberração cromática + ruído + distorção leve */
-body[data-sanity="2"] .app { filter: saturate(0.7) contrast(1.06) brightness(0.97); }
-body[data-sanity="2"] #sanity-fx .sfx-vignette { --b: 0.70; opacity: var(--b); animation: sfx-breathe 7s ease-in-out infinite; }
-body[data-sanity="2"] #sanity-fx .sfx-grain { opacity: 0.5; animation: sfx-grain-shift 0.9s steps(3) infinite; }
-body[data-sanity="2"] #sanity-fx .sfx-chroma { opacity: 0.6; }
-body[data-sanity="2"] #sanity-fx .sfx-blur { backdrop-filter: blur(1.5px); -webkit-backdrop-filter: blur(1.5px); }
-body[data-sanity="2"] .app { animation: sfx-shake-soft 9s ease-in-out infinite; }
+/* Nível 1 (uneasy) — 60-79%: leve escurecimento + vinheta sutil + respiração lenta */
+body[data-sanity="1"],
+body[data-sanity="uneasy"] .app { filter: saturate(0.86) contrast(1.03); }
+body[data-sanity="1"] #sanity-fx .sfx-vignette,
+body[data-sanity="uneasy"] #sanity-fx .sfx-vignette { --b: 0.45; opacity: var(--b); animation: sfx-breathe 9s ease-in-out infinite; }
 
-/* Nível 3 — ~15%: shake agressivo + respiração + vinheta pesada + flicker ocasional */
-body[data-sanity="3"] .app { filter: saturate(0.55) contrast(1.1) brightness(0.93) hue-rotate(-6deg); }
-body[data-sanity="3"] #sanity-fx .sfx-vignette { --b: 0.90; opacity: var(--b); animation: sfx-breathe 5s ease-in-out infinite; }
-body[data-sanity="3"] #sanity-fx .sfx-grain { opacity: 0.7; animation: sfx-grain-shift 0.55s steps(3) infinite; }
-body[data-sanity="3"] #sanity-fx .sfx-chroma { opacity: 0.85; animation: sfx-chroma-pulse 4s ease-in-out infinite; }
-body[data-sanity="3"] #sanity-fx .sfx-blur { backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
-body[data-sanity="3"] #sanity-fx .sfx-flicker { opacity: 0.6; animation: sfx-flicker 6.3s steps(1) infinite; }
-body[data-sanity="3"] .app { animation: sfx-shake 3.7s ease-in-out infinite; }
+/* Nível 2 (shaken) — 40-59%: blur periférico + aberração cromática + ruído + distorção leve */
+body[data-sanity="2"],
+body[data-sanity="shaken"] .app { filter: saturate(0.7) contrast(1.06) brightness(0.97); }
+body[data-sanity="2"] #sanity-fx .sfx-vignette,
+body[data-sanity="shaken"] #sanity-fx .sfx-vignette { --b: 0.70; opacity: var(--b); animation: sfx-breathe 7s ease-in-out infinite; }
+body[data-sanity="2"] #sanity-fx .sfx-grain,
+body[data-sanity="shaken"] #sanity-fx .sfx-grain { opacity: 0.5; animation: sfx-grain-shift 0.9s steps(3) infinite; }
+body[data-sanity="2"] #sanity-fx .sfx-chroma,
+body[data-sanity="shaken"] #sanity-fx .sfx-chroma { opacity: 0.6; }
+body[data-sanity="2"] #sanity-fx .sfx-blur,
+body[data-sanity="shaken"] #sanity-fx .sfx-blur { backdrop-filter: blur(1.5px); -webkit-backdrop-filter: blur(1.5px); }
+body[data-sanity="2"] .app,
+body[data-sanity="shaken"] .app { animation: sfx-shake-soft 9s ease-in-out infinite; }
 
-/* Nível 4 — ~5%: colapso visual, animações instáveis, lampejos imprevisíveis */
-body[data-sanity="4"] .app { filter: saturate(0.4) contrast(1.18) brightness(0.9) hue-rotate(-10deg); }
-body[data-sanity="4"] #sanity-fx .sfx-vignette { --b: 1; opacity: var(--b); animation: sfx-breathe-erratic 3.3s ease-in-out infinite; }
-body[data-sanity="4"] #sanity-fx .sfx-grain { opacity: 0.92; animation: sfx-grain-shift 0.32s steps(2) infinite; }
-body[data-sanity="4"] #sanity-fx .sfx-chroma { opacity: 1; animation: sfx-chroma-pulse 2.1s ease-in-out infinite; }
-body[data-sanity="4"] #sanity-fx .sfx-blur { backdrop-filter: blur(4.5px); -webkit-backdrop-filter: blur(4.5px); }
-body[data-sanity="4"] #sanity-fx .sfx-flicker { opacity: 0.85; animation: sfx-flicker-erratic 4.9s steps(1) infinite; }
-body[data-sanity="4"] .app { animation: sfx-shake-hard 2.9s ease-in-out infinite; }
+/* Nível 3 (fraying) — 20-39%: shake agressivo + respiração + vinheta pesada + flicker */
+body[data-sanity="3"],
+body[data-sanity="fraying"] .app { filter: saturate(0.55) contrast(1.1) brightness(0.93) hue-rotate(-6deg); }
+body[data-sanity="3"] #sanity-fx .sfx-vignette,
+body[data-sanity="fraying"] #sanity-fx .sfx-vignette { --b: 0.90; opacity: var(--b); animation: sfx-breathe 5s ease-in-out infinite; }
+body[data-sanity="3"] #sanity-fx .sfx-grain,
+body[data-sanity="fraying"] #sanity-fx .sfx-grain { opacity: 0.7; animation: sfx-grain-shift 0.55s steps(3) infinite; }
+body[data-sanity="3"] #sanity-fx .sfx-chroma,
+body[data-sanity="fraying"] #sanity-fx .sfx-chroma { opacity: 0.85; animation: sfx-chroma-pulse 4s ease-in-out infinite; }
+body[data-sanity="3"] #sanity-fx .sfx-blur,
+body[data-sanity="fraying"] #sanity-fx .sfx-blur { backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+body[data-sanity="3"] #sanity-fx .sfx-flicker,
+body[data-sanity="fraying"] #sanity-fx .sfx-flicker { opacity: 0.6; animation: sfx-flicker 6.3s steps(1) infinite; }
+body[data-sanity="3"] .app,
+body[data-sanity="fraying"] .app { animation: sfx-shake 3.7s ease-in-out infinite; }
+
+/* Nível 4 (breaking) — <20%: colapso visual, animações instáveis, lampejos imprevisíveis */
+body[data-sanity="4"],
+body[data-sanity="breaking"] .app { filter: saturate(0.4) contrast(1.18) brightness(0.9) hue-rotate(-10deg); }
+body[data-sanity="4"] #sanity-fx .sfx-vignette,
+body[data-sanity="breaking"] #sanity-fx .sfx-vignette { --b: 1; opacity: var(--b); animation: sfx-breathe-erratic 3.3s ease-in-out infinite; }
+body[data-sanity="4"] #sanity-fx .sfx-grain,
+body[data-sanity="breaking"] #sanity-fx .sfx-grain { opacity: 0.92; animation: sfx-grain-shift 0.32s steps(2) infinite; }
+body[data-sanity="4"] #sanity-fx .sfx-chroma,
+body[data-sanity="breaking"] #sanity-fx .sfx-chroma { opacity: 1; animation: sfx-chroma-pulse 2.1s ease-in-out infinite; }
+body[data-sanity="4"] #sanity-fx .sfx-blur,
+body[data-sanity="breaking"] #sanity-fx .sfx-blur { backdrop-filter: blur(4.5px); -webkit-backdrop-filter: blur(4.5px); }
+body[data-sanity="4"] #sanity-fx .sfx-flicker,
+body[data-sanity="breaking"] #sanity-fx .sfx-flicker { opacity: 0.85; animation: sfx-flicker-erratic 4.9s steps(1) infinite; }
+body[data-sanity="4"] .app,
+body[data-sanity="breaking"] .app { animation: sfx-shake-hard 2.9s ease-in-out infinite; }
 
 /* ─────────────────── KEYFRAMES (transform/opacity = GPU) ─────────────────── */
 @keyframes sfx-breathe {
