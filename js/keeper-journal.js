@@ -30,6 +30,8 @@
   ];
 
   var _filter = 'all';
+  var _search = '';        // busca global (título + conteúdo + pasta)
+  var _blMap  = {};        // backlinks: títuloLower → [{id, title}] (recalculado por render)
 
   // ── Storage ─────────────────────────────────────────────────────────────────
   function _load() {
@@ -93,9 +95,23 @@
     });
     var visible = _filter === 'all' ? sorted : sorted.filter(function (t) { return t.category === _filter; });
 
+    // Busca global (estilo Obsidian): título, conteúdo e pasta.
+    if (_search) {
+      var q = _search.toLowerCase();
+      visible = visible.filter(function (t) {
+        return (t.title || '').toLowerCase().indexOf(q) !== -1 ||
+               (t.content || '').toLowerCase().indexOf(q) !== -1 ||
+               (t.folder || '').toLowerCase().indexOf(q) !== -1;
+      });
+    }
+
+    // Backlinks calculados sobre TODOS os tópicos (não só os visíveis),
+    // para que a menção apareça mesmo com filtro/busca ativos.
+    _blMap = _computeBacklinks(topics);
+
     if (visible.length === 0) {
       container.innerHTML = '<p class="journal-empty">Nenhum tópico' +
-        (_filter !== 'all' ? ' nesta categoria' : '') +
+        (_search ? ' para "' + _esc(_search) + '"' : (_filter !== 'all' ? ' nesta categoria' : '')) +
         '. Clique em <b>+ Novo Tópico</b>.</p>';
       return;
     }
@@ -171,9 +187,51 @@
         '</div>' +
       '</div>' +
       '<h4 class="journal-title">' + _esc(t.title || '(sem título)') + '</h4>' +
-      '<div class="journal-content">' + _linkify(t.content) + '</div>' +
+      '<div class="journal-content">' + _contentHtml(t.content) + '</div>' +
       imgHtml +
+      _backlinksHtml(t) +
     '</article>';
+  }
+
+  // Conteúdo do tópico: Markdown seguro (mini-md) com [[wikilinks]] resolvidos
+  // no mesmo padrão de navegação do diário. Fallback no _linkify antigo se o
+  // módulo não tiver carregado (ordem de script protegida pelo CI, mas defensivo).
+  function _contentHtml(raw) {
+    var md = window.CoC && window.CoC.miniMD;
+    if (md && md.render) return md.render(raw, { wikilink: _wikilinkHtml });
+    return _linkify(raw);
+  }
+
+  function _wikilinkHtml(title) {
+    return '<a href="#" class="journal-link" data-journal-link="' + _esc(title) + '">🔗 ' + _esc(title) + '</a>';
+  }
+
+  // ── Backlinks (estilo Obsidian) ─────────────────────────────────────────────
+  // Varre os [[wikilinks]] de todos os tópicos e indexa por título referenciado.
+  function _computeBacklinks(topics) {
+    var map = {};
+    topics.forEach(function (src) {
+      var re = /\[\[([^\]\n]+)\]\]/g, m, seen = {};
+      var content = String(src.content || '');
+      while ((m = re.exec(content))) {
+        var key = m[1].trim().toLowerCase();
+        if (!key || seen[key]) continue;
+        seen[key] = true;
+        (map[key] = map[key] || []).push({ id: src.id, title: src.title || '(sem título)' });
+      }
+    });
+    return map;
+  }
+
+  function _backlinksHtml(t) {
+    var key = (t.title || '').trim().toLowerCase();
+    var refs = (_blMap[key] || []).filter(function (r) { return r.id !== t.id; });
+    if (!refs.length) return '';
+    return '<div class="journal-backlinks">↩ Mencionado em: ' +
+      refs.map(function (r) {
+        return '<a href="#" class="journal-link" data-journal-link="' + _esc(r.title) + '">' + _esc(r.title) + '</a>';
+      }).join(' · ') +
+    '</div>';
   }
 
   // Popula os thumbnails (lazy, via Blob no IndexedDB) após o innerHTML. O
@@ -341,9 +399,11 @@
     var target = _getTopics().find(function (t) { return (t.title || '').trim() === title; });
     var container = document.getElementById('journal-topics');
     if (!target || !container) return;
-    if (_filter !== 'all') {
+    if (_filter !== 'all' || _search) {
       _filter = 'all';
+      _search = '';
       var sel = document.getElementById('journal-filter'); if (sel) sel.value = 'all';
+      var inp = document.getElementById('journal-search'); if (inp) inp.value = '';
       render();
     }
     var idSel = (window.CSS && CSS.escape) ? CSS.escape(target.id) : target.id;
@@ -376,6 +436,16 @@
 
     var filterSel = document.getElementById('journal-filter');
     if (filterSel) filterSel.onchange = function () { _filter = filterSel.value; render(); };
+
+    // Busca global, debounced — não re-renderiza a cada tecla.
+    var searchInp = document.getElementById('journal-search');
+    if (searchInp) {
+      var searchTimer = null;
+      searchInp.addEventListener('input', function () {
+        if (searchTimer) clearTimeout(searchTimer);
+        searchTimer = setTimeout(function () { _search = searchInp.value.trim(); render(); }, 160);
+      });
+    }
 
     var container = document.getElementById('journal-topics');
     if (container && !container._journalDelegated) {
