@@ -648,10 +648,10 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
       style: { padding: "0.4rem 0.6rem", fontSize: "0.75rem", color: "var(--danger)" }
     }, ["🗑️ Remover"]);
     deleteBtn.addEventListener("click", function () {
-      if (window.confirm("Remover esta nota?")) {
+      if (window.confirm("Mover esta nota para a lixeira? (recuperável por 30 dias)")) {
         notes.delete(noteId);
         currentNoteId = null;
-        editor.innerHTML = "<p style='color:var(--ink-faded)'>Nota removida. Selecione outra para continuar.</p>";
+        editor.innerHTML = "<p style='color:var(--ink-faded)'>Nota movida para a 🗑️ Lixeira (recuperável por 30 dias). Selecione outra para continuar.</p>";
         buildNoteList();
       }
     });
