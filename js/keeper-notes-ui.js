@@ -309,9 +309,9 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
       }
       var list = el("ul", { style: { margin: "0", padding: "0 0 0 1rem" } });
       backlinks.forEach(function (bl) {
-        list.appendChild(el("li", { style: { cursor: "pointer", color: "var(--brass)", textDecoration: "underline" } }, [bl.display], {
-          onclick: function () { openNote(bl.noteId); }
-        }));
+        var item = el("li", { style: { cursor: "pointer", color: "var(--brass)", textDecoration: "underline" } }, [bl.display]);
+        item.addEventListener("click", function () { openNote(bl.noteId); });
+        list.appendChild(item);
       });
       pane.appendChild(list);
     }
