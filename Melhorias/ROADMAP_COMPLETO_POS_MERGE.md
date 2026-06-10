@@ -1,7 +1,20 @@
 # Roadmap Completo — AIMalexi RPG Ficha
-**Status**: Post-Merge Planning (após PR #36)  
+**Status**: Sprints 1–3 EXECUTADOS na própria PR #36 (2026-06-10)  
 **Data**: 2026-06-10  
-**Versão**: v2.0 (Keeper Tools + Advanced Notes)
+**Versão**: v2.1 (Keeper Tools + Advanced Notes + Trash/Search/Folders/Timeline/Versioning)
+
+> ✅ **ATUALIZAÇÃO**: Os itens de Sprint 1–3 abaixo foram implementados:
+> - ✅ #1 Integração Keeper↔Investigador (botão 📝 no card → dossiê)
+> - ✅ #3 Archive/Trash (soft delete, retenção 30 dias, restore/purge)
+> - ✅ #4 Folder Organization (view 📁 Pastas + campo pasta no editor)
+> - ✅ #5 Timeline View (view 📅 agrupada por data de edição)
+> - ✅ #6 Note Versioning (snapshots, máx. 10, painel 🕐 Histórico)
+> - ✅ #7 Full-Text Search operators (tag:, folder:, created:, updated:, "frase", -termo)
+> - ✅ BONUS: 2 bugs críticos corrigidos (persistência silenciosamente quebrada
+>   + colisão de namespace keeperNotes) e suíte de testes (59 assertions)
+>
+> Permanecem futuros: #2 Multiplayer Notes (bloqueado pela Fase M),
+> #8 Custom Fields, #9 Collaboration, #10 AI, #11 Mobile, #12 VTT.
 
 ---
 
