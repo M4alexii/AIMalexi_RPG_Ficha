@@ -130,16 +130,16 @@ window.CoC = window.CoC || {};
 
     const wrap = el("div", {});
     wrap.appendChild(el("p", {
-      style: { marginBottom: "0.75rem", color: "var(--ink-dim)" },
-      text: "Efeitos visuais de insanidade conforme sua Sanidade cai. Passe o mouse / toque numa opção para pré-visualizar."
+      style: { marginBottom: "0.75rem", color: "var(--ink-dim)", fontStyle: "italic" },
+      text: "Conforme sua mente se corrói, o arquivo ao seu redor revela sua deterioração. Escolha como o conhecimento muda o que você vê."
     }));
 
     const optionList = el("div", { style: { display: "flex", flexDirection: "column", gap: "0.5rem" } });
 
     const OPTIONS = [
-      { value: "full",    title: "🧠 Completo",  desc: "Experiência máxima: vinheta, blur periférico, aberração cromática, tremor e lampejos progressivos." },
-      { value: "reduced", title: "🌫 Reduzido",  desc: "Só cor e vinheta estáticas — sem movimento, blur ou flicker. Bom para enjoo/telas fracas." },
-      { value: "off",     title: "⬜ Desligado", desc: "Nenhum efeito visual. A ficha permanece neutra mesmo com SAN baixa." }
+      { value: "full",    title: "📖 Arquivo Deteriorado",  desc: "Imersão máxima: vinheta vermelha, distorções periféricas, aberração cromática, tremor e lampejos. Conhecimento = loucura visível." },
+      { value: "reduced", title: "📄 Suavizado",  desc: "Coloração e vinheta estáticas — sem movimento, distorção ou flicker. Para quem prefere narrativa sem efeitos visuais agressivos." },
+      { value: "off",     title: "⬜ Modo Lúcido", desc: "Nenhum efeito visual. O arquivo permanece ordenado e legível, independentemente da sanidade. O dossiê sobrevive ao caos." }
     ];
 
     const buttons = [];
@@ -178,9 +178,9 @@ window.CoC = window.CoC || {};
     wrap.appendChild(optionList);
 
     modal({
-      title: "Efeitos de Insanidade",
+      title: "🌀 A Deterioração do Arquivo",
       body: wrap,
-      actions: [{ label: "Fechar", primary: true }],
+      actions: [{ label: "Entendido", primary: true }],
       onClose: endPreview
     });
   }
