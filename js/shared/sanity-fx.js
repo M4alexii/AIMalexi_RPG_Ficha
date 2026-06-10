@@ -27,13 +27,15 @@ window.CoC = window.CoC || {};
   };
 
   // Limiares de SAN (atual/máx) → nível visual.
-  // 0: ≥50% · 1: <50% · 2: <30% · 3: <15% · 4: <5%
+  // Nomes: lucid (≥50%) · uneasy (<50%) · shaken (<30%) · fraying (<15%) · breaking (<5%)
+  // Também suporta números 0-4 para backward compat.
   const THRESHOLDS = [
-    { max: 0.05, level: 4 },
-    { max: 0.15, level: 3 },
-    { max: 0.30, level: 2 },
-    { max: 0.50, level: 1 }
+    { max: 0.05, level: "breaking",  numeric: 4 },
+    { max: 0.15, level: "fraying",   numeric: 3 },
+    { max: 0.30, level: "shaken",    numeric: 2 },
+    { max: 0.50, level: "uneasy",    numeric: 1 }
   ];
+  const TIER_NAMES = ["lucid", "uneasy", "shaken", "fraying", "breaking"];
 
   const store = window.CoC.storage || null;
 
@@ -92,17 +94,18 @@ window.CoC = window.CoC || {};
 
   // ─── Aplicação do nível por SAN ───────────────────────────────────────
   function ratioToLevel(ratio) {
-    if (!isFinite(ratio) || ratio >= 0.5) return 0;
+    if (!isFinite(ratio) || ratio >= 0.5) return "lucid";
     for (const t of THRESHOLDS) {
       if (ratio < t.max) return t.level;
     }
-    return 0;
+    return "lucid";
   }
 
   function applyRatio(ratio) {
     lastRatio = isFinite(ratio) ? ratio : 1;
     const level = ratioToLevel(lastRatio);
-    document.body.setAttribute("data-sanity", String(level));
+    // Suporta tanto nomes quanto números para backward compat com CSS
+    document.body.setAttribute("data-sanity", level);
   }
 
   /**
@@ -130,16 +133,16 @@ window.CoC = window.CoC || {};
 
     const wrap = el("div", {});
     wrap.appendChild(el("p", {
-      style: { marginBottom: "0.75rem", color: "var(--ink-dim)" },
-      text: "Efeitos visuais de insanidade conforme sua Sanidade cai. Passe o mouse / toque numa opção para pré-visualizar."
+      style: { marginBottom: "0.75rem", color: "var(--ink-dim)", fontStyle: "italic" },
+      text: "Conforme sua mente se corrói, o arquivo ao seu redor revela sua deterioração. Escolha como o conhecimento muda o que você vê."
     }));
 
     const optionList = el("div", { style: { display: "flex", flexDirection: "column", gap: "0.5rem" } });
 
     const OPTIONS = [
-      { value: "full",    title: "🧠 Completo",  desc: "Experiência máxima: vinheta, blur periférico, aberração cromática, tremor e lampejos progressivos." },
-      { value: "reduced", title: "🌫 Reduzido",  desc: "Só cor e vinheta estáticas — sem movimento, blur ou flicker. Bom para enjoo/telas fracas." },
-      { value: "off",     title: "⬜ Desligado", desc: "Nenhum efeito visual. A ficha permanece neutra mesmo com SAN baixa." }
+      { value: "full",    title: "📖 Arquivo Deteriorado",  desc: "Imersão máxima: vinheta vermelha, distorções periféricas, aberração cromática, tremor e lampejos. Conhecimento = loucura visível." },
+      { value: "reduced", title: "📄 Suavizado",  desc: "Coloração e vinheta estáticas — sem movimento, distorção ou flicker. Para quem prefere narrativa sem efeitos visuais agressivos." },
+      { value: "off",     title: "⬜ Modo Lúcido", desc: "Nenhum efeito visual. O arquivo permanece ordenado e legível, independentemente da sanidade. O dossiê sobrevive ao caos." }
     ];
 
     const buttons = [];
@@ -178,9 +181,9 @@ window.CoC = window.CoC || {};
     wrap.appendChild(optionList);
 
     modal({
-      title: "Efeitos de Insanidade",
+      title: "🌀 A Deterioração do Arquivo",
       body: wrap,
-      actions: [{ label: "Fechar", primary: true }],
+      actions: [{ label: "Entendido", primary: true }],
       onClose: endPreview
     });
   }
@@ -228,7 +231,8 @@ window.CoC = window.CoC || {};
     getMode,
     openSettings,
     ratioToLevel,   // exposto para testes
-    MODES
+    MODES,
+    TIER_NAMES      // nomes dos 5 tiers de sanidade
   };
 
 })();

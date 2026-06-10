@@ -13,7 +13,7 @@
   align-items: flex-start;
 }
 
-/* Character sidebar: left permanent panel */
+/* Character sidebar: left permanent panel — now a parchment dossier */
 .character-sidebar {
   width: 220px;
   flex-shrink: 0;
@@ -24,42 +24,73 @@
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
-  background: var(--bg-card);
-  border: 1px solid var(--ink-faded);
-  border-radius: var(--radius-lg);
-  padding: 0.75rem;
+  background:
+    linear-gradient(135deg, rgba(231, 218, 186, 0.02) 0%, transparent 60%),
+    var(--parchment);
+  color: var(--ink-doc);
+  border: 2px solid var(--parchment-dim);
+  border-radius: var(--radius);
+  padding: 1rem;
+  box-shadow:
+    inset 0 1px 0 rgba(231, 218, 186, 0.3),
+    0 8px 24px rgba(0, 0, 0, 0.35);
+  position: relative;
 }
 
-/* Portrait inside sidebar */
+/* Portrait inside sidebar — clipped to paper, rotated, aged */
 .character-sidebar .character-portrait {
   width: 100%;
   aspect-ratio: 3 / 4;
   max-height: 200px;
+  border: 2px solid var(--parchment-dim);
+  border-radius: var(--radius);
+  object-fit: cover;
+  filter: sepia(0.25) brightness(0.95);
+  transform: rotate(-1.5deg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: transform 0.2s, filter 0.2s;
 }
 
-/* Identity display */
-.sidebar-identity { text-align: center; }
+.character-sidebar .character-portrait:hover {
+  transform: rotate(-1.5deg) scale(1.02);
+  filter: sepia(0.15) brightness(1);
+}
+
+/* Identity display — typewriter dossier header */
+.sidebar-identity {
+  text-align: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed var(--parchment-dim);
+}
+
 .sidebar-name {
-  font-family: var(--font-serif);
-  font-size: 1rem;
-  font-weight: bold;
-  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ink-doc);
+  letter-spacing: 0.08em;
   line-height: 1.2;
   word-break: break-word;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 .sidebar-occupation {
-  font-size: 0.78rem;
-  color: var(--ink-dim);
-  font-style: italic;
-  margin-top: 0.2rem;
+  font-family: var(--font-typewriter);
+  font-size: 0.8rem;
+  color: var(--ink-doc-faded);
+  font-style: normal;
+  letter-spacing: 0.04em;
+  margin-top: 0.25rem;
   word-break: break-word;
 }
+
 .sidebar-age {
   font-family: var(--font-mono);
-  font-size: 0.68rem;
-  color: var(--ink-faded);
-  letter-spacing: 0.05em;
-  margin-top: 0.1rem;
+  font-size: 0.7rem;
+  color: var(--ink-doc-faded);
+  letter-spacing: 0.08em;
+  margin-top: 0.15rem;
+  text-transform: uppercase;
 }
 .sidebar-age:empty { display: none; }
 
@@ -910,26 +941,31 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   font-weight: bold;
 }
 
+/* Derived stat cards as official stamps on dossier */
 .derived-card {
-  background: var(--bg-card-hi);
-  border: 1px solid var(--ink-faded);
+  background: linear-gradient(135deg, rgba(231, 218, 186, 0.08) 0%, transparent 100%);
+  border: 1px solid var(--parchment-dim);
   border-radius: var(--radius);
   padding: 0.6rem 0.5rem;
   text-align: center;
+  box-shadow:
+    inset 0 1px 0 rgba(231, 218, 186, 0.2),
+    0 2px 4px rgba(0, 0, 0, 0.12);
 }
 
 .derived-card .derived-label {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  color: var(--ink-dim);
+  font-family: var(--font-typewriter);
+  font-size: 0.7rem;
+  color: var(--ink-doc-faded);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
+  font-weight: 400;
 }
 
 .derived-card .derived-value {
   font-family: var(--font-mono);
   font-size: 1.5rem;
-  color: var(--brass-bright);
+  color: var(--ink-doc);
   font-weight: 700;
   line-height: 1.2;
 }
@@ -950,21 +986,64 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   font-size: 0.7rem;
 }
 
-/* PV/PM/SAN com tracker visual de barra */
-.derived-card.tracker { position: relative; overflow: hidden; }
+/* PV/PM/SAN com tracker visual de barra — adaptado para parchment */
+.derived-card.tracker {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+}
+
 .derived-card.tracker::before {
   content: '';
   position: absolute;
   inset: 0;
   background: linear-gradient(90deg, var(--accent, var(--brass-glow)) var(--fill, 100%), transparent 0%);
-  opacity: 0.1;
+  opacity: 0.12;
   z-index: 0;
   transition: --fill 0.4s;
 }
-.derived-card.tracker > * { position: relative; z-index: 1; }
-.derived-card.tracker.pv { --accent: rgba(139, 26, 26, 0.45); }
-.derived-card.tracker.pm { --accent: rgba(107, 61, 138, 0.45); }
-.derived-card.tracker.san { --accent: rgba(90, 122, 138, 0.45); }
+
+.derived-card.tracker > * {
+  position: relative;
+  z-index: 1;
+}
+
+.derived-card.tracker.pv {
+  --accent: rgba(139, 26, 26, 0.6);
+  border-color: rgba(139, 26, 26, 0.3);
+}
+
+.derived-card.tracker.pm {
+  --accent: rgba(123, 94, 167, 0.6);
+  border-color: rgba(123, 94, 167, 0.3);
+}
+
+.derived-card.tracker.san {
+  --accent: rgba(74, 138, 163, 0.6);
+  border-color: rgba(74, 138, 163, 0.3);
+}
+
+/* Major Wound stamp — overlay when HP is critical */
+.derived-card.tracker.pv.major-wound::after {
+  content: 'FERIMENTO GRAVE';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-typewriter);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--blood);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: rgba(231, 218, 186, 0.4);
+  border: 2px solid var(--blood);
+  border-radius: var(--radius);
+  transform: rotate(-8deg);
+  z-index: 2;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    PERÍCIAS

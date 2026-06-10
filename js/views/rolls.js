@@ -237,9 +237,9 @@ window.CoC.views = window.CoC.views || {};
       const modsSnapshot = Object.assign({}, _mods);
       const btn = el("button", {
         class: "btn-danger",
-        title: "Forçar a rolagem — relança com risco de consequência grave em caso de falha.",
+        title: "Forçar o destino — o conhecimento tem um preço.",
         on: { click: () => pushRoll(entry, modsSnapshot) }
-      }, ["⚡ Forçar Rolagem"]);
+      }, ["🌀 Forçar o Destino"]);
       row.appendChild(btn);
     }
 
@@ -261,8 +261,8 @@ window.CoC.views = window.CoC.views || {};
     if (old) old.remove();
 
     const confirmed = await confirm(
-      `Forçar a rolagem de "${entry.skillRaw || entry.skill}"? Falha numa rolagem forçada gera consequência narrativa GRAVE decidida pelo Guardião.`,
-      { title: "Forçar Rolagem", danger: true, confirmLabel: "Forçar" }
+      `Tentar novamente em "${entry.skillRaw || entry.skill}"? O conhecimento tem um preço. Se falhar, o Guardião decide a consequência.`,
+      { title: "🌀 Forçar o Destino", danger: true, confirmLabel: "Forçar o Destino" }
     );
     if (!confirmed) return;
 
