@@ -56,6 +56,9 @@
   // ═════════════════════════════════════════════════════════════════════
 
   async function boot() {
+    // Detecta múltiplas abas em modo offline.
+    window.CoC.multiTabWarning.init();
+
     bindToolbar();
     bindLibraryTabs();
     bindLibrarySearch();

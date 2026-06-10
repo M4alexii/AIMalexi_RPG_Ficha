@@ -75,6 +75,9 @@
     });
     _persistMiddleware.init();
 
+    // Detecta múltiplas abas em modo offline.
+    window.CoC.multiTabWarning.init();
+
     // M3.1 — Vitals slice init + bus hooks (wired before character load)
     // M3.8 — Identity slice init
     window.CoC.views.identity.init(cocStore);
