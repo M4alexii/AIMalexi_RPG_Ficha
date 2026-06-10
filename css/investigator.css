@@ -99,18 +99,40 @@
 .sidebar-age:empty { display: none; }
 
 /* Compact vitals bars */
-.sidebar-vitals { display: flex; flex-direction: column; gap: 0.35rem; }
+.sidebar-vitals {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.6rem 0;
+  border-top: 2px solid var(--parchment-dim);
+  border-bottom: 1px solid var(--parchment-dim);
+  margin: 0.6rem 0;
+}
 .svital-header {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  margin-bottom: 0.1rem;
+  font-size: 0.75rem;
+  margin-bottom: 0.2rem;
 }
-.svital-label { color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.06em; }
-.svital-value { color: var(--ink); font-weight: bold; }
-.svital-max   { color: var(--ink-faded); font-weight: normal; }
+.svital-label {
+  color: var(--ink-doc-faded);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+.svital-value {
+  color: var(--ink-doc);
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-shadow: 0 0 4px rgba(184, 146, 79, 0.2);
+}
+.svital-max {
+  color: var(--ink-doc-faded);
+  font-weight: normal;
+  font-size: 0.8rem;
+}
 .svital-track {
   height: 6px;
   background: rgba(43, 36, 26, 0.4);
@@ -142,14 +164,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-top: 1px solid var(--ink-faded);
-  padding-top: 0.5rem;
-  margin-top: 0.1rem;
+  border-top: 2px solid var(--parchment-dim);
+  border-bottom: 1px solid var(--parchment-dim);
+  padding: 0.4rem 0;
+  margin: 0.6rem 0 0.4rem;
   font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  color: var(--ink-dim);
-  letter-spacing: 0.06em;
+  font-size: 0.75rem;
+  color: var(--ink-doc-faded);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+  font-weight: 600;
 }
 .sidebar-attr-header::before { content: "Atributos"; }
 
@@ -719,7 +743,16 @@ body[data-difficulty="extreme"] .skill-frac-sep {
 .sheet-card input,
 .sheet-card select,
 .sheet-card textarea { font-size: 16px; }
-.app-shell .section-title { font-size: 1.9rem; }
+.app-shell .section-title {
+  font-size: 1.9rem;
+  font-family: var(--font-display);
+  color: var(--ink-doc);
+  text-shadow: 0 0 8px rgba(184, 146, 79, 0.15);
+  margin-bottom: 1rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 2px solid var(--parchment-dim);
+  letter-spacing: 0.03em;
+}
 
 /* §17 — em telas muito amplas, a coluna do Log/Chat cresce para ocupar o espaço */
 @media (min-width: 1600px) {
