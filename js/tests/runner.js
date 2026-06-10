@@ -53,6 +53,9 @@ load('js/core/session-export.js');
 // Views (somente o necessário para testes; DOM não é chamado no carregamento)
 load('js/views/combat.js');
 
+// Shared puro (sem DOM no carregamento)
+load('js/shared/mini-md.js');
+
 // Campaign — camada de persistência durável (lógica pura; Fase M)
 load('js/campaign/campaign-persistence.js');
 load('js/campaign/outbox-indexeddb.js');
@@ -120,6 +123,7 @@ load('js/tests/test-campaign-persistence.js');
 load('js/tests/test-outbox.js');
 load('js/tests/test-campaign-sync.js');
 load('js/tests/test-keeper-dashboard.js');
+load('js/tests/test-minimd.js');
 const elapsed = Date.now() - t0;
 
 // ── Relatório final ───────────────────────────────────────────────────────

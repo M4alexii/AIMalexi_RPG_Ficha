@@ -50,7 +50,11 @@ window.CoC.views = window.CoC.views || {};
       const cur  = d.current ?? d.value;
       const max  = key === "SAN" ? d.max : d.value;
       const fill = (isTracker && max > 0) ? Math.max(0, Math.min(100, (cur / max) * 100)) : 100;
-      if (isTracker) card.style.setProperty("--fill", fill + "%");
+      if (isTracker) {
+        card.style.setProperty("--fill", fill + "%");
+        // Estado crítico (≤25%): pulso de alerta na barra (CSS .low).
+        if (fill <= 25) card.classList.add("low");
+      }
 
       let actions = "";
       if (isTracker) {
@@ -116,7 +120,8 @@ window.CoC.views = window.CoC.views || {};
       const cur  = d.current ?? d.value;
       const max  = key === "SAN" ? d.max : d.value;
       const fill = max > 0 ? Math.max(0, Math.min(100, (cur / max) * 100)) : 0;
-      const row  = el("div", { class: `svital svital-${key.toLowerCase()}`, "data-svital": key });
+      const low  = fill <= 25 ? " low" : "";
+      const row  = el("div", { class: `svital svital-${key.toLowerCase()}${low}`, "data-svital": key });
       row.innerHTML = `
         <div class="svital-header">
           <span class="svital-label">${label}</span>

@@ -64,6 +64,7 @@
       </div>
 
       <div class="sheet-group">
+        <button id="btn-keeper-tour" class="btn-ghost" title="Rever o tour guiado do Guardião">❓ Tour</button>
         <button id="btn-settings" class="btn-ghost" title="Central de Configurações">⚙️ Configurações</button>
       </div>
     </div>
@@ -290,7 +291,8 @@
   <!-- ═══ T7 · DIÁRIO DO MESTRE (avançado — tópicos estruturados) ═══ -->
   <section class="ktab-panel" data-ktab="diario">
     <div class="journal-toolbar">
-      <p class="ktab-hint" style="margin:0;flex:1 1 auto;">Diário estruturado — tópicos por categoria. Salvo localmente.</p>
+      <p class="ktab-hint" style="margin:0;flex:1 1 auto;">Diário estruturado — Markdown (#, **, listas), <b>[[ligações]]</b> entre tópicos e backlinks. Salvo localmente.</p>
+      <input type="search" id="journal-search" class="journal-search" placeholder="🔍 Buscar no diário…" aria-label="Buscar tópicos por título, conteúdo ou pasta" />
       <select id="journal-filter" class="journal-filter" aria-label="Filtrar por categoria">
         <option value="all">Todas as categorias</option>
         <option value="sessao">Sessão</option>
@@ -349,6 +351,8 @@
      UI COMPARTILHADA
      ═══════════════════════════════════════════════════════════════════════ -->
 <script src="js/shared/ui-components.js"></script>
+<script src="js/shared/guided-tour.js"></script>
+<script src="js/shared/mini-md.js"></script>
 <script src="js/shared/validators.js"></script>
 <script src="js/shared/media-picker.js"></script>
 <script src="js/i18n.js"></script>
@@ -382,6 +386,7 @@
 <script src="js/keeper-journal.js"></script>
 <script src="js/keeper-standard-pack.js"></script>
 <script src="js/keeper-dashboard-summary.js"></script>
+<script src="js/keeper-tour.js"></script>
 
 </body>
 </html>

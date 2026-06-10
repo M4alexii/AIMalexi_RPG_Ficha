@@ -5,6 +5,38 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-10 - UX Grimório: tutorial do Guardião, diário Obsidian e UI game-style
+
+### Adicionado
+
+- **Tutorial guiado do Guardião** (paridade de onboarding com o wizard do
+  Investigador): tour com spotlight em 10 passos cobrindo as 7 mesas de
+  trabalho, dashboard, encontro e diário. Roda uma vez na primeira visita;
+  botão "❓ Tour" na toolbar para rever. Componente reutilizável em
+  `js/shared/guided-tour.js` (Esc pula, ←/→ navegam, respeita
+  `prefers-reduced-motion`, persistido em prefs).
+- **Diário estilo Obsidian**: conteúdo dos tópicos agora renderiza
+  **Markdown seguro** (títulos, negrito/itálico, listas, checklists `- [ ]`,
+  citações, código, réguas) via novo `js/shared/mini-md.js` — escape SEMPRE
+  antes do markup, à prova de XSS e coberto por 28 asserções de teste
+  (`js/tests/test-minimd.js`). **Backlinks**: cada tópico mostra "↩ Mencionado
+  em" com links navegáveis. **Busca global** (`#journal-search`) por título,
+  conteúdo e pasta, debounced.
+
+### Alterado
+
+- **Camada visual "Grimório"** (inspiração Baldur's Gate 3/WoW sobre a
+  identidade Cthulhu): painéis com cantoneiras de latão e relevo, botões
+  cinzelados com letterpress, foco de inputs com anel de latão (`theme.css`).
+- **Vitais do Investigador como barras de jogo**: PV/PM/SAN com gradiente
+  vítreo, glow por recurso e **pulso de alerta quando ≤25%** (classe `.low`
+  aplicada por `vitals.js`); cards de derivados com "vidro de poção".
+- **Refresh do Guardião** (estava visualmente atrás): abas com cara de jogo
+  (serif, painel ativo com brilho de sangue), biblioteca com hover de
+  inventário, cabeçalho de criatura como placa de boss, KPIs como placas
+  gravadas, pastas do diário como fichário.
+- `sw.js`: precache dos 3 arquivos novos; `CACHE_VERSION` v76 → v77.
+
 ## 2026-06-10 - Auditoria residual: empala, XSS no log, validação de ficha, boot IDB
 
 ### Corrigido
