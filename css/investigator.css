@@ -606,6 +606,10 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   border-left: 3px solid transparent;
   background: var(--bg-card-hi);
 }
+/* dark card bg — ink-doc (parchment ink) would be invisible here */
+.svital .svital-label { color: var(--ink-dim); }
+.svital .svital-value { color: var(--ink); }
+.svital .svital-max   { color: var(--ink-dim); }
 .svital-pv   { border-left-color: var(--blood); }
 .svital-san  { border-left-color: #5a8fb5; }
 .svital-pm   { border-left-color: #7b5ea7; }

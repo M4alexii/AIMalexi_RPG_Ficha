@@ -5,6 +5,30 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-10 - Correção de visibilidade dos atributos no mobile + dark mode do SO
+
+### Corrigido
+
+- **Valores de atributo invisíveis na sidebar** (mobile ≤767px e desktop
+  ≥901px): `.sattr-value` usava tinta de documento (`--ink-doc`, quase preta)
+  sobre o fundo escuro `--bg-card-hi` dos cards compactos — texto ilegível.
+  Agora usa `--brass-bright` nesses contextos (`css/investigator.css`).
+- **Dark mode do sistema operacional recolorindo o tema**: nenhuma página
+  declarava `color-scheme`, então o "Force Dark Mode" do Chrome/Android
+  aplicava inversões parciais sobre o tema próprio. Adicionado
+  `color-scheme: dark` em `:root` (`css/theme.css`) e
+  `<meta name="color-scheme" content="dark">` nas 5 páginas HTML.
+- `CACHE_VERSION` do service worker: v79 → v80 (entrega das correções de CSS
+  a clientes com cache antigo).
+
+### Documentação
+
+- `Melhorias/AUDITORIA_QA_CAMPANHA_V1.md`: auditoria QA completa simulando
+  campanha real de CoC 7e (score 70/100, 29 problemas QA-001–QA-029).
+- `Melhorias/ROADMAP_UX_UI_VISUAL_V1.md`: roadmap de validação visual UX/UI
+  (85 itens em 7 eixos: contraste, tipografia, responsividade, interações,
+  formulários, renderização e cross-browser).
+
 ## 2026-06-10 - Notas Avançadas do Guardião: lixeira, busca com operadores, pastas, timeline e versionamento
 
 ### Adicionado
