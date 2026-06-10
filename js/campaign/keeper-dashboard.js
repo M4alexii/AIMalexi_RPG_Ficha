@@ -337,6 +337,18 @@ window.CoC.campaign = window.CoC.campaign || {};
     var countEl   = $s('#is-count');
     if (!container) return;
 
+    // Delegação (uma vez): botão 📝 abre/cria a nota do investigador
+    if (!container._invNoteDelegated) {
+      container._invNoteDelegated = true;
+      container.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-inv-note]');
+        if (!btn) return;
+        e.preventDefault();
+        var ui = window.CoC && window.CoC.keeperNotesUI;
+        if (ui && ui.openOrCreateByTitle) ui.openOrCreateByTitle(btn.getAttribute('data-inv-note'));
+      });
+    }
+
     var online = investigators.filter(function (i) { return i.online; }).length;
     if (countEl) countEl.textContent = online + ' conectado' + (online !== 1 ? 's' : '');
 
@@ -364,6 +376,7 @@ window.CoC.campaign = window.CoC.campaign || {};
           '<span class="inv-card-online-dot"></span>' +
           '<span class="inv-card-name">' + _esc(inv.characterName || '?') + '</span>' +
           '<span class="inv-card-player">' + _esc(inv.playerName || '') + '</span>' +
+          '<button type="button" class="inv-note-btn" data-inv-note="' + _esc(inv.characterName || '') + '" title="Abrir/criar nota do Guardião sobre este investigador">📝</button>' +
         '</div>' +
         '<div class="inv-card-stats">' +
           '<div class="inv-stat hp"><span class="inv-stat-label">PV</span><span class="inv-stat-value">' + (s.hp != null ? s.hp : '?') + '</span></div>' +
