@@ -537,7 +537,88 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
     });
 
     editorColumn.appendChild(contentLabel);
-    editorColumn.appendChild(contentInput);
+
+    // Wikilink autocomplete wrapper (Phase F)
+    var contentWrapper = el("div", { style: { position: "relative" } });
+
+    contentWrapper.appendChild(contentInput);
+
+    var wikilinkHints = el("div", {
+      style: {
+        display: "none",
+        position: "absolute",
+        top: "100%",
+        left: "0",
+        right: "0",
+        background: "var(--bg-deep)",
+        border: "1px solid var(--brass)",
+        borderTop: "none",
+        borderRadius: "0 0 var(--radius) var(--radius)",
+        maxHeight: "200px",
+        overflowY: "auto",
+        zIndex: "10",
+        fontSize: "0.8rem"
+      }
+    });
+
+    contentInput.addEventListener("input", function () {
+      var content = this.value;
+      var match = content.slice(Math.max(0, this.selectionStart - 50), this.selectionStart).match(/\[\[([^\[\]]*?)$/);
+
+      if (match) {
+        var prefix = match[1].toLowerCase();
+        var allNotes = _getAllNotes();
+        var suggestions = allNotes.filter(function (n) {
+          return n.title && n.title.toLowerCase().indexOf(prefix) !== -1;
+        }).slice(0, 5);
+
+        if (suggestions.length > 0) {
+          wikilinkHints.innerHTML = "";
+          wikilinkHints.style.display = "block";
+
+          suggestions.forEach(function (note) {
+            var hint = el("button", {
+              type: "button",
+              style: {
+                width: "100%",
+                padding: "0.4rem 0.6rem",
+                background: "transparent",
+                border: "none",
+                textAlign: "left",
+                color: "var(--brass)",
+                cursor: "pointer",
+                borderBottom: "1px solid var(--ink-faded)"
+              }
+            }, ["[[" + (note.title || "(sem título)") + "]]"]);
+
+            hint.addEventListener("click", function (e) {
+              e.preventDefault();
+              var before = contentInput.value.slice(0, contentInput.selectionStart - match[0].length);
+              var after = contentInput.value.slice(contentInput.selectionStart);
+              contentInput.value = before + "[[" + note.title + "]]" + after;
+              contentInput.dispatchEvent(new Event("input"));
+              notes.update(noteId, { content: contentInput.value });
+              wikilinkHints.style.display = "none";
+              renderPreview();
+              renderBacklinks();
+            });
+
+            wikilinkHints.appendChild(hint);
+          });
+        } else {
+          wikilinkHints.style.display = "none";
+        }
+      } else {
+        wikilinkHints.style.display = "none";
+      }
+
+      notes.update(noteId, { content: this.value });
+      renderPreview();
+      renderBacklinks();
+    });
+
+    contentWrapper.appendChild(wikilinkHints);
+    editorColumn.appendChild(contentWrapper);
     contentArea.appendChild(editorColumn);
 
     // Preview + Backlinks column
@@ -621,6 +702,34 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
   function createNewNote() {
     var note = notes.create("Nova Nota", "Comece a escrever...");
     openNote(note.id);
+  }
+
+  // ─── Keyboard Shortcuts (Phase F) ────────────────────────────────────────
+
+  function _setupKeyboardShortcuts() {
+    document.addEventListener("keydown", function (e) {
+      // Ctrl+K or Cmd+K: Focus search
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        var searchBox = document.querySelector("#keeper-notes-list .journal-search");
+        if (searchBox) searchBox.focus();
+      }
+
+      // Ctrl+N or Cmd+N: New note
+      if ((e.ctrlKey || e.metaKey) && e.key === "n") {
+        e.preventDefault();
+        createNewNote();
+      }
+
+      // Escape: Clear search (if in search box)
+      if (e.key === "Escape") {
+        var searchBox = document.querySelector("#keeper-notes-list .journal-search");
+        if (document.activeElement === searchBox && searchBox.value) {
+          searchBox.value = "";
+          searchBox.dispatchEvent(new Event("input"));
+        }
+      }
+    });
   }
 
   // ─── Init ─────────────────────────────────────────────────────────────────
@@ -730,7 +839,43 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
 
     listContainer.insertBefore(actionButtons, listContainer.firstChild);
 
-    console.log("[keeper-notes-ui] Inicializado. Notas carregadas.");
+    // Setup keyboard shortcuts
+    _setupKeyboardShortcuts();
+
+    // Add keyboard hints
+    var hints = el("div", {
+      style: {
+        fontSize: "0.65rem",
+        color: "var(--ink-faded)",
+        padding: "0.4rem 0.6rem",
+        background: "rgba(0,0,0,0.2)",
+        borderRadius: "var(--radius)",
+        marginTop: "0.8rem",
+        textAlign: "center"
+      }
+    }, ["⌨️ Ctrl+K (busca) · Ctrl+N (nova) · Esc (limpar)"]);
+    listContainer.appendChild(hints);
+
+    // Statistics (Phase F)
+    var allNotes = _getAllNotes();
+    var stats = el("div", {
+      style: {
+        fontSize: "0.7rem",
+        color: "var(--ink-faded)",
+        padding: "0.6rem 0.6rem",
+        marginTop: "0.6rem",
+        borderTop: "1px solid var(--ink-faded)",
+        textAlign: "center"
+      }
+    });
+    var totalNotes = allNotes.length;
+    var totalTags = _getAllTags().length;
+    var avgContentLength = totalNotes > 0 ? Math.round(allNotes.reduce(function (sum, n) { return sum + (n.content || "").length; }, 0) / totalNotes) : 0;
+
+    stats.appendChild(document.createTextNode(totalNotes + " notas · " + totalTags + " tags · " + avgContentLength + " chars avg"));
+    listContainer.appendChild(stats);
+
+    console.log("[keeper-notes-ui] Inicializado. Notas carregadas. Atalhos: Ctrl+K, Ctrl+N, Esc");
   }
 
   // ─── Initialization ──────────────────────────────────────────────────────
