@@ -37,31 +37,10 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
 
   // ─── Note List Panel ──────────────────────────────────────────────────────
 
-  function buildNoteList() {
-    var container = $("keeper-notes-list");
-    if (!container) return;
+  var _currentSearchQuery = "";
+  var _currentTagFilter = null;
 
-    container.innerHTML = "";
-
-    // Search bar
-    var searchBox = el("input", {
-      class: "journal-search",
-      placeholder: "🔍 Buscar notas...",
-      style: { marginBottom: "0.8rem" }
-    });
-
-    searchBox.addEventListener("input", function (e) {
-      var results = notes.search(e.target.value);
-      renderNoteListResults(results);
-    });
-
-    container.appendChild(searchBox);
-
-    // List container
-    var listContainer = el("div", { class: "notes-list" });
-    container.appendChild(listContainer);
-
-    // Load all notes initially
+  function _getAllNotes() {
     var allNotes = [];
     try {
       var store = window.CoC.storage;
@@ -74,8 +53,103 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
         });
       }
     } catch (e) {}
+    return allNotes;
+  }
 
-    renderNoteListResults(allNotes, listContainer);
+  function _getAllTags() {
+    var allNotes = _getAllNotes();
+    var tagSet = {};
+    allNotes.forEach(function (note) {
+      (note.tags || []).forEach(function (tag) {
+        tagSet[tag] = (tagSet[tag] || 0) + 1;
+      });
+    });
+    return Object.keys(tagSet).sort().map(function (tag) {
+      return { tag: tag, count: tagSet[tag] };
+    });
+  }
+
+  function buildNoteList() {
+    var container = $("keeper-notes-list");
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    // Search header
+    var searchHeader = el("div", { style: { marginBottom: "0.6rem" } });
+    var searchBox = el("input", {
+      class: "journal-search",
+      placeholder: "🔍 Buscar notas...",
+      style: { marginBottom: "0.4rem" }
+    });
+
+    searchBox.addEventListener("input", function (e) {
+      _currentSearchQuery = e.target.value;
+      _updateNoteList();
+    });
+
+    searchHeader.appendChild(searchBox);
+
+    // Tag filter buttons (Phase C)
+    var allTags = _getAllTags();
+    if (allTags.length > 0) {
+      var tagCloud = el("div", { style: { display: "flex", flexWrap: "wrap", gap: "0.3rem", fontSize: "0.75rem" } });
+      allTags.slice(0, 8).forEach(function (t) {
+        var btn = el("button", {
+          class: "tag-filter-btn",
+          style: {
+            padding: "0.2rem 0.5rem",
+            background: _currentTagFilter === t.tag ? "var(--brass)" : "rgba(184, 146, 79, 0.2)",
+            color: _currentTagFilter === t.tag ? "var(--bg-deep)" : "var(--brass)",
+            border: "1px solid var(--brass)",
+            borderRadius: "0.3rem",
+            cursor: "pointer",
+            transition: "all 0.15s"
+          }
+        }, ["#" + t.tag + " (" + t.count + ")"]);
+
+        btn.addEventListener("click", function () {
+          _currentTagFilter = _currentTagFilter === t.tag ? null : t.tag;
+          _updateNoteList();
+        });
+        tagCloud.appendChild(btn);
+      });
+      searchHeader.appendChild(tagCloud);
+    }
+
+    container.appendChild(searchHeader);
+
+    // List container
+    var listContainer = el("div", { class: "notes-list", style: { flex: "1 1 auto" } });
+    container.appendChild(listContainer);
+
+    _updateNoteList();
+  }
+
+  function _updateNoteList() {
+    var container = document.querySelector("#keeper-notes-list .notes-list");
+    if (!container) return;
+
+    var allNotes = _getAllNotes();
+    var filtered = allNotes;
+
+    // Apply search filter
+    if (_currentSearchQuery) {
+      var q = _currentSearchQuery.toLowerCase();
+      filtered = filtered.filter(function (note) {
+        return (note.title && note.title.toLowerCase().indexOf(q) !== -1) ||
+               (note.content && note.content.toLowerCase().indexOf(q) !== -1);
+      });
+    }
+
+    // Apply tag filter
+    if (_currentTagFilter) {
+      filtered = filtered.filter(function (note) {
+        return note.tags && note.tags.indexOf(_currentTagFilter) !== -1;
+      });
+    }
+
+    renderNoteListResults(filtered, container);
   }
 
   function renderNoteListResults(notesList, container) {
@@ -148,6 +222,59 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
     });
   }
 
+  // ─── Export (Phase D) ─────────────────────────────────────────────────────
+
+  function _downloadFile(filename, content, mimeType) {
+    mimeType = mimeType || "text/plain";
+    var blob = new Blob([content], { type: mimeType });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    try { URL.revokeObjectURL(url); } catch (e) {}
+  }
+
+  function exportAllNotesAsMarkdown() {
+    var allNotes = _getAllNotes();
+    var content = "# Notas Avançadas — AIMalexi RPG\n\n";
+    content += "Exportado em: " + new Date().toLocaleString("pt-BR") + "\n\n";
+    content += "---\n\n";
+
+    allNotes.forEach(function (note) {
+      content += "## " + (note.title || "(sem título)") + "\n\n";
+      if (note.tags && note.tags.length > 0) {
+        content += "**Tags:** " + note.tags.join(", ") + "\n\n";
+      }
+      content += "**Criado:** " + new Date(note.createdAt).toLocaleString("pt-BR") + "\n\n";
+      content += note.content || "";
+      content += "\n\n---\n\n";
+    });
+
+    _downloadFile("notas-aimalexi-" + Date.now() + ".md", content, "text/markdown");
+  }
+
+  function exportAllNotesAsJSON() {
+    var allNotes = _getAllNotes();
+    var data = {
+      version: 1,
+      exportDate: new Date().toISOString(),
+      count: allNotes.length,
+      notes: allNotes
+    };
+    _downloadFile("notas-aimalexi-" + Date.now() + ".json", JSON.stringify(data, null, 2), "application/json");
+  }
+
+  function exportCurrentNoteAsMarkdown() {
+    if (!currentNoteId) return;
+    var note = notes.read(currentNoteId);
+    if (!note) return;
+    var content = notes.exportMarkdown(currentNoteId);
+    _downloadFile(note.title.replace(/[^a-z0-9]/gi, "-") + ".md", content, "text/markdown");
+  }
+
   // ─── Note Editor ──────────────────────────────────────────────────────────
 
   function openNote(noteId) {
@@ -185,6 +312,32 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
     });
 
     header.appendChild(titleInput);
+
+    // Action buttons (Phase D)
+    var actions = el("div", { style: { display: "flex", gap: "0.5rem", justifyContent: "flex-end", marginBottom: "0.6rem" } });
+
+    var exportBtn = el("button", {
+      class: "btn-ghost btn-sm",
+      style: { padding: "0.4rem 0.6rem", fontSize: "0.75rem" }
+    }, ["📥 Exportar"]);
+    exportBtn.addEventListener("click", exportCurrentNoteAsMarkdown);
+    actions.appendChild(exportBtn);
+
+    var deleteBtn = el("button", {
+      class: "btn-ghost btn-sm",
+      style: { padding: "0.4rem 0.6rem", fontSize: "0.75rem", color: "var(--danger)" }
+    }, ["🗑️ Remover"]);
+    deleteBtn.addEventListener("click", function () {
+      if (window.confirm("Remover esta nota?")) {
+        notes.delete(noteId);
+        currentNoteId = null;
+        editor.innerHTML = "<p style='color:var(--ink-faded)'>Nota removida. Selecione outra para continuar.</p>";
+        buildNoteList();
+      }
+    });
+    actions.appendChild(deleteBtn);
+
+    header.appendChild(actions);
 
     // Tags input
     var tagsInput = el("input", {
@@ -342,14 +495,51 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
     // Renderiza a lista de notas
     buildNoteList();
 
-    // Cria um botão para nova nota
-    var button = el("button", {
-      class: "btn-primary",
-      style: { marginBottom: "1rem", width: "100%" }
-    }, ["+ Nova Nota"]);
+    // Botões de ação (top)
+    var actionButtons = el("div", { style: { display: "flex", flexDirection: "column", gap: "0.5rem", marginBottom: "0.8rem" } });
 
-    button.addEventListener("click", createNewNote);
-    listContainer.insertBefore(button, listContainer.firstChild);
+    var newBtn = el("button", {
+      class: "btn-primary",
+      style: { width: "100%" }
+    }, ["+ Nova Nota"]);
+    newBtn.addEventListener("click", createNewNote);
+    actionButtons.appendChild(newBtn);
+
+    // Expandable export menu (Phase D)
+    var exportWrapper = el("div", { style: { fontSize: "0.75rem" } });
+    var exportToggle = el("button", {
+      class: "btn-ghost",
+      style: { width: "100%", padding: "0.4rem 0.6rem", marginBottom: "0.3rem" }
+    }, ["💾 Exportar"]);
+
+    var exportMenu = el("div", {
+      style: {
+        display: "none",
+        flexDirection: "column",
+        gap: "0.3rem",
+        paddingLeft: "0.6rem",
+        borderLeft: "2px solid var(--ink-faded)"
+      }
+    });
+
+    var exportMdBtn = el("button", { class: "btn-ghost btn-sm", style: { width: "100%" } }, ["📝 MD (todas)"]);
+    exportMdBtn.addEventListener("click", exportAllNotesAsMarkdown);
+    exportMenu.appendChild(exportMdBtn);
+
+    var exportJsonBtn = el("button", { class: "btn-ghost btn-sm", style: { width: "100%" } }, ["📦 JSON (backup)"]);
+    exportJsonBtn.addEventListener("click", exportAllNotesAsJSON);
+    exportMenu.appendChild(exportJsonBtn);
+
+    exportToggle.addEventListener("click", function () {
+      var isVisible = exportMenu.style.display !== "none";
+      exportMenu.style.display = isVisible ? "none" : "flex";
+    });
+
+    exportWrapper.appendChild(exportToggle);
+    exportWrapper.appendChild(exportMenu);
+    actionButtons.appendChild(exportWrapper);
+
+    listContainer.insertBefore(actionButtons, listContainer.firstChild);
 
     console.log("[keeper-notes-ui] Inicializado. Notas carregadas.");
   }
