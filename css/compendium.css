@@ -185,7 +185,7 @@ ol.comp-list li::before {
 .arc-derived {
   font-family: var(--font-mono);
   font-size: 0.72rem;
-  color: var(--ink-faded);
+  color: var(--ink-dim);
   margin-top: 0.3rem;
   border-top: 1px dotted var(--ink-faded);
   padding-top: 0.3rem;

@@ -5,6 +5,29 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-10 - Efeitos de insanidade ativos por padrão + contraste no site inteiro + Notas no mobile
+
+### Corrigido
+
+- **Efeitos visuais de insanidade nunca disparavam**: `resolveInitialMode()`
+  em `js/shared/sanity-fx.js` retornava `"off"` por padrão (contradizendo a
+  documentação do módulo, que prometia COMPLETO). Agora o padrão é `full`
+  (auto-reduzido para `reduced` se o SO sinaliza `prefers-reduced-motion`);
+  quem já escolheu um modo em "🧠 Efeitos" mantém a preferência.
+  Validado: SAN 50→10 aplica `body[data-sanity="fraying"]` (vinheta, grão,
+  aberração cromática).
+- **Notas Avançadas inutilizáveis no celular**: o split-pane lista|editor era
+  um grid inline `280px 1fr` em `keeper.html` — numa tela de 375px o editor
+  ficava com ~60px (texto quebrando letra a letra). Movido para
+  `css/keeper.css` com breakpoint ≤900px que empilha lista (máx. 45vh) e
+  editor em coluna única.
+- **Contraste no site inteiro** (varredura automatizada em index, keeper,
+  compendium e guia): 7 textos com `--ink-faded`/`--blood` sobre fundo escuro
+  abaixo de 3:1 — `.sheet-title`/`.cs-hint`/`.cs-divider` (keeper),
+  `.arc-derived` (compêndio), `.callout.danger .callout-title` e
+  `.section-time` (guia). Todos elevados para `--ink-dim` ou tom claro.
+  Pós-fix: 0 elementos abaixo de 3:1 nas 4 páginas + 6 abas do investigador.
+
 ## 2026-06-10 - Títulos e estatísticas derivadas legíveis + destaque nítido nos números
 
 ### Corrigido
