@@ -2789,3 +2789,76 @@ body:has(.wz-backdrop) .fab { display: none !important; }
 /* Wizard — passo História (ganchos de background) */
 .wz-bg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
 @media (max-width: 720px) { .wz-bg-grid { grid-template-columns: 1fr; } }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GRIMÓRIO — VITAIS COMO BARRAS DE JOGO (redesign 2026-06)
+
+   PV/PM/SAN com leitura instantânea de MMORPG (party frame): gradiente
+   líquido, brilho de superfície, vinheta interna e pulso de alerta quando
+   o recurso está crítico (≤25%, classe .low aplicada por vitals.js).
+   Append-only — sobrepõe os estilos base sem tocar nos seletores do JS.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Sidebar: barras compactas viram barras de party frame ──────────────── */
+.svital {
+  background: linear-gradient(180deg, var(--bg-card-hi), var(--bg-card));
+  border: 1px solid var(--frame-dim);
+  border-left-width: 3px;
+  box-shadow: inset 0 1px 0 rgba(232, 220, 196, 0.04);
+}
+.svital-track {
+  height: 9px;
+  border-radius: 4px;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.25));
+  border: 1px solid rgba(0, 0, 0, 0.6);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+.svital-fill {
+  border-radius: 3px;
+  position: relative;
+  transition: width 0.45s cubic-bezier(0.22, 0.8, 0.3, 1);
+  box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.35);
+  background-image: linear-gradient(180deg,
+    rgba(255, 255, 255, 0.28) 0%,
+    rgba(255, 255, 255, 0.06) 38%,
+    rgba(0, 0, 0, 0.12) 100%);
+}
+/* Cor por recurso: camada de gradiente vítreo sobre a cor base */
+.svital-pv   .svital-fill { background-color: var(--hp-bright);  box-shadow: inset 0 -2px 3px rgba(0,0,0,.35), 0 0 8px rgba(179, 36, 36, 0.45); }
+.svital-pm   .svital-fill { background-color: var(--mp-bright);  box-shadow: inset 0 -2px 3px rgba(0,0,0,.35), 0 0 8px rgba(123, 94, 167, 0.45); }
+.svital-san  .svital-fill { background-color: var(--san-bright); box-shadow: inset 0 -2px 3px rgba(0,0,0,.35), 0 0 8px rgba(74, 138, 163, 0.45); }
+.svital-luck .svital-fill { background-color: var(--luck-bright); box-shadow: inset 0 -2px 3px rgba(0,0,0,.35), 0 0 8px rgba(79, 158, 106, 0.40); }
+
+/* Estado crítico: a barra respira (chama a atenção sem gritar) */
+@keyframes vital-low-pulse {
+  0%, 100% { filter: brightness(1);    }
+  50%      { filter: brightness(1.55); }
+}
+.svital.low .svital-fill,
+.derived-card.tracker.low::before {
+  animation: vital-low-pulse 1.6s ease-in-out infinite;
+}
+.svital.low .svital-value { color: #ff9d9d; }
+@media (prefers-reduced-motion: reduce) {
+  .svital.low .svital-fill,
+  .derived-card.tracker.low::before { animation: none; }
+}
+
+/* ── Cards de derivados: o preenchimento vira "vidro de poção" ──────────── */
+.derived-card {
+  border-color: var(--frame-dim);
+  background: linear-gradient(180deg, var(--bg-card-hi), var(--bg-card));
+  box-shadow:
+    inset 0 1px 0 rgba(232, 220, 196, 0.04),
+    0 3px 10px rgba(0, 0, 0, 0.3);
+}
+.derived-card.tracker::before {
+  opacity: 0.28;
+  background:
+    linear-gradient(90deg, var(--res-deep) 0%, var(--res-bright) var(--fill, 100%), transparent var(--fill, 100%));
+}
+.derived-card.tracker.pv  { --res-deep: var(--hp-deep);   --res-bright: rgba(179, 36, 36, 0.55); border-bottom: 2px solid var(--hp-bright); }
+.derived-card.tracker.pm  { --res-deep: var(--mp-deep);   --res-bright: rgba(123, 94, 167, 0.55); border-bottom: 2px solid var(--mp-bright); }
+.derived-card.tracker.san { --res-deep: var(--san-deep);  --res-bright: rgba(74, 138, 163, 0.55); border-bottom: 2px solid var(--san-bright); }
+.derived-card.tracker .derived-value { text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); }

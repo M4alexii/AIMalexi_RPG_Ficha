@@ -1831,3 +1831,178 @@
   0%, 100% { box-shadow: none; }
   20% { box-shadow: 0 0 0 2px var(--keeper-accent, var(--brass)); }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GRIMÓRIO — REFRESH DO GUARDIÃO (redesign 2026-06)
+
+   O keeper estava visualmente atrás do investigador. Este bloco o traz para
+   a mesma linguagem game-UI (painéis de latão, relevo, glow) mantendo o
+   sangue (--keeper-accent) como identidade do Mestre. Append-only.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Abas: de sublinhado tímido para abas de jogo ───────────────────────── */
+.keeper-tabs {
+  gap: 0.3rem;
+  border-bottom: 1px solid var(--frame-line);
+  padding-bottom: 0;
+}
+.keeper-tab {
+  font-family: var(--font-serif);
+  font-size: 0.98rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.6rem 1rem 0.55rem;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: var(--radius) var(--radius) 0 0;
+  position: relative;
+  top: 1px;
+  transition: color 0.15s, background 0.2s, border-color 0.2s;
+}
+.keeper-tab:hover {
+  color: var(--ink);
+  background: linear-gradient(180deg, rgba(139, 26, 26, 0.12), transparent);
+}
+.keeper-tab.active {
+  color: var(--ink);
+  background: linear-gradient(180deg, var(--bg-card-hi), var(--bg-card));
+  border-color: var(--frame-line);
+  border-bottom: 1px solid var(--bg-card);
+  box-shadow:
+    inset 0 2px 0 var(--keeper-accent),
+    inset 0 1px 0 rgba(232, 220, 196, 0.05),
+    0 -4px 14px rgba(139, 26, 26, 0.18);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+/* ── Biblioteca: cards com presença (hover de inventário de jogo) ───────── */
+.library-list {
+  border-color: var(--frame-dim);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.25), transparent 12%);
+}
+.library-item {
+  transition: background 0.15s, border-color 0.15s, transform 0.12s, box-shadow 0.15s;
+}
+.library-item:hover {
+  transform: translateX(2px);
+  border-left-color: var(--keeper-accent);
+  box-shadow: inset 0 0 18px rgba(139, 26, 26, 0.08);
+}
+.library-item.active {
+  background: linear-gradient(90deg, rgba(139, 26, 26, 0.16), var(--bg-card) 70%);
+  box-shadow: inset 0 0 22px rgba(139, 26, 26, 0.1);
+}
+
+/* ── Workspace: cabeçalho da criatura como placa de boss ────────────────── */
+.creature-header {
+  border-color: var(--frame-line);
+  background:
+    linear-gradient(180deg, rgba(232, 220, 196, 0.03), transparent 25%),
+    linear-gradient(180deg, var(--bg-card-hi), var(--bg-card));
+  box-shadow:
+    inset 0 1px 0 rgba(232, 220, 196, 0.05),
+    0 6px 20px rgba(0, 0, 0, 0.35);
+}
+.attack-card, .stat-tile {
+  transition: transform 0.12s, box-shadow 0.15s, border-color 0.15s;
+}
+.attack-card:hover {
+  transform: translateY(-1px);
+  border-color: var(--keeper-accent);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45), 0 0 12px rgba(139, 26, 26, 0.25);
+  cursor: pointer;
+}
+.stat-tile:hover {
+  border-color: var(--brass);
+  box-shadow: 0 0 10px var(--frame-dim);
+}
+
+/* ── Encontro: HP em destaque, mortos apagados com dignidade ────────────── */
+.encounter-panel {
+  border-color: var(--frame-line);
+  box-shadow: inset 0 1px 0 rgba(232, 220, 196, 0.04), 0 6px 18px rgba(0, 0, 0, 0.3);
+}
+.encounter-item {
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+.encounter-item:hover {
+  box-shadow: inset 0 0 16px rgba(139, 26, 26, 0.08);
+}
+.encounter-item.dead { filter: grayscale(0.7); }
+
+/* ── Dashboard: KPIs como placas gravadas ───────────────────────────────── */
+.keeper-overview {
+  border-color: var(--frame-line);
+  background:
+    linear-gradient(180deg, rgba(232, 220, 196, 0.025), transparent 20%),
+    linear-gradient(180deg, var(--bg-card-hi), var(--bg-card));
+  box-shadow: inset 0 1px 0 rgba(232, 220, 196, 0.05), 0 6px 22px rgba(0, 0, 0, 0.35);
+}
+.ko-kpi {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.25), transparent);
+  border: 1px solid var(--frame-dim);
+  border-radius: var(--radius);
+}
+.ko-kpi-val { text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7); }
+
+/* ── Diário Obsidian: busca, backlinks e conteúdo markdown ──────────────── */
+.journal-search {
+  flex: 0 1 240px;
+  min-width: 150px;
+  background: var(--bg-deep);
+  border: 1px solid var(--frame-dim);
+  border-radius: var(--radius);
+  padding: 0.35rem 0.6rem;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+}
+.journal-search:focus {
+  border-color: var(--keeper-accent);
+  box-shadow: 0 0 0 2px rgba(139, 26, 26, 0.18), 0 0 10px rgba(139, 26, 26, 0.2);
+  outline: none;
+}
+
+.journal-card {
+  transition: transform 0.12s, box-shadow 0.15s, border-color 0.15s;
+  background: linear-gradient(180deg, var(--bg-card-hi), var(--bg-card));
+  box-shadow: inset 0 1px 0 rgba(232, 220, 196, 0.03), 0 3px 12px rgba(0, 0, 0, 0.3);
+}
+.journal-card:hover {
+  transform: translateY(-1px);
+  border-color: var(--frame-line);
+  box-shadow: inset 0 1px 0 rgba(232, 220, 196, 0.04), 0 6px 18px rgba(0, 0, 0, 0.4);
+}
+.journal-content { color: var(--ink-dim); }
+.journal-content .md-h { color: var(--keeper-accent-bright); }
+.journal-content .md-quote { border-left-color: var(--keeper-accent); background: rgba(139, 26, 26, 0.06); }
+
+.journal-backlinks {
+  margin-top: 0.55rem;
+  padding-top: 0.45rem;
+  border-top: 1px dashed var(--frame-dim);
+  font-size: 0.78rem;
+  color: var(--ink-faded);
+}
+.journal-backlinks .journal-link {
+  color: var(--mist);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--mist);
+}
+.journal-backlinks .journal-link:hover { color: var(--ink); }
+
+/* Pastas do diário com cara de fichário */
+.journal-folder {
+  border: 1px solid var(--frame-dim);
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.2), transparent 16%);
+  padding: 0.2rem 0.4rem 0.4rem;
+}
+.journal-folder > summary {
+  cursor: pointer;
+  font-family: var(--font-serif);
+  font-weight: 600;
+  color: var(--brass-bright);
+  padding: 0.3rem 0.2rem;
+}
+.journal-folder > summary:hover { color: var(--ink); }
