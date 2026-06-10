@@ -15,7 +15,7 @@
 
 /* Character sidebar: left permanent panel — now a parchment dossier */
 .character-sidebar {
-  width: 220px;
+  width: 260px;
   flex-shrink: 0;
   position: sticky;
   top: 1rem;
@@ -25,15 +25,16 @@
   flex-direction: column;
   gap: 0.6rem;
   background:
-    linear-gradient(135deg, rgba(231, 218, 186, 0.02) 0%, transparent 60%),
+    linear-gradient(135deg, rgba(231, 218, 186, 0.04) 0%, transparent 60%),
     var(--parchment);
   color: var(--ink-doc);
   border: 2px solid var(--parchment-dim);
   border-radius: var(--radius);
   padding: 1rem;
   box-shadow:
-    inset 0 1px 0 rgba(231, 218, 186, 0.3),
-    0 8px 24px rgba(0, 0, 0, 0.35);
+    inset 0 1px 0 rgba(231, 218, 186, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.08),
+    0 12px 32px rgba(0, 0, 0, 0.45);
   position: relative;
 }
 
@@ -53,8 +54,9 @@
 }
 
 .character-sidebar .character-portrait:hover {
-  transform: rotate(-1.5deg) scale(1.02);
-  filter: sepia(0.15) brightness(1);
+  transform: rotate(-1.5deg) scale(1.04);
+  filter: sepia(0.1) brightness(1.05) contrast(1.1);
+  box-shadow: 0 6px 18px rgba(184, 146, 79, 0.35), 0 0 12px rgba(184, 146, 79, 0.25);
 }
 
 /* Identity display — typewriter dossier header */
@@ -72,7 +74,9 @@
   letter-spacing: 0.08em;
   line-height: 1.2;
   word-break: break-word;
-  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
+  text-shadow:
+    0 1px 1px rgba(255, 255, 255, 0.4),
+    0 0 8px rgba(184, 146, 79, 0.3);
 }
 .sidebar-occupation {
   font-family: var(--font-typewriter);
@@ -108,19 +112,30 @@
 .svital-value { color: var(--ink); font-weight: bold; }
 .svital-max   { color: var(--ink-faded); font-weight: normal; }
 .svital-track {
-  height: 4px;
-  background: var(--bg-card-hi);
-  border-radius: 2px;
+  height: 6px;
+  background: rgba(43, 36, 26, 0.4);
+  border: 1px solid rgba(205, 188, 151, 0.3);
+  border-radius: 3px;
   overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 .svital-fill {
   height: 100%;
   border-radius: 2px;
   transition: width 0.3s ease;
 }
-.svital-pv  .svital-fill { background: var(--blood); }
-.svital-san .svital-fill { background: var(--brass); }
-.svital-pm  .svital-fill { background: #7b5ea7; }
+.svital-pv  .svital-fill {
+  background: linear-gradient(90deg, var(--blood), #c92929);
+  box-shadow: 0 0 8px var(--blood-glow);
+}
+.svital-san .svital-fill {
+  background: linear-gradient(90deg, var(--brass), #e3b65a);
+  box-shadow: 0 0 8px rgba(184, 146, 79, 0.5);
+}
+.svital-pm  .svital-fill {
+  background: linear-gradient(90deg, #7b5ea7, #a378d4);
+  box-shadow: 0 0 8px rgba(163, 120, 212, 0.4);
+}
 
 /* Sidebar attribute list header */
 .sidebar-attr-header {
@@ -139,29 +154,37 @@
 .sidebar-attr-header::before { content: "Atributos"; }
 
 /* Compact attribute rows */
-.sidebar-attributes { display: flex; flex-direction: column; gap: 0.05rem; }
+.sidebar-attributes { display: flex; flex-direction: column; gap: 0.15rem; }
 .sattr-row {
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.18rem 0.3rem;
+  padding: 0.35rem 0.4rem;
   border-radius: var(--radius);
-  transition: background 0.1s;
+  border-left: 3px solid transparent;
+  background: rgba(43, 36, 26, 0.15);
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
-.sattr-row:hover { background: var(--bg-card-hi); }
+.sattr-row:hover {
+  background: rgba(184, 146, 79, 0.15);
+  border-left-color: var(--brass);
+  box-shadow: inset 0 0 8px rgba(184, 146, 79, 0.1);
+}
 .sattr-label {
   font-family: var(--font-mono);
   font-size: var(--text-sm);
-  color: var(--ink-dim);
+  color: var(--ink-doc-faded);
   letter-spacing: 0.07em;
+  text-transform: uppercase;
   width: 2.7rem;
   flex-shrink: 0;
 }
 .sattr-value {
   font-family: var(--font-serif);
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 700;
-  color: var(--ink);            /* contraste máximo — é o número que se lê primeiro */
+  color: var(--ink-doc);
+  text-shadow: 0 0 4px rgba(184, 146, 79, 0.2);
   min-width: 1.6rem;
   cursor: default;
   letter-spacing: 0.01em;
@@ -943,31 +966,42 @@ body[data-difficulty="extreme"] .skill-frac-sep {
 
 /* Derived stat cards as official stamps on dossier */
 .derived-card {
-  background: linear-gradient(135deg, rgba(231, 218, 186, 0.08) 0%, transparent 100%);
-  border: 1px solid var(--parchment-dim);
+  background: linear-gradient(135deg, rgba(231, 218, 186, 0.12) 0%, transparent 100%);
+  border: 2px solid var(--parchment-dim);
   border-radius: var(--radius);
-  padding: 0.6rem 0.5rem;
+  padding: 0.8rem 0.6rem;
   text-align: center;
   box-shadow:
-    inset 0 1px 0 rgba(231, 218, 186, 0.2),
-    0 2px 4px rgba(0, 0, 0, 0.12);
+    inset 0 1px 0 rgba(231, 218, 186, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06),
+    0 6px 18px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.derived-card:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(231, 218, 186, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06),
+    0 8px 24px rgba(0, 0, 0, 0.28);
 }
 
 .derived-card .derived-label {
   font-family: var(--font-typewriter);
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   color: var(--ink-doc-faded);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  font-weight: 400;
+  font-weight: 500;
 }
 
 .derived-card .derived-value {
-  font-family: var(--font-mono);
-  font-size: 1.5rem;
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
   color: var(--ink-doc);
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.1;
+  text-shadow: 0 0 6px rgba(184, 146, 79, 0.25);
 }
 .derived-card .derived-max {
   font-size: 0.85rem;
@@ -991,6 +1025,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   position: relative;
   overflow: hidden;
   border-radius: var(--radius);
+  border-width: 2px;
 }
 
 .derived-card.tracker::before {
@@ -998,9 +1033,19 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   position: absolute;
   inset: 0;
   background: linear-gradient(90deg, var(--accent, var(--brass-glow)) var(--fill, 100%), transparent 0%);
-  opacity: 0.12;
+  opacity: 0.18;
   z-index: 0;
-  transition: --fill 0.4s;
+  transition: opacity 0.4s;
+}
+
+.derived-card.tracker::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--accent-glow, rgba(139, 26, 26, 0.2)) var(--fill, 100%), transparent 0%);
+  opacity: 0;
+  z-index: 0;
+  pointer-events: none;
 }
 
 .derived-card.tracker > * {
@@ -1009,18 +1054,36 @@ body[data-difficulty="extreme"] .skill-frac-sep {
 }
 
 .derived-card.tracker.pv {
-  --accent: rgba(139, 26, 26, 0.6);
-  border-color: rgba(139, 26, 26, 0.3);
+  --accent: rgba(139, 26, 26, 0.8);
+  --accent-glow: rgba(139, 26, 26, 0.3);
+  border-color: rgba(139, 26, 26, 0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(231, 218, 186, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06),
+    0 0 12px rgba(139, 26, 26, 0.2),
+    0 6px 18px rgba(0, 0, 0, 0.2);
 }
 
 .derived-card.tracker.pm {
-  --accent: rgba(123, 94, 167, 0.6);
-  border-color: rgba(123, 94, 167, 0.3);
+  --accent: rgba(123, 94, 167, 0.8);
+  --accent-glow: rgba(123, 94, 167, 0.3);
+  border-color: rgba(123, 94, 167, 0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(231, 218, 186, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06),
+    0 0 12px rgba(123, 94, 167, 0.15),
+    0 6px 18px rgba(0, 0, 0, 0.2);
 }
 
 .derived-card.tracker.san {
-  --accent: rgba(74, 138, 163, 0.6);
-  border-color: rgba(74, 138, 163, 0.3);
+  --accent: rgba(184, 146, 79, 0.8);
+  --accent-glow: rgba(184, 146, 79, 0.3);
+  border-color: rgba(184, 146, 79, 0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(231, 218, 186, 0.3),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06),
+    0 0 12px rgba(184, 146, 79, 0.2),
+    0 6px 18px rgba(0, 0, 0, 0.2);
 }
 
 /* Major Wound stamp — overlay when HP is critical */
@@ -1110,15 +1173,22 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   grid-template-columns: 1fr auto auto auto auto;
   gap: 0.4rem;
   align-items: center;
-  padding: 0.4rem 0.5rem;
-  background: var(--bg-card-hi);
+  padding: 0.5rem 0.6rem;
+  background: linear-gradient(135deg, rgba(43, 36, 26, 0.08) 0%, transparent 100%);
   border: 1px solid var(--ink-faded);
+  border-left: 3px solid transparent;
   border-radius: var(--radius);
-  transition: border-color 0.2s;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
-.skill-row:hover { border-color: var(--brass); }
+.skill-row:hover {
+  border-color: var(--brass);
+  border-left-color: var(--brass);
+  background: linear-gradient(135deg, rgba(184, 146, 79, 0.12) 0%, transparent 100%);
+  box-shadow: inset 0 0 8px rgba(184, 146, 79, 0.08);
+}
 .skill-row.occupation { border-left: 3px solid var(--brass); }
-.skill-row.over-cap   { border-left: 3px solid var(--err); background: rgba(139,26,26,0.08); }
+.skill-row.over-cap   { border-left: 3px solid var(--err); background: rgba(139,26,26,0.12); }
 .skill-row.over-cap-warn { border-left: 3px solid var(--warn); }
 
 .skill-row .skill-name {
@@ -1477,23 +1547,30 @@ body[data-difficulty="extreme"] .skill-frac-sep {
 }
 
 .weapon-card {
-  background: var(--bg-card-hi);
+  background: linear-gradient(135deg, rgba(43, 36, 26, 0.12) 0%, transparent 100%);
   border: 1px solid var(--ink-faded);
   border-radius: var(--radius);
-  padding: 0.7rem;
+  padding: 0.8rem;
   cursor: pointer;
   transition: all 0.2s;
   position: relative;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 4px 12px rgba(0,0,0,0.15);
 }
 .weapon-card:hover {
   border-color: var(--blood);
-  background: var(--bg-card);
-  box-shadow: 0 4px 18px rgba(0,0,0,0.5);
+  background: linear-gradient(135deg, rgba(139, 26, 26, 0.15) 0%, transparent 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 0 12px rgba(139, 26, 26, 0.25), 0 6px 20px rgba(0,0,0,0.3);
+  transform: translateY(-2px);
 }
 
 .weapon-card.magical {
   border-color: var(--purple-merlin, #6b3d8a);
-  background: linear-gradient(135deg, var(--bg-card-hi) 80%, rgba(107, 61, 138, 0.15) 100%);
+  background: linear-gradient(135deg, rgba(107, 61, 138, 0.12) 0%, transparent 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 0 8px rgba(107, 61, 138, 0.15), 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.weapon-card.magical:hover {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 0 12px rgba(107, 61, 138, 0.3), 0 6px 20px rgba(0,0,0,0.3);
 }
 
 .weapon-card .weapon-header {
@@ -2142,13 +2219,20 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   align-items: flex-start;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 0.6rem 0.75rem;
-  background: var(--bg-card-hi);
+  padding: 0.7rem 0.85rem;
+  background: linear-gradient(135deg, rgba(155, 127, 212, 0.08) 0%, transparent 100%);
   border: 1px solid var(--ink-faded);
+  border-left: 3px solid transparent;
   border-radius: var(--radius);
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 2px 8px rgba(0,0,0,0.1);
 }
-.spell-card:hover { border-color: var(--brass); }
+.spell-card:hover {
+  border-color: var(--brass);
+  border-left-color: #7b5ea7;
+  background: linear-gradient(135deg, rgba(155, 127, 212, 0.15) 0%, transparent 100%);
+  box-shadow: inset 0 0 8px rgba(155, 127, 212, 0.1), 0 4px 12px rgba(0,0,0,0.15);
+}
 
 .spell-main { flex: 1; min-width: 0; }
 
