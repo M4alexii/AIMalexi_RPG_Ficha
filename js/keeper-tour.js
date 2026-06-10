@@ -1,134 +1,167 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    AIMalexi RPG · js/keeper-tour.js
-   Tutorial guiado do Guardião — paridade de onboarding com o Investigador
-   (que tem o wizard de criação). Roda UMA vez na primeira visita; pode ser
-   revisto pelo botão "❓ Tour" da toolbar.
+   Tour guiado para Mestres — onboarding na Ficha do Mestre.
 
-   Usa CoC.ui.guidedTour (js/shared/guided-tour.js). Os textos são estáticos
-   e escritos aqui (HTML controlado pelo app — sem conteúdo de usuário).
+   O tour roda automaticamente na primeira visita ao keeper.html
+   e pode ser re-triggerado via botão "❓ Tour" no toolbar.
    ═══════════════════════════════════════════════════════════════════════════ */
+
+window.CoC = window.CoC || {};
+window.CoC.keeperTour = window.CoC.keeperTour || {};
 
 (function () {
   "use strict";
 
-  function showTab(name) {
-    return function () {
-      var btn = document.querySelector('.keeper-tab[data-ktab="' + name + '"]');
-      if (btn) btn.click();
+  var tourId = "keeper-v1";
+  var tourSteps = [
+    {
+      target: null,
+      title: "Bem-vindo, Mestre!",
+      body: "Esta ferramenta ajuda a gerenciar criaturas, NPCs, inventário " +
+            "e combate em tempo real durante suas sessões de Chamado de Cthulhu. " +
+            "Vamos fazer um tour rápido de 5 minutos para você dominar a interface."
+    },
+    {
+      target: ".keeper-overview",
+      title: "📊 Dashboard Executivo",
+      body: "Aqui você vê métricas da campanha: investigadores vivos, sanidade média, " +
+            "criaturas em campo, timeline de eventos. Útil para manter tudo sob controle " +
+            "sem abrir múltiplos painéis.",
+      before: function () {
+        document.body.setAttribute("data-tab", "visao-geral");
+      }
+    },
+    {
+      target: ".library-list",
+      title: "📚 Biblioteca de Criaturas",
+      body: "Seu banco de dados de NPCs e criaturas. Clique para carregar uma criatura, " +
+            "edite nome/tipo, ou crie novos com o botão +. Busque por nome para encontrar rápido durante o jogo."
+    },
+    {
+      target: ".workspace",
+      title: "🎭 Espaço de Trabalho",
+      body: "A criatura ativa aparece aqui. <b>Modo Simples</b> mostra HP, ataques, " +
+            "perícias essenciais. <b>Clique [Modo Completo]</b> para editar todos os dados."
+    },
+    {
+      target: ".simple-stats",
+      title: "⚔️ Modo Simples — Ao Vivo",
+      body: "Tudo que você precisa em combate: FOR/AGL/PV/ataques. Sem rolagem, sem confusão. " +
+            "Clique em qualquer valor para rolar D100 direto."
+    },
+    {
+      target: ".stat-tile.tracker.pv",
+      title: "❤️ Tracker de Pontos de Vida",
+      body: "Siga a vida da criatura em tempo real. Clique ± para ajustar. " +
+            "Ferimentos graves e morte são <b>detectados automaticamente</b>."
+    },
+    {
+      target: '[data-tab="combate"]',
+      title: "⚔️ Aba de Combate",
+      body: "Armadura, iniciativa, armas, esquiva. Tudo organizado para combate rápido. " +
+            "Marque ferimentos graves, inconsciente, morrendo — tudo sincronizado com a ficha.",
+      before: function () {
+        var tab = document.querySelector('[data-tab="combate"]');
+        if (tab) tab.click();
+      }
+    },
+    {
+      target: ".attack-card:first-of-type",
+      title: "🗡️ Ataques Rápidos",
+      body: "Clique para rolar ataque. Resultado aparece no log. Modificadores aplicam automaticamente."
+    },
+    {
+      target: '[data-tab="diario"]',
+      title: "📖 Diário de Sessão",
+      body: "Registre eventos, pistas, revelações. Suporta markdown e [[wikilinks]] " +
+            "para conectar notas. Tudo searchable e exportável.",
+      before: function () {
+        var tab = document.querySelector('[data-tab="diario"]');
+        if (tab) tab.click();
+      }
+    },
+    {
+      target: ".encounter-panel",
+      title: "🎲 Rastreador de Encontro",
+      body: "Adicione criaturas ao encontro ativo. Mostra round counter e iniciativa. " +
+            "Clique uma criatura para colocá-la no topo da ordem de ação."
+    },
+    {
+      target: ".enc-round-bar",
+      title: "📍 Contador de Rounds",
+      body: "Avança cada turno/round. Mostra quem é a vez e a ordem de ação. " +
+            "Reseta após combate terminar."
+    },
+    {
+      target: "#roll-log",
+      title: "📜 Log de Sessão",
+      body: "Timeline de rolagens, dano, sanidade, eventos. Filtrável por tipo. " +
+            "Exportável para relato de campanha ou compartilhamento com players."
+    },
+    {
+      target: "#btn-settings",
+      title: "⚙️ Configurações",
+      body: "Mude tema, acessibilidade, redução de movimento. Suas preferências salvam automaticamente. " +
+            "Também temos efeitos de insanidade visuais — configure aqui!"
+    },
+    {
+      target: ".campaign-badge",
+      title: "🔗 Modo Campanha (Multiplayer)",
+      body: "Convide investigadores via PIN. Sincroniza em tempo real. " +
+            "Mestres sempre têm autoridade final (ações sagradas só de mestre).",
+      before: function () {
+        document.body.setAttribute("data-tab", "visao-geral");
+      }
+    },
+    {
+      target: null,
+      title: "✅ Pronto para Mestrar!",
+      body: "Você está equipado com tudo que precisa. Dúvidas? " +
+            "Abra o <b>Compêndio</b> (→ Guia de Referência) ou releia este tutorial " +
+            "clicando em ❓ Tour no toolbar."
+    }
+  ];
+
+  function initTour() {
+    if (!window.CoC.ui || !window.CoC.ui.guidedTour) {
+      console.warn("[keeper-tour] guided-tour.js não carregado");
+      return;
+    }
+
+    var tour = window.CoC.ui.guidedTour({
+      id: tourId,
+      steps: tourSteps,
+      onFinish: function () {
+        console.log("[keeper-tour] Tour finalizado");
+      }
+    });
+
+    // Auto-start na primeira visita
+    tour.start();
+
+    // Expor para botão "Rever Tutorial"
+    window.CoC.keeperTour.restart = function () {
+      tour.start(true);
     };
+
+    // Vincular botão "❓ Tour" no toolbar
+    var tourBtn = document.getElementById("btn-keeper-tour");
+    if (tourBtn) {
+      tourBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        window.CoC.keeperTour.restart();
+      });
+    }
   }
 
-  function buildTour() {
-    var tourFactory = window.CoC && window.CoC.ui && window.CoC.ui.guidedTour;
-    if (!tourFactory) return null;
-
-    return tourFactory({
-      id: "keeper-v1",
-      steps: [
-        {
-          target: null,
-          title: "🕯️ Bem-vindo, Guardião",
-          body: "Este é o seu <b>Centro de Campanha</b> — bestiário, encontros, " +
-                "investigadores conectados, lore e diário, tudo em uma tela. " +
-                "Em ~60 segundos você conhece cada mesa de trabalho. " +
-                "(Esc pula; ←/→ navegam.)"
-        },
-        {
-          target: "#keeper-overview",
-          title: "📊 Visão de 10 segundos",
-          body: "O painel executivo mostra a saúde da campanha de relance: " +
-                "investigadores <b>vivos</b>, <b>SAN média</b>, alertas críticos " +
-                "e os últimos eventos. Se algo está vermelho aqui, merece sua atenção."
-        },
-        {
-          target: "#keeper-tabs",
-          title: "🗂️ As 7 mesas de trabalho",
-          body: "Cada aba é um contexto: <b>Investigadores</b> (campanha ao vivo), " +
-                "<b>Compêndio</b> (regras), <b>NPCs</b> (bestiário), <b>Encontro</b> " +
-                "(combate), <b>Timeline</b>, <b>Lore</b> e <b>Diário</b>. " +
-                "A última aba aberta é lembrada."
-        },
-        {
-          target: '.ktab-panel[data-ktab="investigadores"]',
-          title: "👥 Campanha multiplayer",
-          before: showTab("investigadores"),
-          body: "Crie uma campanha e compartilhe o <b>PIN de 6 dígitos</b> — os " +
-                "jogadores entram pela ficha deles e os vitais aparecem aqui " +
-                "<b>em tempo real</b>. Funciona offline; sincroniza quando a rede volta."
-        },
-        {
-          target: "#library-list",
-          title: "📚 Biblioteca de criaturas",
-          before: showTab("npcs"),
-          body: "Bestiário do Mythos pronto + suas criaturas salvas. " +
-                "<b>Clique</b> em uma para abri-la na mesa de trabalho ao lado. " +
-                "🎲 <b>NPC Aleatório</b> (toolbar) gera um figurante em 1 clique."
-        },
-        {
-          target: "#workspace",
-          title: "⚔️ Mesa de trabalho",
-          before: showTab("npcs"),
-          body: "A criatura aberta vive aqui. No <b>Modo Simples</b>: clique no " +
-                "card de um <b>ataque</b> para rolar acerto + dano de uma vez; " +
-                "clique num atributo para teste de resistência. O <b>Editor " +
-                "Completo</b> libera tudo para customizar."
-        },
-        {
-          target: '.ktab-panel[data-ktab="encontro"]',
-          title: "🩸 Encontro",
-          before: showTab("encontro"),
-          body: "Adicione criaturas ao encontro e gerencie o combate: " +
-                "<b>HP editável</b>, contador de <b>rounds</b>, marcação de mortos. " +
-                "É o seu tabuleiro mental — sem mapa, sem fricção."
-        },
-        {
-          target: '.ktab-panel[data-ktab="lore"]',
-          title: "🗺️ Lore da campanha",
-          before: showTab("lore"),
-          body: "Facções, mistérios, locais, pistas, personagens e cronologia — " +
-                "cada caixa salva sozinha. Sem ideias? O <b>🧰 Pacote Padrão</b> " +
-                "preenche a estrutura inicial sem apagar nada seu."
-        },
-        {
-          target: '.ktab-panel[data-ktab="diario"]',
-          title: "📔 Diário — seu Obsidian de mesa",
-          before: showTab("diario"),
-          body: "Tópicos com <b>pastas</b>, <b>imagens</b> e <b>Markdown</b> " +
-                "(#títulos, **negrito**, listas, - [ ] checklists). Ligue tópicos " +
-                "com <b>[[Nome do Tópico]]</b> — cada tópico mostra quem o menciona " +
-                "(<b>backlinks</b>) e a 🔍 busca encontra qualquer coisa."
-        },
-        {
-          target: "#btn-keeper-tour",
-          title: "❓ Para rever este tour",
-          body: "É só clicar aqui. E o <b>guia de mestre</b> com técnicas de " +
-                "horror (regra das 3 pistas, quando NÃO pedir teste) está no " +
-                "Guia do Iniciante, seção 15. Boa sessão — e que os dados " +
-                "tenham piedade dos seus jogadores. 🐙"
-        }
-      ]
-    });
-  }
-
-  function init() {
-    var tour = buildTour();
-    if (!tour) return;
-
-    // Botão "rever tour" na toolbar.
-    var btn = document.getElementById("btn-keeper-tour");
-    if (btn) btn.addEventListener("click", function () { tour.start(true); });
-
-    // Primeira visita: espera o storage carregar (prefs) e a tela assentar.
-    var st = window.CoC.storage;
-    var ready = st && st.ready ? st.ready : Promise.resolve();
-    Promise.resolve(ready).then(function () {
-      setTimeout(function () { tour.start(false); }, 900);
-    });
-  }
-
+  // Tenta inicializar quando DOMContentLoaded ou se já carregado
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
+    document.addEventListener("DOMContentLoaded", initTour);
   } else {
-    init();
+    setTimeout(initTour, 100);
   }
+
+  // Expor init
+  window.CoC.keeperTour.init = initTour;
+
 })();
