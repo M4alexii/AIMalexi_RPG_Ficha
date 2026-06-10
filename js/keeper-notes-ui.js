@@ -39,6 +39,8 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
 
   var _currentSearchQuery = "";
   var _currentTagFilter = null;
+  var _recentNotesKey = "keeper-notes-recent";
+  var _recentNotesMax = 5;
 
   function _getAllNotes() {
     var allNotes = [];
@@ -67,6 +69,31 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
     return Object.keys(tagSet).sort().map(function (tag) {
       return { tag: tag, count: tagSet[tag] };
     });
+  }
+
+  function _trackRecentNote(noteId) {
+    try {
+      var recent = JSON.parse(localStorage.getItem(_recentNotesKey) || "[]");
+      recent = recent.filter(function (id) { return id !== noteId; });
+      recent.unshift(noteId);
+      recent = recent.slice(0, _recentNotesMax);
+      localStorage.setItem(_recentNotesKey, JSON.stringify(recent));
+    } catch (e) {}
+  }
+
+  function _getRecentNotes() {
+    try {
+      var ids = JSON.parse(localStorage.getItem(_recentNotesKey) || "[]");
+      var allNotes = _getAllNotes();
+      var recentNotes = [];
+      ids.forEach(function (id) {
+        var note = allNotes.find(function (n) { return n.id === id; });
+        if (note) recentNotes.push(note);
+      });
+      return recentNotes;
+    } catch (e) {
+      return [];
+    }
   }
 
   function buildNoteList() {
@@ -118,6 +145,33 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
     }
 
     container.appendChild(searchHeader);
+
+    // Quick Access (Phase E) — Recently viewed notes
+    var recentNotes = _getRecentNotes();
+    if (recentNotes.length > 0 && !_currentSearchQuery && !_currentTagFilter) {
+      var quickAccessDiv = el("div", { style: { marginBottom: "0.8rem", paddingBottom: "0.8rem", borderBottom: "1px solid var(--ink-faded)" } });
+      var quickLabel = el("div", { style: { fontSize: "0.7rem", textTransform: "uppercase", color: "var(--ink-dim)", marginBottom: "0.4rem", letterSpacing: "0.05em" } }, ["⚡ Acesso Rápido"]);
+      quickAccessDiv.appendChild(quickLabel);
+
+      var quickButtons = el("div", { style: { display: "flex", flexDirection: "column", gap: "0.3rem" } });
+      recentNotes.slice(0, 3).forEach(function (note) {
+        var btn = el("button", {
+          class: "btn-ghost btn-sm",
+          style: {
+            width: "100%",
+            textAlign: "left",
+            padding: "0.4rem 0.6rem",
+            fontSize: "0.8rem",
+            background: "rgba(184, 146, 79, 0.1)"
+          }
+        }, ["⭐ " + (note.title || "(sem título)")]);
+        btn.addEventListener("click", function () { openNote(note.id); });
+        quickButtons.appendChild(btn);
+      });
+
+      quickAccessDiv.appendChild(quickButtons);
+      container.appendChild(quickAccessDiv);
+    }
 
     // List container
     var listContainer = el("div", { class: "notes-list", style: { flex: "1 1 auto" } });
@@ -222,6 +276,93 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
     });
   }
 
+  // ─── Note Templates (Phase E) ────────────────────────────────────────────
+
+  var NOTE_TEMPLATES = {
+    npc: {
+      title: "Novo PNJ",
+      content: "## Identidade\n- **Nome**: \n- **Ocupação**: \n- **Aparência**: \n\n## Relações\n- Aliados: \n- Inimigos: \n- Segredos: \n\n## Notas\n"
+    },
+    local: {
+      title: "Novo Local",
+      content: "## Descrição\n- **Nome**: \n- **Localização**: \n- **Atmosfera**: \n\n## Pontos de Interesse\n1. \n2. \n3. \n\n## Perigos\n\n## Segredos\n"
+    },
+    encontro: {
+      title: "Novo Encontro",
+      content: "## Setup\n- **Cenário**: \n- **Participantes**: \n- **Objetivo**: \n\n## Desenvolvimento\n\n## Recompensas\n- Experiência: \n- Itens: \n- Informações: \n"
+    },
+    misterio: {
+      title: "Novo Mistério",
+      content: "## O Mistério\n**Questão Central**: \n\n## Pistas\n1. \n2. \n3. \n\n## Solução\n\n## Consequências\n- Sucesso: \n- Fracasso: \n"
+    },
+    sessao: {
+      title: "Notas da Sessão",
+      content: "## Resumo Executivo\n\n## Eventos-Chave\n1. \n2. \n3. \n\n## Personagens Envolvidos\n\n## Pistas Reveladas\n\n## Próximos Passos\n"
+    }
+  };
+
+  function createNoteFromTemplate(templateKey) {
+    var template = NOTE_TEMPLATES[templateKey];
+    if (!template) return;
+    var note = notes.create(template.title, template.content);
+    openNote(note.id);
+  }
+
+  // ─── Import (Phase E) ─────────────────────────────────────────────────────
+
+  function importNotesFromMarkdown(file) {
+    if (!file) return;
+
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      var content = e.target.result;
+      var lines = content.split('\n');
+      var currentNote = null;
+      var count = 0;
+
+      for (var i = 0; i < lines.length; i++) {
+        var line = lines[i];
+
+        // Detect note boundaries: "## Title" or "---"
+        if (line.match(/^#{1,2}\s+(.+)/)) {
+          // Save previous note if exists
+          if (currentNote && currentNote.title) {
+            notes.create(currentNote.title, currentNote.content.trim());
+            count++;
+          }
+
+          // Start new note
+          var titleMatch = line.match(/^#{1,2}\s+(.+)/);
+          currentNote = {
+            title: titleMatch[1].trim(),
+            content: ""
+          };
+        } else if (line.match(/^---\s*$/)) {
+          // Separator: save current note
+          if (currentNote && currentNote.title) {
+            notes.create(currentNote.title, currentNote.content.trim());
+            count++;
+            currentNote = null;
+          }
+        } else if (currentNote) {
+          // Add line to current note
+          currentNote.content += line + "\n";
+        }
+      }
+
+      // Save last note
+      if (currentNote && currentNote.title) {
+        notes.create(currentNote.title, currentNote.content.trim());
+        count++;
+      }
+
+      alert("✓ Importadas " + count + " notas do arquivo Markdown!");
+      buildNoteList();
+    };
+
+    reader.readAsText(file);
+  }
+
   // ─── Export (Phase D) ─────────────────────────────────────────────────────
 
   function _downloadFile(filename, content, mimeType) {
@@ -282,6 +423,7 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
     if (!note) return;
 
     currentNoteId = noteId;
+    _trackRecentNote(noteId);
 
     var editor = $("keeper-notes-editor");
     if (!editor) return;
@@ -505,6 +647,39 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
     newBtn.addEventListener("click", createNewNote);
     actionButtons.appendChild(newBtn);
 
+    // Templates (Phase E)
+    var templateWrapper = el("div", { style: { fontSize: "0.75rem" } });
+    var templateToggle = el("button", {
+      class: "btn-ghost",
+      style: { width: "100%", padding: "0.4rem 0.6rem", marginBottom: "0.3rem" }
+    }, ["📋 Modelos"]);
+
+    var templateMenu = el("div", {
+      style: {
+        display: "none",
+        flexDirection: "column",
+        gap: "0.3rem",
+        paddingLeft: "0.6rem",
+        borderLeft: "2px solid var(--ink-faded)"
+      }
+    });
+
+    Object.keys(NOTE_TEMPLATES).forEach(function (key) {
+      var template = NOTE_TEMPLATES[key];
+      var btn = el("button", { class: "btn-ghost btn-sm", style: { width: "100%", textAlign: "left" } }, [template.title]);
+      btn.addEventListener("click", function () { createNoteFromTemplate(key); });
+      templateMenu.appendChild(btn);
+    });
+
+    templateToggle.addEventListener("click", function () {
+      var isVisible = templateMenu.style.display !== "none";
+      templateMenu.style.display = isVisible ? "none" : "flex";
+    });
+
+    templateWrapper.appendChild(templateToggle);
+    templateWrapper.appendChild(templateMenu);
+    actionButtons.appendChild(templateWrapper);
+
     // Expandable export menu (Phase D)
     var exportWrapper = el("div", { style: { fontSize: "0.75rem" } });
     var exportToggle = el("button", {
@@ -529,6 +704,20 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
     var exportJsonBtn = el("button", { class: "btn-ghost btn-sm", style: { width: "100%" } }, ["📦 JSON (backup)"]);
     exportJsonBtn.addEventListener("click", exportAllNotesAsJSON);
     exportMenu.appendChild(exportJsonBtn);
+
+    var importBtn = el("button", { class: "btn-ghost btn-sm", style: { width: "100%" } }, ["📂 Importar MD"]);
+    importBtn.addEventListener("click", function () {
+      var fileInput = document.createElement("input");
+      fileInput.type = "file";
+      fileInput.accept = ".md,.markdown,.txt";
+      fileInput.addEventListener("change", function (e) {
+        if (e.target.files.length > 0) {
+          importNotesFromMarkdown(e.target.files[0]);
+        }
+      });
+      fileInput.click();
+    });
+    exportMenu.appendChild(importBtn);
 
     exportToggle.addEventListener("click", function () {
       var isVisible = exportMenu.style.display !== "none";
