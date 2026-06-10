@@ -67,13 +67,14 @@ window.CoC.keeperNotes = window.CoC.keeperNotes || {};
     return "note-" + Date.now();
   }
 
-  function createNote(title, content, folder, tags) {
+  function createNote(title, content, folder, tags, fields) {
     var note = {
       id: generateId(),
       title: title || "Sem título",
       content: content || "",
       folder: folder || null,
       tags: tags || [],
+      fields: fields || {},   // campos customizados { chave: valor } (ex.: PV: "12")
       wikilinks: extractWikilinks(content),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -265,10 +266,11 @@ window.CoC.keeperNotes = window.CoC.keeperNotes || {};
   // ─── Search ──────────────────────────────────────────────────────────────
 
   // ── Busca com operadores ────────────────────────────────────────────────
-  // Suporta: tag:x · folder:x · created:>2026-01-01 · updated:<7d ·
+  // Suporta: tag:x · folder:x · campo:chave=valor (ou field:) ·
+  //          created:>2026-01-01 · updated:<7d ·
   //          "frase exata" · -excluído · termos livres (AND implícito)
   function parseSearchQuery(query) {
-    var parsed = { terms: [], phrases: [], excluded: [], tags: [], folders: [], created: null, updated: null };
+    var parsed = { terms: [], phrases: [], excluded: [], tags: [], folders: [], fields: [], created: null, updated: null };
     if (!query) return parsed;
 
     // Extrai frases exatas primeiro
@@ -282,6 +284,10 @@ window.CoC.keeperNotes = window.CoC.keeperNotes || {};
       var m;
       if ((m = tok.match(/^tag:(.+)$/i))) { parsed.tags.push(m[1].toLowerCase().replace(/^#/, "")); return; }
       if ((m = tok.match(/^folder:(.+)$/i))) { parsed.folders.push(m[1].toLowerCase()); return; }
+      if ((m = tok.match(/^(?:campo|field):([^=]+)(?:=(.+))?$/i))) {
+        parsed.fields.push({ key: m[1].toLowerCase(), value: m[2] !== undefined ? m[2].toLowerCase() : null });
+        return;
+      }
       if ((m = tok.match(/^created:([<>])(.+)$/i))) { parsed.created = { op: m[1], value: m[2] }; return; }
       if ((m = tok.match(/^updated:([<>])(.+)$/i))) { parsed.updated = { op: m[1], value: m[2] }; return; }
       if (tok.charAt(0) === "-" && tok.length > 1) { parsed.excluded.push(tok.slice(1).toLowerCase()); return; }
@@ -289,6 +295,18 @@ window.CoC.keeperNotes = window.CoC.keeperNotes || {};
     });
 
     return parsed;
+  }
+
+  // campo:chave → nota tem o campo; campo:chave=valor → valor contém (substring)
+  function _matchFieldFilter(note, filter) {
+    var fields = note.fields || {};
+    for (var key in fields) {
+      if (!Object.prototype.hasOwnProperty.call(fields, key)) continue;
+      if (key.toLowerCase() !== filter.key) continue;
+      if (filter.value === null) return true;
+      return String(fields[key]).toLowerCase().indexOf(filter.value) !== -1;
+    }
+    return false;
   }
 
   // Converte valor de filtro de data: "2026-01-01" (absoluto) ou "7d"/"2w"/"1m" (relativo)
@@ -338,6 +356,9 @@ window.CoC.keeperNotes = window.CoC.keeperNotes || {};
       for (i = 0; i < parsed.folders.length; i++) {
         if ((note.folder || "").toLowerCase().indexOf(parsed.folders[i]) === -1) return false;
       }
+      for (i = 0; i < parsed.fields.length; i++) {
+        if (!_matchFieldFilter(note, parsed.fields[i])) return false;
+      }
       if (parsed.created && !_matchDateFilter(note.createdAt, parsed.created)) return false;
       if (parsed.updated && !_matchDateFilter(note.updatedAt, parsed.updated)) return false;
 
@@ -358,6 +379,17 @@ window.CoC.keeperNotes = window.CoC.keeperNotes || {};
     if (!note) return "";
 
     var md = "# " + note.title + "\n\n";
+
+    // Campos customizados como tabela
+    var fieldKeys = Object.keys(note.fields || {});
+    if (fieldKeys.length > 0) {
+      md += "| Campo | Valor |\n|---|---|\n";
+      fieldKeys.forEach(function (k) {
+        md += "| " + k + " | " + note.fields[k] + " |\n";
+      });
+      md += "\n";
+    }
+
     md += note.content + "\n\n";
 
     if (note.tags.length > 0) {

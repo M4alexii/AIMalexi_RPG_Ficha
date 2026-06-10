@@ -142,7 +142,7 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
     // Dica de operadores de busca
     var searchHint = el("div", {
       style: { fontSize: "0.6rem", color: "var(--ink-faded)", marginBottom: "0.4rem" }
-    }, ['Operadores: tag:pista · folder:ato1 · created:>2026-01-01 · updated:<7d · "frase" · -termo']);
+    }, ['Operadores: tag:pista · folder:ato1 · campo:PV=12 · created:>2026-01-01 · updated:<7d · "frase" · -termo']);
     searchHeader.appendChild(searchHint);
 
     // Tag filter buttons (Phase C)
@@ -451,30 +451,41 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
   var NOTE_TEMPLATES = {
     npc: {
       title: "Novo PNJ",
-      content: "## Identidade\n- **Nome**: \n- **Ocupação**: \n- **Aparência**: \n\n## Relações\n- Aliados: \n- Inimigos: \n- Segredos: \n\n## Notas\n"
+      content: "## Identidade\n- **Aparência**: \n\n## Relações\n- Aliados: \n- Inimigos: \n- Segredos: \n\n## Notas\n",
+      tags: ["npc"],
+      fields: { "PV": "", "SAN": "", "Ocupação": "" }
     },
     local: {
       title: "Novo Local",
-      content: "## Descrição\n- **Nome**: \n- **Localização**: \n- **Atmosfera**: \n\n## Pontos de Interesse\n1. \n2. \n3. \n\n## Perigos\n\n## Segredos\n"
+      content: "## Descrição\n- **Atmosfera**: \n\n## Pontos de Interesse\n1. \n2. \n3. \n\n## Perigos\n\n## Segredos\n",
+      tags: ["local"],
+      fields: { "Região": "" }
     },
     encontro: {
       title: "Novo Encontro",
-      content: "## Setup\n- **Cenário**: \n- **Participantes**: \n- **Objetivo**: \n\n## Desenvolvimento\n\n## Recompensas\n- Experiência: \n- Itens: \n- Informações: \n"
+      content: "## Setup\n- **Cenário**: \n- **Participantes**: \n- **Objetivo**: \n\n## Desenvolvimento\n\n## Recompensas\n- Experiência: \n- Itens: \n- Informações: \n",
+      tags: ["encontro"],
+      fields: { "Dificuldade": "" }
     },
     misterio: {
       title: "Novo Mistério",
-      content: "## O Mistério\n**Questão Central**: \n\n## Pistas\n1. \n2. \n3. \n\n## Solução\n\n## Consequências\n- Sucesso: \n- Fracasso: \n"
+      content: "## O Mistério\n**Questão Central**: \n\n## Pistas\n1. \n2. \n3. \n\n## Solução\n\n## Consequências\n- Sucesso: \n- Fracasso: \n",
+      tags: ["misterio"],
+      fields: {}
     },
     sessao: {
       title: "Notas da Sessão",
-      content: "## Resumo Executivo\n\n## Eventos-Chave\n1. \n2. \n3. \n\n## Personagens Envolvidos\n\n## Pistas Reveladas\n\n## Próximos Passos\n"
+      content: "## Resumo Executivo\n\n## Eventos-Chave\n1. \n2. \n3. \n\n## Personagens Envolvidos\n\n## Pistas Reveladas\n\n## Próximos Passos\n",
+      tags: ["sessao"],
+      fields: { "Data da Sessão": "" }
     }
   };
 
   function createNoteFromTemplate(templateKey) {
     var template = NOTE_TEMPLATES[templateKey];
     if (!template) return;
-    var note = notes.create(template.title, template.content);
+    var note = notes.create(template.title, template.content, null, (template.tags || []).slice(),
+      JSON.parse(JSON.stringify(template.fields || {})));
     openNote(note.id);
   }
 
@@ -706,6 +717,72 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
     });
 
     header.appendChild(folderInput);
+
+    // Campos customizados (Custom Fields, #8): chave=valor por nota
+    var fieldsWrap = el("div", { style: { marginTop: "0.6rem" } });
+    var fieldsLabel = el("div", {
+      style: { fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--ink-dim)", marginBottom: "0.3rem" }
+    }, ["🏷️ Campos (busque com campo:chave=valor)"]);
+    fieldsWrap.appendChild(fieldsLabel);
+
+    var fieldsRows = el("div", { style: { display: "flex", flexDirection: "column", gap: "0.3rem" } });
+    fieldsWrap.appendChild(fieldsRows);
+
+    function saveFields() {
+      var updated = {};
+      Array.prototype.forEach.call(fieldsRows.querySelectorAll("[data-field-row]"), function (row) {
+        var k = row.querySelector("[data-field-key]").value.trim();
+        var v = row.querySelector("[data-field-value]").value;
+        if (k) updated[k] = v;
+      });
+      notes.update(noteId, { fields: updated });
+    }
+
+    function addFieldRow(key, value) {
+      var row = el("div", { "data-field-row": "1", style: { display: "flex", gap: "0.3rem", alignItems: "center" } });
+
+      var inputStyle = {
+        padding: "0.3rem 0.4rem",
+        border: "1px solid var(--ink-faded)",
+        borderRadius: "var(--radius)",
+        background: "var(--bg-deep)",
+        color: "var(--ink)",
+        fontSize: "0.8rem"
+      };
+
+      var keyInput = el("input", { type: "text", placeholder: "Chave", value: key || "", "data-field-key": "1", style: Object.assign({ width: "35%" }, inputStyle) });
+      var valInput = el("input", { type: "text", placeholder: "Valor", value: value || "", "data-field-value": "1", style: Object.assign({ flex: "1" }, inputStyle) });
+      keyInput.addEventListener("change", saveFields);
+      valInput.addEventListener("change", saveFields);
+
+      var delBtn = el("button", {
+        type: "button",
+        title: "Remover campo",
+        style: { background: "transparent", border: "none", color: "var(--ink-faded)", cursor: "pointer", fontSize: "0.9rem" }
+      }, ["✕"]);
+      delBtn.addEventListener("click", function () {
+        row.remove();
+        saveFields();
+      });
+
+      row.appendChild(keyInput);
+      row.appendChild(valInput);
+      row.appendChild(delBtn);
+      fieldsRows.appendChild(row);
+    }
+
+    var noteFields = note.fields || {};
+    Object.keys(noteFields).forEach(function (k) { addFieldRow(k, noteFields[k]); });
+
+    var addFieldBtn = el("button", {
+      type: "button",
+      class: "btn-ghost btn-sm",
+      style: { marginTop: "0.3rem", fontSize: "0.7rem" }
+    }, ["+ Campo"]);
+    addFieldBtn.addEventListener("click", function () { addFieldRow("", ""); });
+    fieldsWrap.appendChild(addFieldBtn);
+
+    header.appendChild(fieldsWrap);
     editor.appendChild(header);
 
     // Content editor

@@ -152,6 +152,36 @@
   }
   assert(notes.getHistory(doc.id).length <= 10, 'histórico limitado a 10 snapshots');
 
+  // ── Campos customizados ───────────────────────────────────────────────────
+  group('Keeper Notes — campos customizados');
+  wipe();
+
+  var cultista = notes.create('Cultista de Dagon', 'Líder do culto local.', null, ['npc'], { 'PV': '12', 'SAN': '35', 'Ocupação': 'Pescador' });
+  notes.create('Taverna do Porto', 'Ponto de encontro.', null, ['local'], { 'Região': 'Innsmouth' });
+  notes.create('Sem Campos', 'Nota simples.');
+
+  assertEq(notes.read(cultista.id).fields['PV'], '12', 'create persiste campos');
+  assertEq(notes.search('campo:PV').length, 1, 'campo:chave acha nota que tem o campo');
+  assertEq(notes.search('campo:pv').length, 1, 'campo:chave é case-insensitive');
+  assertEq(notes.search('campo:PV=12').length, 1, 'campo:chave=valor casa valor exato');
+  assertEq(notes.search('campo:PV=99').length, 0, 'campo:chave=valor não casa valor errado');
+  assertEq(notes.search('field:Região=innsmouth').length, 1, 'alias field: e valor case-insensitive');
+  assertEq(notes.search('campo:Inexistente').length, 0, 'campo inexistente não casa');
+  assertEq(notes.search('tag:npc campo:SAN').length, 1, 'campo combina com tag (AND)');
+
+  notes.update(cultista.id, { fields: { 'PV': '8' } });
+  assertEq(notes.search('campo:PV=8').length, 1, 'update substitui campos');
+  assertEq(notes.search('campo:SAN').length, 0, 'campo removido no update some da busca');
+
+  var mdCampos = notes.exportMarkdown(cultista.id);
+  assert(mdCampos.indexOf('| PV | 8 |') !== -1, 'export inclui tabela de campos');
+
+  var parsedField = notes.parseSearchQuery('campo:PV=12 field:SAN');
+  assertEq(parsedField.fields.length, 2, 'parse extrai dois filtros de campo');
+  assertEq(parsedField.fields[0].key, 'pv', 'parse normaliza chave (lowercase)');
+  assertEq(parsedField.fields[0].value, '12', 'parse extrai valor');
+  assertEq(parsedField.fields[1].value, null, 'campo sem = tem valor null');
+
   // ── Export ────────────────────────────────────────────────────────────────
   group('Keeper Notes — export Markdown');
   wipe();
