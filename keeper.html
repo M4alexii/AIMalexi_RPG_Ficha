@@ -94,6 +94,7 @@
     <button class="keeper-tab" data-ktab="timeline" type="button">📜 Timeline</button>
     <button class="keeper-tab" data-ktab="lore" type="button">🗺️ Lore</button>
     <button class="keeper-tab" data-ktab="diario" type="button">📔 Diário</button>
+    <button class="keeper-tab" data-ktab="notas" type="button">📝 Notas Avançadas</button>
   </nav>
 
   <!-- ═══ T1 · INVESTIGADORES ═══ -->
@@ -310,6 +311,18 @@
     <div id="journal-topics" class="journal-topics"></div>
   </section>
 
+  <!-- ═══ T8 · NOTAS AVANÇADAS (Phase B) — Editor com wikilinks e backlinks ═══ -->
+  <section class="ktab-panel" data-ktab="notas" style="display: grid; grid-template-columns: 280px 1fr; gap: 1rem; min-height: 600px;">
+    <!-- Painel esquerdo: Lista de notas com busca -->
+    <div id="keeper-notes-list" style="border-right: 1px solid var(--ink-faded); padding: 1rem; overflow-y: auto;">
+      <!-- Preenchido pelo keeper-notes-ui.js -->
+    </div>
+    <!-- Painel direito: Editor e preview -->
+    <div id="keeper-notes-editor" style="padding: 1rem; overflow-y: auto;">
+      <!-- Preenchido pelo keeper-notes-ui.js -->
+    </div>
+  </section>
+
   <!-- Modal: Gerenciar Campanha -->
   <div class="modal-overlay" id="modal-campaign" style="display:none">
     <div class="modal-box">
@@ -361,6 +374,7 @@
 <script src="js/settings.js"></script>
 <script src="js/keeper-tour.js"></script>
 <script src="js/keeper-notes-advanced.js"></script>
+<script src="js/keeper-notes-ui.js"></script>
 
 <!-- ═══════════════════════════════════════════════════════════════════════
      CAMPANHA

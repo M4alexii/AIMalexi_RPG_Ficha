@@ -2326,3 +2326,141 @@
 .session-entry.handwritten .session-entry-author {
   color: var(--keeper-accent-bright);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Keeper Notes Advanced — Phase B (UI Components)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+#keeper-notes-list {
+  background: var(--bg-deep);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.journal-search {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid var(--ink-faded);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  margin-bottom: 0.8rem;
+}
+
+.journal-search::placeholder {
+  color: var(--ink-faded);
+}
+
+.notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.notes-list-empty {
+  color: var(--ink-dim);
+  font-style: italic;
+  padding: 1rem;
+  text-align: center;
+}
+
+.note-item {
+  padding: 0.6rem 0.8rem;
+  border-left: 3px solid transparent;
+  background: var(--bg-card-hi);
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: all 0.15s ease;
+}
+
+.note-item:hover {
+  background: var(--bg-card);
+  border-left-color: var(--brass);
+  transform: translateX(4px);
+}
+
+.note-item.active {
+  background: var(--bg-card);
+  border-left-color: var(--brass);
+  box-shadow: inset 0 0 8px rgba(184, 146, 79, 0.15);
+}
+
+.note-item-title {
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 0.2rem;
+}
+
+.note-item-date {
+  font-size: 0.7rem;
+  color: var(--ink-faded);
+}
+
+.note-item-tags {
+  font-size: 0.75rem;
+  margin-top: 0.3rem;
+}
+
+.note-item-tags span {
+  display: inline-block;
+  background: rgba(184, 146, 79, 0.2);
+  border: 1px solid var(--brass);
+  color: var(--brass);
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.3rem;
+  margin-right: 0.3rem;
+  font-size: 0.65rem;
+}
+
+#keeper-notes-editor {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--ink-faded);
+}
+
+#note-preview,
+#note-backlinks {
+  border: 1px solid var(--ink-faded);
+  border-radius: var(--radius);
+  background: var(--bg-deep);
+  padding: 0.8rem;
+  overflow-y: auto;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+#note-preview {
+  min-height: 200px;
+  max-height: 200px;
+}
+
+#note-backlinks {
+  min-height: 150px;
+  max-height: 150px;
+}
+
+#note-backlinks ul {
+  margin: 0;
+  padding: 0 0 0 1rem;
+}
+
+#note-backlinks li {
+  cursor: pointer;
+  color: var(--brass);
+  text-decoration: underline;
+  margin-bottom: 0.3rem;
+}
+
+#note-backlinks li:hover {
+  text-decoration: none;
+}
+
+textarea {
+  font-family: var(--font-mono);
+}
