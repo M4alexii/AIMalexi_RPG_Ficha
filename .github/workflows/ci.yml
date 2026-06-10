@@ -22,3 +22,66 @@ jobs:
 
       - name: Rodar suíte
         run: node js/tests/runner.js
+
+  # Integridade de assets (auditoria 2026-06): pega as classes de erro que a
+  # suíte não cobre — sintaxe de arquivos fora do runner, manifest quebrado e
+  # referências a arquivos inexistentes. O check de referências dos HTML é a
+  # anti-regressão direta do "bug do banner" (cc75117: HTML referenciava
+  # arquivos nunca commitados → 404 silencioso).
+  integrity:
+    name: Integridade (sintaxe + referências)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Sintaxe de todos os .js (node --check)
+        run: |
+          set -e
+          git ls-files '*.js' | while read -r f; do
+            node --check "$f"
+          done
+          echo "✓ Todos os .js passaram em node --check"
+
+      - name: manifest.json é JSON válido
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('manifest.json','utf8')); console.log('✓ manifest.json válido')"
+
+      - name: PRECACHE_URLS do sw.js apontam para arquivos existentes
+        run: |
+          node -e '
+            const fs = require("fs");
+            const sw = fs.readFileSync("sw.js", "utf8");
+            const m = sw.match(/PRECACHE_URLS\s*=\s*\[([\s\S]*?)\]/);
+            if (!m) { console.error("✗ PRECACHE_URLS não encontrado no sw.js"); process.exit(1); }
+            const urls = [...m[1].matchAll(/"\.\/([^"]+)"/g)].map(x => x[1]).filter(u => u);
+            const missing = urls.filter(u => !fs.existsSync(u));
+            if (missing.length) {
+              console.error("✗ Arquivos no precache do SW que NÃO existem no repo:", missing);
+              process.exit(1);
+            }
+            console.log("✓ " + urls.length + " URLs do precache verificadas");
+          '
+
+      - name: Referências locais dos HTML existem (anti-regressão do bug do banner)
+        run: |
+          node -e '
+            const fs = require("fs");
+            const files = fs.readdirSync(".").filter(f => f.endsWith(".html"));
+            const missing = [];
+            for (const f of files) {
+              const html = fs.readFileSync(f, "utf8");
+              const refs = [...html.matchAll(/(?:src|href)="((?:js|css|data)\/[^"#?]+)"/g)].map(m => m[1]);
+              for (const r of refs) if (!fs.existsSync(r)) missing.push(f + " → " + r);
+            }
+            if (missing.length) {
+              console.error("✗ HTML referencia arquivos que não existem:", missing);
+              process.exit(1);
+            }
+            console.log("✓ Referências locais de " + files.length + " HTMLs verificadas");
+          '

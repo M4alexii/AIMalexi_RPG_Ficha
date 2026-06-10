@@ -4,6 +4,13 @@
 > itens **#2** (`validateCharacter` — agora ativo no boot/persist) e **#3** (re-roll de Sorte 15-19)
 > **JÁ CORRIGIDOS** no código; **#1** (ajuste por idade) **PARCIAL** (resíduos: tiers de APA,
 > distribuição interativa, caminho de idade manual). A priorização segue o roadmap da diretriz.
+>
+> 🔎 **Correção 2026-06-10** (ver [`AUDITORIA_RESIDUAL_2026-06-10.md`](AUDITORIA_RESIDUAL_2026-06-10.md)):
+> o fix do **#2** estava **incompleto** — `validateCharacter` só validava skills em ARRAY
+> (criaturas); a ficha usa OBJETO, então o cap 75/90 não rodava para investigadores mesmo
+> com o wiring ativo. Agora aceita as duas formas (+ teto próprio do Nível de Crédito) e tem
+> teste de regressão. O **empala** (dado como corrigido no cabeçalho abaixo) também estava
+> incompleto — faltava a rolagem extra da arma; completado e travado por teste de faixa.
 
 Auditoria feita em 2026-05-27 contra o PDF oficial de Chamada de Cthulhu 7ª Edição PT-BR (`pdfcoffee.com_call-of-cthulhu-7th-pt-br-pdf-free.pdf`, 351 páginas) e contra a base de código pós Fase 5 (commit `f29bdbc`).
 

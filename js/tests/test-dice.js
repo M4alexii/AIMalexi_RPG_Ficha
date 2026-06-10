@@ -331,3 +331,66 @@ assert(dice.gradeRoll(100, 60, 'extreme').met === false, 'gradeRoll fumble|extre
 const gDef = dice.gradeRoll(40, 60);
 assert(gDef.met === true, 'gradeRoll(40,60) sem difficulty: met=true (default regular)');
 assertEq(gDef.target, 60, 'gradeRoll(40,60) sem difficulty: target=60');
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  rollDamage — Empala (PDF Cap. 6, p. 104)
+//
+//  Regra: dano MÁXIMO da arma + dano MÁXIMO do DB + UMA rolagem extra da arma
+//  (sem DB). Exemplo do livro: arma 1D4, DB +1D4 → 4 + 4 + 1D4 = faixa 9–12.
+//
+//  Regressão (auditoria 2026-06): a versão anterior parava no máximo (faltava
+//  a rolagem extra) e o cálculo de constantes por regex perdia o DB plano
+//  ("-2") e errava em dados multi-dígito ("+10D6").
+// ─────────────────────────────────────────────────────────────────────────────
+group('rollDamage — empala: máximo + rolagem extra (PDF p.104)');
+
+// Exemplo do livro: 1D4 + DB 1D4 → faixa exata 9–12 (4+4 fixos + 1d4 extra).
+(function () {
+  let min = Infinity, max = -Infinity, shapeOk = true;
+  for (let i = 0; i < 400; i++) {
+    const r = dice.rollDamage('1D4+DB', '+1D4', true);
+    if (r.total < min) min = r.total;
+    if (r.total > max) max = r.total;
+    if (r.impale !== true || r.maxDamage !== 8 || !Array.isArray(r.rolls)) shapeOk = false;
+  }
+  assert(min >= 9 && max <= 12, `empala 1D4+DB(+1D4): faixa observada [${min},${max}] contida em [9,12]`);
+  assertEq(min, 9,  'empala 1D4+DB(+1D4): mínimo 9 alcançado (rolagem extra existe)');
+  assertEq(max, 12, 'empala 1D4+DB(+1D4): máximo 12 alcançado');
+  assert(shapeOk, 'empala: shape { impale:true, maxDamage:8, rolls[] } estável');
+})();
+
+// DB plano negativo: 1D6+DB com DB="-2" → máx 6−2=4 + extra 1d6 → faixa 5–10.
+// (regressão: o regex antigo lia constantes só da string da ARMA e perdia o -2)
+(function () {
+  let min = Infinity, max = -Infinity, maxDmgOk = true;
+  for (let i = 0; i < 400; i++) {
+    const r = dice.rollDamage('1D6+DB', '-2', true);
+    if (r.maxDamage !== 4) maxDmgOk = false;
+    if (r.total < min) min = r.total;
+    if (r.total > max) max = r.total;
+  }
+  assert(maxDmgOk, 'empala 1D6+DB(-2): maxDamage=4 (DB plano entra no máximo)');
+  assert(min >= 5 && max <= 10, `empala 1D6+DB(-2): faixa [${min},${max}] contida em [5,10]`);
+})();
+
+// Constante da arma: 1D4+2 sem DB → máx 6 + extra (1d4+2 = 3..6) → faixa 9–12.
+(function () {
+  let min = Infinity, max = -Infinity;
+  for (let i = 0; i < 400; i++) {
+    const r = dice.rollDamage('1D4+2', '0', true);
+    if (r.total < min) min = r.total;
+    if (r.total > max) max = r.total;
+  }
+  assert(min >= 9 && max <= 12, `empala 1D4+2: faixa [${min},${max}] contida em [9,12] (constante da arma preservada)`);
+})();
+
+// Caminho NÃO-empala segue intacto: 2D6+3 ∈ [5,15].
+(function () {
+  let min = Infinity, max = -Infinity;
+  for (let i = 0; i < 400; i++) {
+    const r = dice.rollDamage('2D6+3', '0', false);
+    if (r.total < min) min = r.total;
+    if (r.total > max) max = r.total;
+  }
+  assert(min >= 5 && max <= 15, `rollDamage normal 2D6+3: faixa [${min},${max}] contida em [5,15]`);
+})();

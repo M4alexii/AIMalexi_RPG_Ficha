@@ -420,15 +420,20 @@ window.CoC = window.CoC || {};
     else if (lvl)                             { marker = "✓"; markCls = "ok"; }
 
     let html = `<span class="roll-marker ${markCls}">${marker}</span>`;
+    // REGRA (CONSTITUIÇÃO/segurança): todo campo interpolado em innerHTML passa
+    // por escapeHtml — sem exceção. target/d100/level podem carregar strings
+    // vindas de nomes de arma/criatura (controláveis pelo usuário e, no
+    // multiplayer, por OUTROS usuários da campanha).
     if (e.skill)  html += `<span class="skill">${escapeHtml(e.skill)}</span>`;
-    if (e.target != null) html += ` <span class="roll-target">${e.target}%</span>`;
+    if (e.target != null) html += ` <span class="roll-target">${escapeHtml(String(e.target))}%</span>`;
     if (e.difficulty && e.difficulty !== "regular") {
       const dl = e.difficulty === "hard" ? "Difícil" : (e.difficulty === "extreme" ? "Extremo" : e.difficulty);
       html += ` <span class="roll-diff">${escapeHtml(dl)}</span>`;
     }
-    if (e.d100 != null) html += ` <span class="result">→ ${e.d100}</span>`;
+    if (e.d100 != null) html += ` <span class="result">→ ${escapeHtml(String(e.d100))}</span>`;
     if (e.level) {
-      let levelText = labels[e.level] || e.level;
+      // Escapa o texto-base ANTES de anexar o span intencional de "insuficiente".
+      let levelText = escapeHtml(labels[e.level] || String(e.level));
       if (e.met === false && e.difficulty && e.difficulty !== "regular") {
         const diffLabel = e.difficulty === "hard" ? "Difícil" : "Extremo";
         levelText += ` <span style="color:var(--err);font-size:0.8em">(insuf. ${diffLabel})</span>`;

@@ -219,22 +219,38 @@ window.CoC = window.CoC || {};
   /**
    * Rola dano de uma arma (atalho de rollNotation com nome de arma).
    * Substitui "+DB" pelo bônus do personagem se fornecido.
+   *
+   * Empala (PDF Cap. 6, p. 104): dano MÁXIMO da arma + dano MÁXIMO do DB
+   * + UMA rolagem extra de dano da arma (sem DB).
+   * Ex. do livro: arma 1D4, DB +1D4 → 4 + 4 + 1D4 = faixa 9–12.
+   * (A versão anterior parava no máximo — faltava a rolagem extra.)
    */
   function rollDamage(weaponDamageString, db = "0", impale = false) {
     if (impale) {
-      // Dano máximo (regra de empalar): substitui rolagens por valor máximo
-      const result = rollNotation(weaponDamageString, db);
-      // Re-calcular total como se cada dado fosse o máximo
+      // Parte 1 — máximo de arma + DB: rola a notação só para obter a estrutura
+      // (dados + constantes já com o DB substituído) e re-totaliza no máximo.
+      const maxPart = rollNotation(weaponDamageString, db);
       let max = 0;
-      for (const r of result.rolls) {
+      for (const r of maxPart.rolls) {
         max += (r.n * r.sides) * (r.result < 0 ? -1 : 1);
       }
-      // Adiciona termos numéricos (constantes)
-      const constants = (weaponDamageString.match(/[+-]\d+(?!D)/gi) || [])
-        .reduce((acc, t) => acc + parseInt(t, 10), 0);
-      result.total = max + constants;
-      result.impale = true;
-      return result;
+      // Constantes exatas por diferença (total = soma dos dados + constantes).
+      // Cobre DB plano ("-2"), constante inicial sem sinal e dados multi-dígito
+      // ("+10D6") — casos em que o regex antigo falhava ou perdia termos.
+      const diceSum = maxPart.rolls.reduce((acc, r) => acc + r.result, 0);
+      const constants = maxPart.total - diceSum;
+
+      // Parte 2 — rolagem extra da arma (DB zerado: o bônus não rola de novo).
+      const extra = rollNotation(weaponDamageString, "0");
+
+      return {
+        total: max + constants + extra.total,
+        rolls: extra.rolls,   // dados exibíveis = só a rolagem extra (o resto é máximo fixo)
+        expression: "MÁX(" + maxPart.expression + ") + " + extra.expression,
+        impale: true,
+        maxDamage: max + constants,
+        extraRoll: extra.total
+      };
     }
     return rollNotation(weaponDamageString, db);
   }
