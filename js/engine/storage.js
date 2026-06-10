@@ -265,12 +265,17 @@ window.CoC = window.CoC || {};
   // ─── Boot: detecta backend e carrega cache ───────────────────────────
   async function loadAllFromIDB() {
     const keys = await idbKeys();
-    for (const key of keys) {
-      if (typeof key !== "string" || !key.startsWith(KEY_PREFIX)) continue;
-      if (key.startsWith(KEY_PREFIX + "blobs/")) continue;   // blobs (imagens) são lazy-loaded via getBlob — não inflam o boot
-      const val = await idbGet(key);
-      placeInCache(key, val);
-    }
+    const dataKeys = keys.filter((key) =>
+      typeof key === "string" &&
+      key.startsWith(KEY_PREFIX) &&
+      !key.startsWith(KEY_PREFIX + "blobs/")   // blobs (imagens) são lazy-loaded via getBlob — não inflam o boot
+    );
+    // Leituras em PARALELO: cada `await idbGet` sequencial custava 1 round-trip
+    // de transação por entrada — com N personagens+criaturas o boot era O(N)
+    // serial. Promise.all deixa o IDB enfileirar tudo de uma vez.
+    // A ordem de placeInCache é preservada (mesma dos keys), determinística.
+    const values = await Promise.all(dataKeys.map((key) => idbGet(key)));
+    dataKeys.forEach((key, i) => placeInCache(key, values[i]));
   }
 
   function loadAllFromLocalStorage() {
