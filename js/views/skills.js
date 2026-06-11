@@ -35,7 +35,28 @@ window.CoC.views = window.CoC.views || {};
   const validators = window.CoC.validators;
 
   // Estado efêmero de UI — não vai ao store (não é estado do personagem)
-  let _filter = "all";   // all | occupation | used
+  let _filter = "all";   // all | occupation | used | fav
+
+  // ── Modo de sessão (spec Personalização & Modos V1, item 6) ────────────────
+  // Em combate/investigação, as perícias da cena sobem (abaixo das favoritas).
+  // Estado de cena: vive em body[data-session-mode], setado pelo orquestrador.
+  const SESSION_BOOST = {
+    combat: new Set(["Esquivar", "Lutar", "Arremessar", "Primeiros Socorros",
+                     "Medicina", "Intimidação", "Furtividade", "Saltar"]),
+    investigation: new Set(["Encontrar", "Escutar", "Usar Bibliotecas", "Psicologia",
+                            "Ocultismo", "Avaliação", "História", "Rastrear",
+                            "Persuasão", "Lábia", "Charme", "Leitura Labial"]),
+  };
+  function _sessionBoosted(name) {
+    const mode = document.body.dataset.sessionMode;
+    const set = SESSION_BOOST[mode];
+    if (!set) return false;
+    if (set.has(name)) return true;
+    // prefixos (especializações): "Armas de Fogo (…)", "Lutar (…)"
+    if (mode === "combat" && (/^Armas de Fogo/.test(name) || /^Lutar/.test(name))) return true;
+    if (mode === "investigation" && /^Idiomas?/.test(name)) return true;
+    return false;
+  }
   let _search = "";
 
   // ── Helpers puros ─────────────────────────────────────────────────────────
@@ -253,9 +274,11 @@ window.CoC.views = window.CoC.views || {};
         return true;
       });
       if (filtered.length === 0) continue;
-      // Favoritas (★) sobem para o topo do grupo, mantendo a ordem entre si
-      filtered.sort((a, b) =>
-        (c.skills?.[b.name]?.fav ? 1 : 0) - (c.skills?.[a.name]?.fav ? 1 : 0));
+      // Ordem: favoritas (★) primeiro, depois perícias da cena (modo de
+      // sessão), depois as demais — estável dentro de cada grupo.
+      const _rank = name =>
+        (c.skills?.[name]?.fav ? 2 : 0) + (_sessionBoosted(name) ? 1 : 0);
+      filtered.sort((a, b) => _rank(b.name) - _rank(a.name));
 
       const group = el("div", { class: "skill-group" });
       group.innerHTML = `<h3 class="skill-group-title">${escapeHtml(labels[cat] || cat)}</h3>`;

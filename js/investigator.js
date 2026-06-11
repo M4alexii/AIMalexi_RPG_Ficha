@@ -147,6 +147,7 @@
     bindDirtyTracking();
     if (window.CoC.sanityFx) window.CoC.sanityFx.init();   // overlay + modo de efeitos
     if (window.CoC.globalSearch) window.CoC.globalSearch.init();  // Ctrl+K + botão 🔍
+    _initSessionMode();                                    // 🎬 cena (investigação/combate)
 
     // Sprint 6 — Render Pipeline: registry centralizado substituindo subscriptions manuais.
     // SPEND_LUCK e combat actions agora re-renderizam via RENDER_MAP em vez de
@@ -344,6 +345,37 @@
     const tc = window.CoC.themeCustom;
     if (tc) { if (t === "custom") tc.applySaved(); else tc.clear(); }
     $$(".theme-swatch").forEach(s => s.classList.toggle("active", s.dataset.theme === t));
+  }
+
+  // ─── MODO DE SESSÃO (🎬 cena: neutro → investigação → combate) ─────────
+  // Prioriza as perícias da cena atual (skills.js lê body[data-session-mode]).
+  // Estado de cena: sessionStorage (não vai ao Store — não é dado de ficha).
+  function _initSessionMode() {
+    const btn = $("#btn-session-mode");
+    if (!btn) return;
+    const MODES  = ["", "investigation", "combat"];
+    const LABELS = { "": "🎬 Cena", investigation: "🔎 Investigação", combat: "⚔️ Combate" };
+    function applyScene(m, navigate) {
+      if (m) document.body.dataset.sessionMode = m;
+      else delete document.body.dataset.sessionMode;
+      btn.textContent = LABELS[m || ""];
+      btn.classList.toggle("active", !!m);
+      try { sessionStorage.setItem("aimalexi-rpg/sessionMode", m || ""); } catch (e) { /* sem sessionStorage */ }
+      if (window.CoC.views.skills?.render) window.CoC.views.skills.render();
+      if (navigate) {
+        const tab = m === "combat" ? "combate" : (m === "investigation" ? "pericias" : null);
+        if (tab) $(`.desktop-tab[data-tab="${tab}"], .mobile-tab[data-tab="${tab}"]`)?.click();
+      }
+    }
+    btn.onclick = () => {
+      const cur  = document.body.dataset.sessionMode || "";
+      const next = MODES[(MODES.indexOf(cur) + 1) % MODES.length];
+      applyScene(next, true);
+    };
+    try {
+      const saved = sessionStorage.getItem("aimalexi-rpg/sessionMode");
+      if (saved) applyScene(saved, false);
+    } catch (e) { /* sem sessionStorage */ }
   }
 
   function clearUI() {
