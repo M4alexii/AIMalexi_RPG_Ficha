@@ -1902,3 +1902,141 @@ body[data-notes-style="caderno"] .section[data-tab="diario"] textarea {
   filter: grayscale(1) contrast(1.25) brightness(0.22);
   background-color: var(--bg-card-hi);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   APARÊNCIA — SOM AMBIENTE VISUAL (spec item 13) — sem áudio
+   ───────────────────────────────────────────────────────────────────────────
+   body[data-ambient="none|rain|mist|dust|vhs|film"] (settings.js) ·
+   overlay #ambient-fx injetado por js/shared/ambient-fx.js.
+   z-index 35: acima do conteúdo, ABAIXO de #sanity-fx (40) — a insanidade
+   prevalece. pointer-events:none; opacidades sutis (nunca atrapalham leitura).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+#ambient-fx {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  pointer-events: none;
+  overflow: hidden;
+}
+#ambient-fx > div {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.2s ease-out;
+}
+
+/* ── Chuva: duas camadas de riscos diagonais em velocidades diferentes ── */
+body[data-ambient="rain"] #ambient-fx .amb-a {
+  opacity: 0.10;
+  background: repeating-linear-gradient(78deg, transparent 0 7px, rgba(180, 200, 220, 0.55) 7px 8px, transparent 8px 14px);
+  background-size: 200% 200%;
+  animation: amb-rain-a 0.7s linear infinite;
+}
+body[data-ambient="rain"] #ambient-fx .amb-b {
+  opacity: 0.07;
+  background: repeating-linear-gradient(75deg, transparent 0 12px, rgba(160, 185, 210, 0.45) 12px 13px, transparent 13px 24px);
+  background-size: 200% 200%;
+  animation: amb-rain-b 1.15s linear infinite;
+}
+@keyframes amb-rain-a { from { background-position: 0 0; } to { background-position: -18% 100%; } }
+@keyframes amb-rain-b { from { background-position: 0 0; } to { background-position: -12% 100%; } }
+
+/* ── Névoa: véus radiais à deriva ── */
+body[data-ambient="mist"] #ambient-fx .amb-a {
+  opacity: 0.14;
+  inset: -40%;
+  background:
+    radial-gradient(ellipse 45% 30% at 25% 60%, rgba(190, 200, 205, 0.5) 0%, transparent 70%),
+    radial-gradient(ellipse 55% 35% at 75% 30%, rgba(170, 185, 195, 0.4) 0%, transparent 70%);
+  animation: amb-drift 38s ease-in-out infinite;
+}
+body[data-ambient="mist"] #ambient-fx .amb-b {
+  opacity: 0.10;
+  inset: -40%;
+  background: radial-gradient(ellipse 60% 40% at 50% 80%, rgba(200, 210, 215, 0.45) 0%, transparent 72%);
+  animation: amb-drift 55s ease-in-out infinite reverse;
+}
+@keyframes amb-drift {
+  0%, 100% { transform: translate(0, 0); }
+  33%      { transform: translate(3%, -2%); }
+  66%      { transform: translate(-2%, 2%); }
+}
+
+/* ── Poeira: grão esparso flutuando ── */
+body[data-ambient="dust"] #ambient-fx .amb-a {
+  opacity: 0.12;
+  inset: -20%;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='d'><feTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.8 0 0 0 0 0.74 0 0 0 0 0.6 0 0 0 0.35 0'/></filter><rect width='100%25' height='100%25' filter='url(%23d)'/></svg>");
+  animation: amb-drift 26s ease-in-out infinite;
+}
+body[data-ambient="dust"] #ambient-fx .amb-b {
+  opacity: 0.10;
+  background-image: radial-gradient(rgba(220, 205, 170, 0.8) 1px, transparent 1.6px);
+  background-size: 90px 110px;
+  animation: amb-dust-fall 18s linear infinite;
+}
+@keyframes amb-dust-fall { from { background-position: 0 -110px; } to { background-position: 30px 110px; } }
+
+/* ── VHS: scanlines + franja cromática ── */
+body[data-ambient="vhs"] #ambient-fx .amb-a {
+  opacity: 0.16;
+  background: repeating-linear-gradient(0deg, transparent 0 2px, rgba(0, 0, 0, 0.55) 2px 3px);
+}
+body[data-ambient="vhs"] #ambient-fx .amb-b {
+  opacity: 0.08;
+  background:
+    linear-gradient(90deg, rgba(255, 50, 50, 0.35) 0%, transparent 4%),
+    linear-gradient(270deg, rgba(50, 180, 255, 0.35) 0%, transparent 4%);
+  animation: amb-vhs-jitter 6s steps(1) infinite;
+}
+body[data-ambient="vhs"] #ambient-fx .amb-c {
+  opacity: 0.10;
+  background: linear-gradient(0deg, transparent 49.4%, rgba(235, 235, 235, 0.5) 49.7%, transparent 50%);
+  background-size: 100% 220px;
+  animation: amb-vhs-roll 9s linear infinite;
+}
+@keyframes amb-vhs-jitter {
+  0%, 88%, 100% { transform: translateX(0); }
+  89% { transform: translateX(2px); }
+  92% { transform: translateX(-1.5px); }
+  95% { transform: translateX(1px); }
+}
+@keyframes amb-vhs-roll { from { background-position: 0 -220px; } to { background-position: 0 100vh; } }
+
+/* ── Filme antigo: grão + vinheta + flicker ── */
+body[data-ambient="film"] #ambient-fx .amb-a {
+  opacity: 0.14;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='f'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.85 0 0 0 0 0.85 0 0 0 0 0.8 0 0 0 0.5 0'/></filter><rect width='100%25' height='100%25' filter='url(%23f)'/></svg>");
+  animation: amb-grain 0.45s steps(3) infinite;
+}
+body[data-ambient="film"] #ambient-fx .amb-b {
+  opacity: 0.35;
+  background: radial-gradient(ellipse 115% 115% at 50% 50%, transparent 58%, rgba(10, 8, 6, 0.6) 100%);
+}
+body[data-ambient="film"] #ambient-fx .amb-c {
+  opacity: 0.05;
+  background: rgba(255, 244, 220, 0.5);
+  animation: amb-film-flicker 3.1s steps(1) infinite;
+}
+@keyframes amb-grain {
+  0%   { transform: translate(0, 0); }
+  33%  { transform: translate(-2%, 1.5%); }
+  66%  { transform: translate(1.5%, -2%); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes amb-film-flicker {
+  0%, 76%, 100% { opacity: 0.05; }
+  78% { opacity: 0.10; }
+  81% { opacity: 0.03; }
+  84% { opacity: 0.08; }
+}
+
+/* ── Acessibilidade: congela movimento; impressão: some ── */
+body.reduce-motion #ambient-fx > div { animation: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  #ambient-fx > div { animation: none !important; }
+}
+@media print {
+  #ambient-fx { display: none !important; }
+}
