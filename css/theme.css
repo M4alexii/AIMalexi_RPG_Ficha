@@ -252,6 +252,9 @@ body::after {
   width: 48px; height: 32px; padding: 0; border: 1px solid var(--ink-faded);
   border-radius: var(--radius); background: none; cursor: pointer; vertical-align: middle;
 }
+/* Controles lado a lado na mesma linha (ex.: cor de destaque + ✕) */
+.settings-inline { display: flex; align-items: center; gap: 0.5rem; }
+.settings-row > button { align-self: flex-start; }
 
 /* Densidade compacta — reduz paddings/gaps globais */
 body.density-normal  { --gap-lg: 1.1rem; }
@@ -506,6 +509,20 @@ input:focus, select:focus, textarea:focus {
 input[type="number"] {
   font-family: var(--font-mono);
   text-align: center;
+}
+
+/* Checkbox/radio: o reset global de input (width:100% + padding) os deformava,
+   desalinhando a caixinha do texto do label. */
+input[type="checkbox"],
+input[type="radio"] {
+  width: 1rem;
+  height: 1rem;
+  padding: 0;
+  margin: 0;
+  flex: 0 0 auto;
+  accent-color: var(--accent, var(--brass));
+  vertical-align: middle;
+  cursor: pointer;
 }
 
 label {
@@ -1158,9 +1175,11 @@ body[data-sanity="breaking"] .svital-san .svital-fill { background-color: var(--
    PRINCÍPIOS DE ENGENHARIA:
    - Legibilidade preservada: o blur/distorção vivem num OVERLAY (#sanity-fx,
      irmão de .app) mascarado para a PERIFERIA — o centro de leitura fica nítido.
-     A graduação de cor vai no .app (não no <body>, que quebraria position:fixed
-     de modais/toasts). Modais e toasts ficam ACIMA do overlay (z-index 100/200)
-     e portanto permanecem 100% legíveis.
+     A graduação de cor vai na camada .sfx-tone via backdrop-filter — NUNCA como
+     filter em .app/<body>, pois ambos contêm position:fixed (.mobile-tabs,
+     .toolbar-actions) e filter no ancestral quebra fixed (abas somem).
+     O tremor vai em .app-shell (sem descendentes fixed). Modais e toasts ficam
+     ACIMA do overlay (z-index 100/200) e portanto permanecem 100% legíveis.
    - GPU: animações usam apenas transform/opacity. backdrop-filter é restrito aos
      níveis altos e desligado em "reduced"/reduced-motion.
    - Sem reflow: todas as camadas são fixed/absolute, pointer-events:none.
@@ -1220,8 +1239,17 @@ body[data-sanity="breaking"] .svital-san .svital-fill { background-color: var(--
   background: radial-gradient(ellipse 120% 120% at 50% 50%, rgba(0,0,0,0) 40%, rgba(20, 2, 2, 0.5) 100%);
 }
 
-/* ── Graduação de cor + tremor no conteúdo (.app), não no <body> ── */
-.app { transition: filter 1.2s ease-out; }
+/* Camada: graduação de cor (dessaturação/contraste) via backdrop-filter.
+   NUNCA aplicar filter/transform em .app ou <body>: ambos contêm elementos
+   position:fixed (.mobile-tabs, .toolbar-actions, .sheet-backdrop) e um filtro
+   no ancestral vira containing block — a barra de abas "some" da viewport. */
+#sanity-fx .sfx-tone {
+  opacity: 1;
+  transition: backdrop-filter 1.2s ease-out, -webkit-backdrop-filter 1.2s ease-out;
+}
+
+/* ── Tremor no miolo da ficha (.app-shell), que não contém position:fixed ── */
+.app-shell { transition: transform 1.2s ease-out; }
 
 /* ─────────────────── NÍVEIS (valores de data-sanity) ─────────────────── */
 /* Backward compat: code still uses 0-4; CSS rules support both numeric and named */
@@ -1231,14 +1259,14 @@ body[data-sanity="0"],
 body[data-sanity="lucid"] { /* sem regras — é o padrão */ }
 
 /* Nível 1 (uneasy) — 60-79%: leve escurecimento + vinheta sutil + respiração lenta */
-body[data-sanity="1"],
-body[data-sanity="uneasy"] .app { filter: saturate(0.86) contrast(1.03); }
+body[data-sanity="1"] #sanity-fx .sfx-tone,
+body[data-sanity="uneasy"] #sanity-fx .sfx-tone { backdrop-filter: saturate(0.86) contrast(1.03); -webkit-backdrop-filter: saturate(0.86) contrast(1.03); }
 body[data-sanity="1"] #sanity-fx .sfx-vignette,
 body[data-sanity="uneasy"] #sanity-fx .sfx-vignette { --b: 0.45; opacity: var(--b); animation: sfx-breathe 9s ease-in-out infinite; }
 
 /* Nível 2 (shaken) — 40-59%: blur periférico + aberração cromática + ruído + distorção leve */
-body[data-sanity="2"],
-body[data-sanity="shaken"] .app { filter: saturate(0.7) contrast(1.06) brightness(0.97); }
+body[data-sanity="2"] #sanity-fx .sfx-tone,
+body[data-sanity="shaken"] #sanity-fx .sfx-tone { backdrop-filter: saturate(0.7) contrast(1.06) brightness(0.97); -webkit-backdrop-filter: saturate(0.7) contrast(1.06) brightness(0.97); }
 body[data-sanity="2"] #sanity-fx .sfx-vignette,
 body[data-sanity="shaken"] #sanity-fx .sfx-vignette { --b: 0.70; opacity: var(--b); animation: sfx-breathe 7s ease-in-out infinite; }
 body[data-sanity="2"] #sanity-fx .sfx-grain,
@@ -1247,12 +1275,12 @@ body[data-sanity="2"] #sanity-fx .sfx-chroma,
 body[data-sanity="shaken"] #sanity-fx .sfx-chroma { opacity: 0.6; }
 body[data-sanity="2"] #sanity-fx .sfx-blur,
 body[data-sanity="shaken"] #sanity-fx .sfx-blur { backdrop-filter: blur(1.5px); -webkit-backdrop-filter: blur(1.5px); }
-body[data-sanity="2"] .app,
-body[data-sanity="shaken"] .app { animation: sfx-shake-soft 9s ease-in-out infinite; }
+body[data-sanity="2"] .app-shell,
+body[data-sanity="shaken"] .app-shell { animation: sfx-shake-soft 9s ease-in-out infinite; }
 
 /* Nível 3 (fraying) — 20-39%: shake agressivo + respiração + vinheta pesada + flicker */
-body[data-sanity="3"],
-body[data-sanity="fraying"] .app { filter: saturate(0.55) contrast(1.1) brightness(0.93) hue-rotate(-6deg); }
+body[data-sanity="3"] #sanity-fx .sfx-tone,
+body[data-sanity="fraying"] #sanity-fx .sfx-tone { backdrop-filter: saturate(0.55) contrast(1.1) brightness(0.93) hue-rotate(-6deg); -webkit-backdrop-filter: saturate(0.55) contrast(1.1) brightness(0.93) hue-rotate(-6deg); }
 body[data-sanity="3"] #sanity-fx .sfx-vignette,
 body[data-sanity="fraying"] #sanity-fx .sfx-vignette { --b: 0.90; opacity: var(--b); animation: sfx-breathe 5s ease-in-out infinite; }
 body[data-sanity="3"] #sanity-fx .sfx-grain,
@@ -1263,12 +1291,12 @@ body[data-sanity="3"] #sanity-fx .sfx-blur,
 body[data-sanity="fraying"] #sanity-fx .sfx-blur { backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
 body[data-sanity="3"] #sanity-fx .sfx-flicker,
 body[data-sanity="fraying"] #sanity-fx .sfx-flicker { opacity: 0.6; animation: sfx-flicker 6.3s steps(1) infinite; }
-body[data-sanity="3"] .app,
-body[data-sanity="fraying"] .app { animation: sfx-shake 3.7s ease-in-out infinite; }
+body[data-sanity="3"] .app-shell,
+body[data-sanity="fraying"] .app-shell { animation: sfx-shake 3.7s ease-in-out infinite; }
 
 /* Nível 4 (breaking) — <20%: colapso visual, animações instáveis, lampejos imprevisíveis */
-body[data-sanity="4"],
-body[data-sanity="breaking"] .app { filter: saturate(0.4) contrast(1.18) brightness(0.9) hue-rotate(-10deg); }
+body[data-sanity="4"] #sanity-fx .sfx-tone,
+body[data-sanity="breaking"] #sanity-fx .sfx-tone { backdrop-filter: saturate(0.4) contrast(1.18) brightness(0.9) hue-rotate(-10deg); -webkit-backdrop-filter: saturate(0.4) contrast(1.18) brightness(0.9) hue-rotate(-10deg); }
 body[data-sanity="4"] #sanity-fx .sfx-vignette,
 body[data-sanity="breaking"] #sanity-fx .sfx-vignette { --b: 1; opacity: var(--b); animation: sfx-breathe-erratic 3.3s ease-in-out infinite; }
 body[data-sanity="4"] #sanity-fx .sfx-grain,
@@ -1279,8 +1307,8 @@ body[data-sanity="4"] #sanity-fx .sfx-blur,
 body[data-sanity="breaking"] #sanity-fx .sfx-blur { backdrop-filter: blur(4.5px); -webkit-backdrop-filter: blur(4.5px); }
 body[data-sanity="4"] #sanity-fx .sfx-flicker,
 body[data-sanity="breaking"] #sanity-fx .sfx-flicker { opacity: 0.85; animation: sfx-flicker-erratic 4.9s steps(1) infinite; }
-body[data-sanity="4"] .app,
-body[data-sanity="breaking"] .app { animation: sfx-shake-hard 2.9s ease-in-out infinite; }
+body[data-sanity="4"] .app-shell,
+body[data-sanity="breaking"] .app-shell { animation: sfx-shake-hard 2.9s ease-in-out infinite; }
 
 /* ─────────────────── KEYFRAMES (transform/opacity = GPU) ─────────────────── */
 @keyframes sfx-breathe {
@@ -1346,11 +1374,11 @@ body[data-sanity-fx="reduced"] #sanity-fx .sfx-blur {
   -webkit-backdrop-filter: none !important;
 }
 body[data-sanity-fx="reduced"] #sanity-fx .sfx-vignette { animation: none !important; }
-body[data-sanity-fx="reduced"] .app { animation: none !important; }
+body[data-sanity-fx="reduced"] .app-shell { animation: none !important; }
 
 /* ─── MODO OFF: desliga tudo ─── */
 body[data-sanity-fx="off"] #sanity-fx { display: none !important; }
-body[data-sanity-fx="off"] .app { filter: none !important; animation: none !important; }
+body[data-sanity-fx="off"] .app-shell { animation: none !important; }
 
 /* ─── prefers-reduced-motion: corta movimento mesmo no modo COMPLETO ─── */
 @media (prefers-reduced-motion: reduce) {
@@ -1358,14 +1386,14 @@ body[data-sanity-fx="off"] .app { filter: none !important; animation: none !impo
   #sanity-fx .sfx-grain,
   #sanity-fx .sfx-chroma,
   #sanity-fx .sfx-flicker,
-  .app { animation: none !important; }
+  .app-shell { animation: none !important; }
   #sanity-fx .sfx-flicker { opacity: 0 !important; }
 }
 
 /* ─── Impressão: sem efeitos ─── */
 @media print {
   #sanity-fx { display: none !important; }
-  .app { filter: none !important; animation: none !important; }
+  .app-shell { animation: none !important; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
