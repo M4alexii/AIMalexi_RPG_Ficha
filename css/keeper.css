@@ -1059,13 +1059,13 @@
 .cs-divider {
   font-family: var(--font-mono);
   font-size: 0.78rem;
-  color: var(--ink-faded);
+  color: var(--ink-dim);
   padding: 0 0.25rem;
 }
 
 .cs-hint {
   font-size: 0.72rem;
-  color: var(--ink-faded);
+  color: var(--ink-dim);
   font-family: var(--font-mono);
   letter-spacing: 0.02em;
 }
@@ -1666,7 +1666,7 @@
   .toolbar-actions .sheet-title {
     display: block; font-family: var(--font-mono); font-size: 0.7rem;
     text-transform: uppercase; letter-spacing: 0.1em;
-    color: var(--ink-faded); margin-bottom: 0.4rem;
+    color: var(--ink-dim); margin-bottom: 0.4rem;
   }
   .toolbar-actions .sheet-group {
     display: flex; flex-direction: column; gap: 0.25rem;
@@ -2331,11 +2331,41 @@
    Keeper Notes Advanced — Phase B (UI Components)
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* Split-pane lista | editor. No mobile colapsa em coluna única (lista em cima,
+   editor embaixo) — antes era grid inline 280px+1fr que esmagava o editor. */
+.ktab-panel[data-ktab="notas"].active {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 1rem;
+  min-height: 600px;
+}
+
 #keeper-notes-list {
   background: var(--bg-deep);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  border-right: 1px solid var(--ink-faded);
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+#keeper-notes-editor {
+  padding: 1rem;
+  overflow-y: auto;
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .ktab-panel[data-ktab="notas"].active {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+  #keeper-notes-list {
+    border-right: none;
+    border-bottom: 1px solid var(--ink-faded);
+    max-height: 45vh;
+  }
 }
 
 .journal-search {

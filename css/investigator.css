@@ -422,10 +422,15 @@ body[data-difficulty="extreme"] .skill-frac-sep {
 .theme-swatch:hover  { transform: scale(1.3); }
 .theme-swatch.active { border-color: var(--ink); box-shadow: 0 0 0 2px var(--accent-glow); }
 .theme-swatch[data-theme="arkham"]     { background: #b8924f; }
+.theme-swatch[data-theme="dossie"]     { background: #556B2F; }
+.theme-swatch[data-theme="lovecraft"]  { background: #8B6F47; }
+.theme-swatch[data-theme="cosmic"]     { background: #3F6B5A; }
+.theme-swatch[data-theme="arquivo"]    { background: #F4EFD8; border-color: #5C4033; }
 .theme-swatch[data-theme="miskatonic"] { background: #4a9040; }
 .theme-swatch[data-theme="sepia"]      { background: #c08030; }
 .theme-swatch[data-theme="obsidian"]   { background: #4888c8; }
 .theme-swatch[data-theme="eldritch"]   { background: #7848c8; }
+.theme-swatch[data-theme="custom"]     { background: conic-gradient(#8A3B3B, #C69C4D, #4F7A4F, #5D8B84, #8A3B3B); }
 
 /* Main panel: right of character sidebar */
 .main-panel {
@@ -608,7 +613,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
 }
 /* dark card bg — ink-doc (parchment ink) would be invisible here */
 .svital .svital-label { color: var(--ink-dim); }
-.svital .svital-value { color: var(--ink); }
+.svital .svital-value { color: var(--num-ink); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35); }
 .svital .svital-max   { color: var(--ink-dim); }
 .svital-pv   { border-left-color: var(--blood); }
 .svital-san  { border-left-color: #5a8fb5; }
@@ -622,13 +627,14 @@ body[data-difficulty="extreme"] .skill-frac-sep {
 .svital-pm   .svital-label::before { content: "\2726"; }   /* ✦ */
 .svital-luck .svital-label::before { content: "\1F340"; }  /* 🍀 */
 
-/* Botão "Editar Investigador" no rodapé da sidebar */
+/* Botão "Editar Investigador" no rodapé da sidebar — assenta sobre parchment,
+   então usa tinta de documento (brass claro seria ilegível aqui) */
 .sidebar-edit-btn {
   margin-top: 0.2rem;
   width: 100%;
   border: 1px solid var(--brass);
   background: transparent;
-  color: var(--brass-bright);
+  color: var(--ink-doc);
   border-radius: var(--radius);
   padding: 0.45rem;
   font-family: var(--font-mono);
@@ -637,7 +643,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   cursor: pointer;
   transition: background 0.15s;
 }
-.sidebar-edit-btn:hover { background: var(--bg-card-hi); }
+.sidebar-edit-btn:hover { background: rgba(184, 146, 79, 0.2); }
 
 /* Atributos em grade 2 colunas — cards centrados limpos (≥901px, sidebar vertical) */
 @media (min-width: 901px) {
@@ -661,7 +667,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
     font-size: var(--text-xs);
     color: var(--ink-dim);
   }
-  .sidebar-attributes .sattr-value { font-size: 1.4rem; line-height: 1.1; color: var(--brass-bright); }
+  .sidebar-attributes .sattr-value { font-size: 1.4rem; line-height: 1.1; color: var(--num-accent); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35); }
   .sidebar-attributes .sattr-fracs { margin-left: 0; font-size: var(--text-xs); }
 }
 
@@ -750,8 +756,8 @@ body[data-difficulty="extreme"] .skill-frac-sep {
 .app-shell .section-title {
   font-size: 1.9rem;
   font-family: var(--font-display);
-  color: var(--ink-doc);
-  text-shadow: 0 0 8px rgba(184, 146, 79, 0.15);
+  color: var(--title-ink);
+  text-shadow: 0 2px 2px rgba(0, 0, 0, 0.35), 0 0 16px var(--brass-glow);
   margin-bottom: 1rem;
   padding-bottom: 0.8rem;
   border-bottom: 2px solid var(--parchment-dim);
@@ -1026,7 +1032,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
 .derived-card .derived-label {
   font-family: var(--font-typewriter);
   font-size: 0.72rem;
-  color: var(--ink-doc-faded);
+  color: var(--ink-dim);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   font-weight: 500;
@@ -1035,14 +1041,14 @@ body[data-difficulty="extreme"] .skill-frac-sep {
 .derived-card .derived-value {
   font-family: var(--font-serif);
   font-size: 1.8rem;
-  color: var(--ink-doc);
+  color: var(--num-ink);
   font-weight: 700;
   line-height: 1.1;
-  text-shadow: 0 0 6px rgba(184, 146, 79, 0.25);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 .derived-card .derived-max {
   font-size: 0.85rem;
-  color: var(--ink-faded);
+  color: var(--ink-dim);
 }
 
 .derived-card .derived-actions {
@@ -1935,7 +1941,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
 }
 .btn-cash.gain:hover { background: var(--ok); color: var(--bg-deep); }
 .btn-cash.spend {
-  color: #c46a5e;
+  color: var(--spend-ink, #c46a5e);
   border-color: var(--blood);
   background: rgba(139, 26, 26, 0.12);
 }
@@ -2801,7 +2807,7 @@ body:has(.wz-backdrop) .fab { display: none !important; }
   }
   /* dark card bg — switch to light-theme ink vars */
   .sattr-row .sattr-label { color: var(--ink-dim); }
-  .sattr-row .sattr-value { color: var(--brass-bright); }
+  .sattr-row .sattr-value { color: var(--num-accent); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35); }
   .sattr-fracs { margin-left: 0; }
 
   /* ── Bottom navigation fixa ── */

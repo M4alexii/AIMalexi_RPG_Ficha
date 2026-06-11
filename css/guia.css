@@ -263,7 +263,7 @@
   gap: 0.4rem;
 }
 .callout.warn .callout-title    { color: var(--warn); }
-.callout.danger .callout-title  { color: var(--blood); }
+.callout.danger .callout-title  { color: #d66a6a; } /* --blood é escuro demais p/ fundo escuro */
 .callout.success .callout-title { color: var(--ok); }
 .callout.tip .callout-title     { color: var(--mist); }
 .callout .callout-title         { color: var(--brass); }
@@ -701,7 +701,7 @@
 .section-time {
   display: inline-flex; align-items: center; gap: 0.3rem;
   font-family: var(--font-mono); font-size: 0.68rem;
-  color: var(--ink-faded); text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.06em;
   margin-left: 0.5rem; vertical-align: middle;
 }
 

@@ -5,6 +5,78 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-10 - Novos temas (claro/escuro), tema custom do jogador e SAN com cor de estado
+
+### Adicionado
+
+- **4 temas novos** (`css/theme.css`, paletas dessaturadas p/ sessões longas):
+  - **Dossiê** — arquivo de investigador (neutros quentes, verde-oliva,
+    dourado de alerta) — a estrutura recomendada do AIMalexi;
+  - **Lovecraft** — biblioteca antiga (bronze envelhecido, verde antigo);
+  - **Cosmic** — horror cósmico (verde eldritch, turquesa sombrio);
+  - **Arquivo** — **primeiro tema CLARO** (papel #F4EFD8, tinta #2A2522,
+    marrom/vermelho escuros) — documento investigativo p/ leitura de 4-6h.
+- **Tema personalizado do jogador** (`js/shared/theme-custom.js`): editor
+  visual (🎨 no seletor de temas) com 5 cores (fundo, cards, texto, texto
+  secundário, destaque) + 5 fontes, preview ao vivo, tons intermediários
+  derivados automaticamente (claro/escuro detectado por luminância).
+  Paleta salva como preferência do dispositivo; escolha do tema continua
+  em `character._meta.theme`.
+- **Barra de SAN com cor de estado** ("Sanidade em Colapso"): verde-sálvia
+  (normal) → âmbar (abalada) → vermelho (em colapso), dirigida pelo
+  `body[data-sanity]` que o sanity-fx já mantém.
+- Variáveis tema-conscientes `--title-ink`/`--num-ink`/`--num-accent`
+  substituem cores fixas de títulos e números (necessário p/ tema claro).
+- Varredura de contraste no tema claro: 0 elementos <3:1 nas 5 abas
+  (`--ink-faded` e botão de gasto ajustados).
+
+## 2026-06-10 - Efeitos de insanidade ativos por padrão + contraste no site inteiro + Notas no mobile
+
+### Corrigido
+
+- **Efeitos visuais de insanidade nunca disparavam**: `resolveInitialMode()`
+  em `js/shared/sanity-fx.js` retornava `"off"` por padrão (contradizendo a
+  documentação do módulo, que prometia COMPLETO). Agora o padrão é `full`
+  (auto-reduzido para `reduced` se o SO sinaliza `prefers-reduced-motion`);
+  quem já escolheu um modo em "🧠 Efeitos" mantém a preferência.
+  Validado: SAN 50→10 aplica `body[data-sanity="fraying"]` (vinheta, grão,
+  aberração cromática).
+- **Notas Avançadas inutilizáveis no celular**: o split-pane lista|editor era
+  um grid inline `280px 1fr` em `keeper.html` — numa tela de 375px o editor
+  ficava com ~60px (texto quebrando letra a letra). Movido para
+  `css/keeper.css` com breakpoint ≤900px que empilha lista (máx. 45vh) e
+  editor em coluna única.
+- **Contraste no site inteiro** (varredura automatizada em index, keeper,
+  compendium e guia): 7 textos com `--ink-faded`/`--blood` sobre fundo escuro
+  abaixo de 3:1 — `.sheet-title`/`.cs-hint`/`.cs-divider` (keeper),
+  `.arc-derived` (compêndio), `.callout.danger .callout-title` e
+  `.section-time` (guia). Todos elevados para `--ink-dim` ou tom claro.
+  Pós-fix: 0 elementos abaixo de 3:1 nas 4 páginas + 6 abas do investigador.
+
+## 2026-06-10 - Títulos e estatísticas derivadas legíveis + destaque nítido nos números
+
+### Corrigido
+
+- **Títulos de seção invisíveis em todas as abas** ("Identidade", "Perícias",
+  "Estatísticas Derivadas"…): `.app-shell .section-title` usava `--ink-doc`
+  (tinta de papel) sobre o fundo escuro de `.section` — contraste 1.3:1.
+  Agora `--candle-bright` com sombra de recorte nítida.
+- **Valores das Estatísticas Derivadas invisíveis** (aba Combate): PV/PM/SAN/
+  Movimento/Bônus de Dano/Corpo/Armadura em `.derived-card` usavam tinta de
+  documento sobre card escuro. Agora creme claro com sombra nítida.
+- **Botão "Editar Investigador" ilegível**: brass claro sobre parchment claro
+  (1.57:1). Agora tinta de documento, com hover âmbar translúcido.
+
+### Melhorado
+
+- **Destaque nítido em números e títulos**: text-shadows tipo "glow" difuso
+  (que davam aparência desfocada/apagada) substituídos por sombras de recorte
+  (`0 1px 2px`) e cores mais brilhantes (`--candle-bright`, `#f5ecd8`) em
+  atributos, vitais, estatísticas derivadas e títulos de seção.
+- Varredura automatizada de contraste (Puppeteer, 6 abas, 375px): 0 elementos
+  abaixo de 2.5:1 após as correções.
+- `CACHE_VERSION` v80 → v81.
+
 ## 2026-06-10 - Correção de visibilidade dos atributos no mobile + dark mode do SO
 
 ### Corrigido

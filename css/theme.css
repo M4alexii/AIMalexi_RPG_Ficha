@@ -81,6 +81,11 @@
   --accent:         var(--brass);
   --accent-glow:    var(--brass-glow);
 
+  /* === Tinta de destaque (números/títulos sobre cards) — temas claros invertem === */
+  --title-ink:      var(--candle-bright);   /* títulos de seção */
+  --num-ink:        #f5ecd8;                /* números neutros (PV/PM/SAN) */
+  --num-accent:     var(--candle-bright);   /* números dourados (atributos) */
+
   /* === Gradiente de fundo do body (override por tema) === */
   --body-grad-top:    rgba(74, 28, 28, 0.15);
   --body-grad-bottom: rgba(90, 122, 138, 0.08);
@@ -935,6 +940,125 @@ body[data-theme="eldritch"] {
   --body-grad-top:    rgba(50, 16, 80, 0.22);
   --body-grad-bottom: rgba(20, 8, 60, 0.12);
 }
+
+/* ── Dossiê · Estrutura AIMalexi · Arquivo de investigador ──
+   Paleta de leitura prolongada: neutros quentes, acentos dessaturados. */
+body[data-theme="dossie"] {
+  --bg-deep:          #1B1A17;
+  --bg-mid:           #211F1B;
+  --bg-card:          #26231F;
+  --bg-card-hi:       #2E2A25;
+  --bg-overlay:       rgba(27, 26, 23, 0.92);
+  --ink:              #E6E0D5;
+  --ink-dim:          #B7B0A4;
+  --ink-faded:        #3D3831;
+  --brass:            #556B2F;
+  --brass-bright:     #7A934B;
+  --brass-glow:       rgba(85, 107, 47, 0.45);
+  --ok:               #4F7A4F;
+  --err:              #8A3B3B;
+  --warn:             #C69C4D;
+  --crit:             #C69C4D;
+  --fail:             #8A3B3B;
+  --num-accent:       #C69C4D;
+  --title-ink:        #C69C4D;
+  --accent:           var(--brass);
+  --accent-glow:      var(--brass-glow);
+  --body-grad-top:    rgba(61, 56, 49, 0.20);
+  --body-grad-bottom: rgba(85, 107, 47, 0.06);
+}
+
+/* ── Lovecraft · Clássica Lovecraftiana · Biblioteca antiga ── */
+body[data-theme="lovecraft"] {
+  --bg-deep:          #1C1A17;
+  --bg-mid:           #232019;
+  --bg-card:          #2A2723;
+  --bg-card-hi:       #33302A;
+  --bg-overlay:       rgba(28, 26, 23, 0.92);
+  --ink:              #E8E1D4;
+  --ink-dim:          #B8B0A4;
+  --ink-faded:        #4d463c;
+  --brass:            #8B6F47;
+  --brass-bright:     #b09467;
+  --brass-glow:       rgba(139, 111, 71, 0.45);
+  --ok:               #556B2F;
+  --num-accent:       #b09467;
+  --title-ink:        #b09467;
+  --accent:           var(--brass);
+  --accent-glow:      var(--brass-glow);
+  --body-grad-top:    rgba(85, 107, 47, 0.10);
+  --body-grad-bottom: rgba(139, 111, 71, 0.08);
+}
+
+/* ── Cosmic · Horror Cósmico · Verde eldritch + turquesa sombrio ── */
+body[data-theme="cosmic"] {
+  --bg-deep:          #111315;
+  --bg-mid:           #16191c;
+  --bg-card:          #1B1F22;
+  --bg-card-hi:       #23282c;
+  --bg-overlay:       rgba(17, 19, 21, 0.92);
+  --ink:              #E6E6E6;
+  --ink-dim:          #9FA8A3;
+  --ink-faded:        #3a4540;
+  --brass:            #3F6B5A;
+  --brass-bright:     #5D8B84;
+  --brass-glow:       rgba(63, 107, 90, 0.45);
+  --eldritch:         #3F6B5A;
+  --eldritch-glow:    #5D8B84;
+  --num-accent:       #7fb0a8;
+  --title-ink:        #7fb0a8;
+  --accent:           var(--brass);
+  --accent-glow:      var(--brass-glow);
+  --body-grad-top:    rgba(63, 107, 90, 0.14);
+  --body-grad-bottom: rgba(93, 139, 132, 0.08);
+}
+
+/* ── Arquivo · Documento Investigativo · TEMA CLARO ──
+   Dossiê policial em papel: leitura prolongada (sessões de 4-6h). */
+body[data-theme="arquivo"] {
+  color-scheme: light;
+  --bg-deep:          #F4EFD8;
+  --bg-mid:           #EEE7CC;
+  --bg-card:          #E8DFC3;
+  --bg-card-hi:       #DFD4B2;
+  --bg-overlay:       rgba(244, 239, 216, 0.94);
+  --ink:              #2A2522;
+  --ink-dim:          #5C5044;
+  --ink-faded:        #80735a;
+  --spend-ink:        #7A2E2E;
+  --brass:            #5C4033;
+  --brass-bright:     #7A5642;
+  --brass-glow:       rgba(92, 64, 51, 0.35);
+  --blood:            #7A2E2E;
+  --err:              #7A2E2E;
+  --crit:             #7A5642;
+  --hard:             #6b5d4e;
+  --extreme:          #95543a;
+  --regular:          #5d6570;
+  --title-ink:        #5C4033;
+  --num-ink:          #2A2522;
+  --num-accent:       #5C4033;
+  --accent:           var(--brass);
+  --accent-glow:      var(--brass-glow);
+  --body-grad-top:    rgba(92, 64, 51, 0.06);
+  --body-grad-bottom: rgba(122, 46, 46, 0.04);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SANIDADE EM COLAPSO — cor da barra de SAN acompanha o estado mental
+   (body[data-sanity] já é mantido por js/shared/sanity-fx.js)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --san-state-ok:   #8F9E7A;   /* sanidade normal  */
+  --san-state-low:  #C28E3B;   /* sanidade baixa   */
+  --san-state-crit: #8C3030;   /* sanidade crítica */
+}
+body[data-sanity="lucid"]  .svital-san .svital-fill { background-color: var(--san-state-ok); }
+body[data-sanity="uneasy"] .svital-san .svital-fill { background-color: var(--san-state-ok); }
+body[data-sanity="shaken"] .svital-san .svital-fill { background-color: var(--san-state-low); }
+body[data-sanity="fraying"]  .svital-san .svital-fill { background-color: var(--san-state-crit); }
+body[data-sanity="breaking"] .svital-san .svital-fill { background-color: var(--san-state-crit); }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    PRINT (PDF export via window.print)
