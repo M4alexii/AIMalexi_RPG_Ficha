@@ -255,6 +255,15 @@ body::after {
 /* Controles lado a lado na mesma linha (ex.: cor de destaque + ✕) */
 .settings-inline { display: flex; align-items: center; gap: 0.5rem; }
 .settings-row > button { align-self: flex-start; }
+/* Separador de seção dentro do modal de configurações */
+.settings-section-title {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  color: var(--title-ink, var(--brass-bright));
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.25rem;
+  margin-top: 0.5rem;
+}
 
 /* Densidade compacta — reduz paddings/gaps globais */
 body.density-normal  { --gap-lg: 1.1rem; }
@@ -1648,3 +1657,67 @@ input:focus, select:focus, textarea:focus {
 }
 
 .md-wikilink { color: var(--mist); border-bottom: 1px dotted var(--mist); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   APARÊNCIA — FUNDO COM TEXTURA + OPACIDADE (spec item 8)
+   ───────────────────────────────────────────────────────────────────────────
+   body[data-bg-texture="none|papel|couro|madeira|nebulosa|arquivo"] (settings.js)
+   Intensidade: --bg-texture-opacity (0–0.35 — teto blinda contraste ≥3:1).
+   Tudo CSS/SVG inline (offline-first, zero assets externos). A camada vive em
+   .app::before (fixed, z-index:-1): acima do gradiente do body, abaixo de todo
+   o conteúdo — e nunca interfere em position:fixed (sem filter/transform).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+body[data-bg-texture]:not([data-bg-texture="none"]) .app::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: var(--bg-texture-opacity, 0.18);
+  mix-blend-mode: overlay;
+  transition: opacity 0.4s ease;
+}
+/* Temas claros: multiply preserva o "papel" sem acinzentar */
+body[data-theme="arquivo"][data-bg-texture] .app::before,
+body[data-theme="hospital"][data-bg-texture] .app::before { mix-blend-mode: multiply; }
+
+/* Papel envelhecido: grão fino fractal */
+body[data-bg-texture="papel"] .app::before {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='p'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.65 0 0 0 0 0.55 0 0 0 0 0.40 0 0 0 0.9 0'/></filter><rect width='100%25' height='100%25' filter='url(%23p)'/></svg>");
+}
+
+/* Couro envelhecido: turbulência grossa + vinheta */
+body[data-bg-texture="couro"] .app::before {
+  background-image:
+    radial-gradient(ellipse 120% 120% at 50% 50%, transparent 55%, rgba(30, 16, 8, 0.8) 100%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='c'><feTurbulence type='fractalNoise' baseFrequency='0.16' numOctaves='4' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.45 0 0 0 0 0.28 0 0 0 0 0.14 0 0 0 0.85 0'/></filter><rect width='100%25' height='100%25' filter='url(%23c)'/></svg>");
+}
+
+/* Madeira escura: veios verticais (turbulência esticada) + tábuas */
+body[data-bg-texture="madeira"] .app::before {
+  background-image:
+    repeating-linear-gradient(90deg, transparent 0 117px, rgba(0, 0, 0, 0.55) 117px 120px),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='w'><feTurbulence type='fractalNoise' baseFrequency='0.012 0.35' numOctaves='4' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.38 0 0 0 0 0.24 0 0 0 0 0.12 0 0 0 0.9 0'/></filter><rect width='100%25' height='100%25' filter='url(%23w)'/></svg>");
+}
+
+/* Nebulosa cósmica: véus radiais nas cores do tema */
+body[data-bg-texture="nebulosa"] .app::before {
+  background-image:
+    radial-gradient(ellipse 55% 40% at 22% 28%, var(--accent-glow) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 55% at 78% 64%, rgba(94, 60, 160, 0.35) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 45% at 55% 12%, rgba(40, 90, 110, 0.30) 0%, transparent 65%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='s'><feTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.9 0 0 0 0 0.9 0 0 0 0 1 0 0 0 0.22 0'/></filter><rect width='100%25' height='100%25' filter='url(%23s)'/></svg>");
+}
+
+/* Arquivo policial: pautas horizontais + grão leve de papel batido */
+body[data-bg-texture="arquivo"] .app::before {
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0 27px, rgba(110, 96, 70, 0.55) 27px 28px),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='a'><feTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.6 0 0 0 0 0.55 0 0 0 0 0.45 0 0 0 0.5 0'/></filter><rect width='100%25' height='100%25' filter='url(%23a)'/></svg>");
+}
+
+/* Impressão: sem textura */
+@media print {
+  body[data-bg-texture] .app::before { display: none !important; }
+}
