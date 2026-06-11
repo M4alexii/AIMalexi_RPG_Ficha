@@ -35,30 +35,28 @@
 | Histórico de SAN | Event-log registra perdas; falta UI narrativa ("−5 SAN · Ao ver o ritual") com motivo capturado no momento da perda |
 | Atalhos de veterano | Enter confirma em modais; falta duplo-clique = rolar, Ctrl+K global |
 
-### ⬜ A fazer (priorizado pelo proprietário)
+### ✅ Entregues em 2026-06-11 (PRs #41–#47 + branch coc-sheet-design)
 
-1. **Layout adaptativo (Modo Jogador / Investigador / Keeper)** — progressive disclosure:
-   - *Jogador* (padrão p/ iniciantes): atributos, top-10 perícias + "ver todas", botão grande
-     "Rolar Perícia" (Normal/Difícil/Extremo), cards dedicados SAN/PV/Sorte, equipamentos
-     simples, notas livres.
-   - *Investigador*: a ficha completa atual.
-   - *Keeper*: SAN recente, ferimentos, anotações, contatos, NPCs (já coberto em parte pelo keeper.html).
-2. **Busca global (Ctrl+K)** na ficha.
-3. **Histórico narrativo de SAN** — prompt opcional de motivo na perda; timeline no card de SAN
-   (`[Histórico] [Perdas] [Fobias]`).
-4. **Favoritos de perícias** + ordenação por uso.
+1. **Layout adaptativo (Modo Jogador / Investigador)** — PR #42.
+2. **Busca global (Ctrl+K)** — PR #43.
+3. **Histórico narrativo de SAN** — PR #44.
+4. **Favoritos de perícias** — PR #45 (ordenação por uso ainda pendente).
+6. **Modo de sessão (Investigação/Combate)** — PR #46.
+7. **Modo Imersão** — PR #47.
+8. **Fundo customizável com textura + opacidade** — ⚙️ → 🎨 Aparência (teto 0.35 de opacidade).
+9. **Estilo dos cards + bordas** — Arcano (padrão atual)/Moderno/Arquivo/Máquina;
+   bordas Vintage/Runas/Art Déco via border-image SVG.
+10. **Temas extras**: Noir, Hospital Psiquiátrico, Agência Federal.
+11. **Molduras de avatar** + token/silhueta (`_meta.avatarFrame/Shape`).
+12. **Sistema visual de anotações** (Caderno/Dossiê/Diário/Máquina).
+13. **Som ambiente visual** (`js/shared/ambient-fx.js`, off por padrão).
+
+### ⬜ A fazer
+
 5. **Cards reorganizáveis** (drag & drop da ordem das seções, persistido).
-6. **Modo de sessão (Investigação/Combate)** — reprioriza o que aparece primeiro:
-   combate → PV/Esquiva/Armas/Munição; investigação → Biblioteca/Psicologia/Ocultismo.
-7. **Modo Imersão** — interface limpa, menos números, mais descrição.
-8. **Fundo customizável com textura + opacidade** (papel/couro/madeira/nebulosa · 0–100%).
-9. **Estilo dos cards** (Moderno/Arquivo/Máquina de escrever/Arcano) + bordas
-   (Nenhuma/Simples/Vintage/Runas/Art Déco).
-10. **Temas extras**: Noir (P&B), Hospital Psiquiátrico (claro/verde), Agência Federal (cinza/azul).
-11. **Molduras de avatar** (Investigador/Ocultista/Militar/Acadêmico) + suporte a token/silhueta.
-12. **Sistema visual de anotações** (Caderno/Dossiê/Diário/Máquina de escrever).
-13. **Som ambiente visual** (chuva/névoa/poeira/VHS/filme antigo — sem áudio).
 14. **Perfil compartilhável** (link público da ficha — depende de decisão de backend/Supabase).
+- "Top 10 mais usadas" (ordenação de perícias por contagem de uso).
+- *Modo Keeper* como terceiro modo da ficha (hoje coberto pelo keeper.html).
 
 ## Diretrizes de implementação
 

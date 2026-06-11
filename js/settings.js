@@ -30,6 +30,9 @@ window.CoC = window.CoC || {};
     { id: 'sepia',      label: 'Sépia (Documento Histórico)' },
     { id: 'obsidian',   label: 'Obsidian (Escuro/Moderno)' },
     { id: 'eldritch',   label: 'Eldritch (Vazio Púrpura)' },
+    { id: 'noir',       label: 'Noir (Preto e Branco)' },
+    { id: 'hospital',   label: 'Hospital Psiquiátrico (Claro)' },
+    { id: 'agencia',    label: 'Agência Federal (Cinza/Azul)' },
   ];
 
   var DEFAULTS = {
@@ -42,7 +45,50 @@ window.CoC = window.CoC || {};
     reduceMotion: false,
     highContrast: false,
     rollEffects:  true,
+    // Aparência (camada temática — tudo via tokens, nunca quebra legibilidade)
+    bgTexture:    'none',      // none|papel|couro|madeira|nebulosa|arquivo
+    bgIntensity:  50,          // 0–100% (mapeado p/ opacidade real com teto 0.35)
+    cardStyle:    'arcano',    // arcano (visual atual)|moderno|arquivo|maquina
+    borderStyle:  'simples',   // nenhuma|simples|vintage|runas|artdeco
+    notesStyle:   'caderno',   // caderno|dossie|diario|maquina
+    ambient:      'none',      // none|rain|mist|dust|vhs|film
   };
+
+  var BG_TEXTURES = [
+    { id: 'none',     label: 'Nenhum (cor sólida)' },
+    { id: 'papel',    label: 'Papel envelhecido' },
+    { id: 'couro',    label: 'Couro envelhecido' },
+    { id: 'madeira',  label: 'Madeira escura' },
+    { id: 'nebulosa', label: 'Nebulosa cósmica' },
+    { id: 'arquivo',  label: 'Arquivo policial' },
+  ];
+  var CARD_STYLES = [
+    { id: 'arcano',  label: 'Arcano (cantoneiras de latão — padrão)' },
+    { id: 'moderno', label: 'Moderno (bordas suaves, sombra leve)' },
+    { id: 'arquivo', label: 'Arquivo (borda dupla, papel)' },
+    { id: 'maquina', label: 'Máquina de escrever (bordas retas)' },
+  ];
+  var BORDER_STYLES = [
+    { id: 'nenhuma', label: 'Nenhuma' },
+    { id: 'simples', label: 'Simples' },
+    { id: 'vintage', label: 'Vintage (filete duplo)' },
+    { id: 'runas',   label: 'Runas' },
+    { id: 'artdeco', label: 'Art Déco (anos 20)' },
+  ];
+  var NOTES_STYLES = [
+    { id: 'caderno', label: 'Caderno (pautas)' },
+    { id: 'dossie',  label: 'Dossiê (carimbo)' },
+    { id: 'diario',  label: 'Diário (manuscrito)' },
+    { id: 'maquina', label: 'Máquina de escrever' },
+  ];
+  var AMBIENTS = [
+    { id: 'none', label: 'Nenhum' },
+    { id: 'rain', label: 'Chuva' },
+    { id: 'mist', label: 'Névoa' },
+    { id: 'dust', label: 'Poeira' },
+    { id: 'vhs',  label: 'VHS' },
+    { id: 'film', label: 'Filme antigo' },
+  ];
 
   var _settings = null;
 
@@ -105,6 +151,22 @@ window.CoC = window.CoC || {};
     body.classList.toggle('reduce-motion',   !!s.reduceMotion);
     body.classList.toggle('no-roll-fx',      !s.rollEffects);
 
+    // Aparência: textura de fundo (teto de opacidade 0.35 blinda a legibilidade)
+    var tex = BG_TEXTURES.some(function (t2) { return t2.id === s.bgTexture; }) ? s.bgTexture : 'none';
+    body.dataset.bgTexture = tex;
+    var pct = Math.max(0, Math.min(100, Number(s.bgIntensity) || 0));
+    document.documentElement.style.setProperty('--bg-texture-opacity', (pct / 100 * 0.35).toFixed(3));
+
+    // Aparência: estilo dos cards, bordas e anotações
+    body.dataset.cardStyle   = CARD_STYLES.some(function (c2) { return c2.id === s.cardStyle; }) ? s.cardStyle : 'arcano';
+    body.dataset.borderStyle = BORDER_STYLES.some(function (b2) { return b2.id === s.borderStyle; }) ? s.borderStyle : 'simples';
+    body.dataset.notesStyle  = NOTES_STYLES.some(function (n2) { return n2.id === s.notesStyle; }) ? s.notesStyle : 'caderno';
+
+    // Aparência: ambiente visual (módulo presente só no investigador)
+    var amb = AMBIENTS.some(function (a2) { return a2.id === s.ambient; }) ? s.ambient : 'none';
+    if (window.CoC.ambientFx && window.CoC.ambientFx.set) window.CoC.ambientFx.set(amb);
+    else body.dataset.ambient = amb;
+
     // Idioma
     if (window.CoC.i18n) {
       window.CoC.i18n.setLang(s.language || 'pt');
@@ -131,8 +193,10 @@ window.CoC = window.CoC || {};
         }).join('') + '</select></div>' +
       // Cor de destaque
       '<div class="settings-row"><label>' + T('settings.accent') + '</label>' +
-        '<input type="color" id="set-accent" value="' + (s.accent || '#b8924f') + '" />' +
-        '<button type="button" id="set-accent-clear" class="btn-ghost btn-sm">✕</button></div>' +
+        '<div class="settings-inline">' +
+          '<input type="color" id="set-accent" value="' + (s.accent || '#b8924f') + '" />' +
+          '<button type="button" id="set-accent-clear" class="btn-ghost btn-sm" title="Voltar à cor do tema">✕</button>' +
+        '</div></div>' +
       // Idioma
       '<div class="settings-row"><label>' + T('settings.language') + '</label>' +
         '<select id="set-lang">' +
@@ -155,6 +219,30 @@ window.CoC = window.CoC || {};
           '<option value="normal"' + (s.density === 'normal' ? ' selected' : '') + '>Normal (desktop)</option>' +
           '<option value="compact"' + (s.density === 'compact' ? ' selected' : '') + '>' + T('settings.density.compact') + '</option>' +
         '</select></div>' +
+      // ── Aparência (camada temática) ──
+      '<div class="settings-section-title">🎨 Aparência</div>' +
+      '<div class="settings-row"><label>Textura de fundo</label>' +
+        '<select id="set-bgtex">' + BG_TEXTURES.map(function (t2) {
+          return '<option value="' + t2.id + '"' + (t2.id === s.bgTexture ? ' selected' : '') + '>' + t2.label + '</option>';
+        }).join('') + '</select></div>' +
+      '<div class="settings-row"><label>Intensidade da textura (<span id="set-bgint-val">' + (s.bgIntensity || 0) + '%</span>)</label>' +
+        '<input type="range" id="set-bgint" min="0" max="100" step="25" value="' + (s.bgIntensity || 0) + '" /></div>' +
+      '<div class="settings-row"><label>Estilo dos cards</label>' +
+        '<select id="set-cardstyle">' + CARD_STYLES.map(function (c2) {
+          return '<option value="' + c2.id + '"' + (c2.id === s.cardStyle ? ' selected' : '') + '>' + c2.label + '</option>';
+        }).join('') + '</select></div>' +
+      '<div class="settings-row"><label>Bordas dos cards</label>' +
+        '<select id="set-borderstyle">' + BORDER_STYLES.map(function (b2) {
+          return '<option value="' + b2.id + '"' + (b2.id === s.borderStyle ? ' selected' : '') + '>' + b2.label + '</option>';
+        }).join('') + '</select></div>' +
+      '<div class="settings-row"><label>Estilo das anotações</label>' +
+        '<select id="set-notesstyle">' + NOTES_STYLES.map(function (n2) {
+          return '<option value="' + n2.id + '"' + (n2.id === s.notesStyle ? ' selected' : '') + '>' + n2.label + '</option>';
+        }).join('') + '</select></div>' +
+      '<div class="settings-row"><label>Ambiente visual (sem áudio)</label>' +
+        '<select id="set-ambient">' + AMBIENTS.map(function (a2) {
+          return '<option value="' + a2.id + '"' + (a2.id === s.ambient ? ' selected' : '') + '>' + a2.label + '</option>';
+        }).join('') + '</select></div>' +
       // Toggles
       '<div class="settings-row toggle"><label><input type="checkbox" id="set-motion"' + (s.reduceMotion ? ' checked' : '') + ' /> ' + T('settings.reduceMotion') + '</label></div>' +
       '<div class="settings-row toggle"><label><input type="checkbox" id="set-contrast"' + (s.highContrast ? ' checked' : '') + ' /> ' + T('settings.highContrast') + '</label></div>' +
@@ -176,6 +264,15 @@ window.CoC = window.CoC || {};
     };
     $('set-density').onchange  = function () { set('density', this.value); };
     $('set-uimode').onchange   = function () { set('uiMode', this.value); };
+    $('set-bgtex').onchange    = function () { set('bgTexture', this.value); };
+    $('set-bgint').oninput     = function () {
+      set('bgIntensity', parseInt(this.value, 10) || 0);
+      var lbl = $('set-bgint-val'); if (lbl) lbl.textContent = this.value + '%';
+    };
+    $('set-cardstyle').onchange   = function () { set('cardStyle', this.value); };
+    $('set-borderstyle').onchange = function () { set('borderStyle', this.value); };
+    $('set-notesstyle').onchange  = function () { set('notesStyle', this.value); };
+    $('set-ambient').onchange     = function () { set('ambient', this.value); };
     $('set-motion').onchange   = function () { set('reduceMotion', this.checked); };
     $('set-contrast').onchange = function () { set('highContrast', this.checked); };
     $('set-rollfx').onchange   = function () { set('rollEffects', this.checked); };

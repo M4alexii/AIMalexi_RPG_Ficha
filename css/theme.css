@@ -252,6 +252,18 @@ body::after {
   width: 48px; height: 32px; padding: 0; border: 1px solid var(--ink-faded);
   border-radius: var(--radius); background: none; cursor: pointer; vertical-align: middle;
 }
+/* Controles lado a lado na mesma linha (ex.: cor de destaque + ✕) */
+.settings-inline { display: flex; align-items: center; gap: 0.5rem; }
+.settings-row > button { align-self: flex-start; }
+/* Separador de seção dentro do modal de configurações */
+.settings-section-title {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  color: var(--title-ink, var(--brass-bright));
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.25rem;
+  margin-top: 0.5rem;
+}
 
 /* Densidade compacta — reduz paddings/gaps globais */
 body.density-normal  { --gap-lg: 1.1rem; }
@@ -506,6 +518,20 @@ input:focus, select:focus, textarea:focus {
 input[type="number"] {
   font-family: var(--font-mono);
   text-align: center;
+}
+
+/* Checkbox/radio: o reset global de input (width:100% + padding) os deformava,
+   desalinhando a caixinha do texto do label. */
+input[type="checkbox"],
+input[type="radio"] {
+  width: 1rem;
+  height: 1rem;
+  padding: 0;
+  margin: 0;
+  flex: 0 0 auto;
+  accent-color: var(--accent, var(--brass));
+  vertical-align: middle;
+  cursor: pointer;
 }
 
 label {
@@ -1065,6 +1091,104 @@ body[data-theme="arquivo"] {
   --body-grad-bottom: rgba(122, 46, 46, 0.04);
 }
 
+/* ── Noir · Filme policial · Preto e branco ──
+   Quase monocromático: o único vermelho que sobra é o sangue. */
+body[data-theme="noir"] {
+  --bg-deep:          #0d0d0d;
+  --bg-mid:           #141414;
+  --bg-card:          #1a1a1a;
+  --bg-card-hi:       #232323;
+  --bg-overlay:       rgba(13, 13, 13, 0.92);
+  --ink:              #e8e8e8;
+  --ink-dim:          #a8a8a8;
+  --ink-faded:        #555555;
+  --line:             #383838;
+  --brass:            #9a9a9a;
+  --brass-bright:     #c4c4c4;
+  --brass-glow:       rgba(154, 154, 154, 0.35);
+  --on-accent:        #0d0d0d;
+  --candle:           #b8b8b8;
+  --candle-bright:    #d8d8d8;
+  --crit:             #d8d8d8;
+  --extreme:          #b8b8b8;
+  --hard:             #a8a8a8;
+  --regular:          #888888;
+  --fail:             #6e3a3a;
+  --ok:               #8a8a8a;
+  --warn:             #b8b8b8;
+  --err:              #8A3B3B;
+  --san-tone:         #9a9a9a;
+  --title-ink:        #d8d8d8;
+  --num-ink:          #f0f0f0;
+  --num-accent:       #d8d8d8;
+  --accent:           var(--brass);
+  --accent-glow:      var(--brass-glow);
+  --body-grad-top:    rgba(60, 60, 60, 0.18);
+  --body-grad-bottom: rgba(30, 30, 30, 0.10);
+}
+
+/* ── Hospital Psiquiátrico · TEMA CLARO · Branco-gelo + verde hospitalar ── */
+body[data-theme="hospital"] {
+  color-scheme: light;
+  --bg-deep:          #F2F5F1;
+  --bg-mid:           #EAEFE8;
+  --bg-card:          #E2E9E0;
+  --bg-card-hi:       #D6E0D3;
+  --bg-overlay:       rgba(242, 245, 241, 0.94);
+  --ink:              #25302A;
+  --ink-dim:          #4E5F55;
+  --ink-faded:        #7E8F84;
+  --line:             #BECABF;
+  --brass:            #3F6E58;
+  --brass-bright:     #54866E;
+  --brass-glow:       rgba(63, 110, 88, 0.30);
+  --blood:            #8C3030;
+  --err:              #8C3030;
+  --fail:             #8C3030;
+  --crit:             #2F5D47;
+  --extreme:          #6e5a32;
+  --hard:             #4E5F55;
+  --regular:          #5d6570;
+  --ok:               #3F6E58;
+  --warn:             #9a7a30;
+  --title-ink:        #3F6E58;
+  --num-ink:          #25302A;
+  --num-accent:       #2F5D47;
+  --parchment:        #E9EFE7;
+  --parchment-dim:    #C2CFC3;
+  --ink-doc:          #25302A;
+  --ink-doc-faded:    #5E6F65;
+  --accent:           var(--brass);
+  --accent-glow:      var(--brass-glow);
+  --body-grad-top:    rgba(63, 110, 88, 0.05);
+  --body-grad-bottom: rgba(63, 110, 88, 0.03);
+}
+
+/* ── Agência Federal · Dossiê confidencial · Cinza + azul-aço ── */
+body[data-theme="agencia"] {
+  --bg-deep:          #101418;
+  --bg-mid:           #161B21;
+  --bg-card:          #1A2026;
+  --bg-card-hi:       #232B33;
+  --bg-overlay:       rgba(16, 20, 24, 0.92);
+  --ink:              #D6DCE2;
+  --ink-dim:          #94A0AC;
+  --ink-faded:        #4E5A66;
+  --line:             #303A44;
+  --brass:            #4A6B8A;
+  --brass-bright:     #6E92B2;
+  --brass-glow:       rgba(74, 107, 138, 0.40);
+  --candle:           #A8915C;
+  --candle-bright:    #C4AE78;
+  --san-tone:         #6A8294;
+  --title-ink:        #8FA8BE;
+  --num-accent:       #8FA8BE;
+  --accent:           var(--brass);
+  --accent-glow:      var(--brass-glow);
+  --body-grad-top:    rgba(40, 60, 84, 0.18);
+  --body-grad-bottom: rgba(20, 34, 48, 0.10);
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    SANIDADE EM COLAPSO — cor da barra de SAN acompanha o estado mental
    (body[data-sanity] já é mantido por js/shared/sanity-fx.js)
@@ -1158,9 +1282,11 @@ body[data-sanity="breaking"] .svital-san .svital-fill { background-color: var(--
    PRINCÍPIOS DE ENGENHARIA:
    - Legibilidade preservada: o blur/distorção vivem num OVERLAY (#sanity-fx,
      irmão de .app) mascarado para a PERIFERIA — o centro de leitura fica nítido.
-     A graduação de cor vai no .app (não no <body>, que quebraria position:fixed
-     de modais/toasts). Modais e toasts ficam ACIMA do overlay (z-index 100/200)
-     e portanto permanecem 100% legíveis.
+     A graduação de cor vai na camada .sfx-tone via backdrop-filter — NUNCA como
+     filter em .app/<body>, pois ambos contêm position:fixed (.mobile-tabs,
+     .toolbar-actions) e filter no ancestral quebra fixed (abas somem).
+     O tremor vai em .app-shell (sem descendentes fixed). Modais e toasts ficam
+     ACIMA do overlay (z-index 100/200) e portanto permanecem 100% legíveis.
    - GPU: animações usam apenas transform/opacity. backdrop-filter é restrito aos
      níveis altos e desligado em "reduced"/reduced-motion.
    - Sem reflow: todas as camadas são fixed/absolute, pointer-events:none.
@@ -1220,8 +1346,17 @@ body[data-sanity="breaking"] .svital-san .svital-fill { background-color: var(--
   background: radial-gradient(ellipse 120% 120% at 50% 50%, rgba(0,0,0,0) 40%, rgba(20, 2, 2, 0.5) 100%);
 }
 
-/* ── Graduação de cor + tremor no conteúdo (.app), não no <body> ── */
-.app { transition: filter 1.2s ease-out; }
+/* Camada: graduação de cor (dessaturação/contraste) via backdrop-filter.
+   NUNCA aplicar filter/transform em .app ou <body>: ambos contêm elementos
+   position:fixed (.mobile-tabs, .toolbar-actions, .sheet-backdrop) e um filtro
+   no ancestral vira containing block — a barra de abas "some" da viewport. */
+#sanity-fx .sfx-tone {
+  opacity: 1;
+  transition: backdrop-filter 1.2s ease-out, -webkit-backdrop-filter 1.2s ease-out;
+}
+
+/* ── Tremor no miolo da ficha (.app-shell), que não contém position:fixed ── */
+.app-shell { transition: transform 1.2s ease-out; }
 
 /* ─────────────────── NÍVEIS (valores de data-sanity) ─────────────────── */
 /* Backward compat: code still uses 0-4; CSS rules support both numeric and named */
@@ -1231,14 +1366,14 @@ body[data-sanity="0"],
 body[data-sanity="lucid"] { /* sem regras — é o padrão */ }
 
 /* Nível 1 (uneasy) — 60-79%: leve escurecimento + vinheta sutil + respiração lenta */
-body[data-sanity="1"],
-body[data-sanity="uneasy"] .app { filter: saturate(0.86) contrast(1.03); }
+body[data-sanity="1"] #sanity-fx .sfx-tone,
+body[data-sanity="uneasy"] #sanity-fx .sfx-tone { backdrop-filter: saturate(0.86) contrast(1.03); -webkit-backdrop-filter: saturate(0.86) contrast(1.03); }
 body[data-sanity="1"] #sanity-fx .sfx-vignette,
 body[data-sanity="uneasy"] #sanity-fx .sfx-vignette { --b: 0.45; opacity: var(--b); animation: sfx-breathe 9s ease-in-out infinite; }
 
 /* Nível 2 (shaken) — 40-59%: blur periférico + aberração cromática + ruído + distorção leve */
-body[data-sanity="2"],
-body[data-sanity="shaken"] .app { filter: saturate(0.7) contrast(1.06) brightness(0.97); }
+body[data-sanity="2"] #sanity-fx .sfx-tone,
+body[data-sanity="shaken"] #sanity-fx .sfx-tone { backdrop-filter: saturate(0.7) contrast(1.06) brightness(0.97); -webkit-backdrop-filter: saturate(0.7) contrast(1.06) brightness(0.97); }
 body[data-sanity="2"] #sanity-fx .sfx-vignette,
 body[data-sanity="shaken"] #sanity-fx .sfx-vignette { --b: 0.70; opacity: var(--b); animation: sfx-breathe 7s ease-in-out infinite; }
 body[data-sanity="2"] #sanity-fx .sfx-grain,
@@ -1247,12 +1382,12 @@ body[data-sanity="2"] #sanity-fx .sfx-chroma,
 body[data-sanity="shaken"] #sanity-fx .sfx-chroma { opacity: 0.6; }
 body[data-sanity="2"] #sanity-fx .sfx-blur,
 body[data-sanity="shaken"] #sanity-fx .sfx-blur { backdrop-filter: blur(1.5px); -webkit-backdrop-filter: blur(1.5px); }
-body[data-sanity="2"] .app,
-body[data-sanity="shaken"] .app { animation: sfx-shake-soft 9s ease-in-out infinite; }
+body[data-sanity="2"] .app-shell,
+body[data-sanity="shaken"] .app-shell { animation: sfx-shake-soft 9s ease-in-out infinite; }
 
 /* Nível 3 (fraying) — 20-39%: shake agressivo + respiração + vinheta pesada + flicker */
-body[data-sanity="3"],
-body[data-sanity="fraying"] .app { filter: saturate(0.55) contrast(1.1) brightness(0.93) hue-rotate(-6deg); }
+body[data-sanity="3"] #sanity-fx .sfx-tone,
+body[data-sanity="fraying"] #sanity-fx .sfx-tone { backdrop-filter: saturate(0.55) contrast(1.1) brightness(0.93) hue-rotate(-6deg); -webkit-backdrop-filter: saturate(0.55) contrast(1.1) brightness(0.93) hue-rotate(-6deg); }
 body[data-sanity="3"] #sanity-fx .sfx-vignette,
 body[data-sanity="fraying"] #sanity-fx .sfx-vignette { --b: 0.90; opacity: var(--b); animation: sfx-breathe 5s ease-in-out infinite; }
 body[data-sanity="3"] #sanity-fx .sfx-grain,
@@ -1263,12 +1398,12 @@ body[data-sanity="3"] #sanity-fx .sfx-blur,
 body[data-sanity="fraying"] #sanity-fx .sfx-blur { backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
 body[data-sanity="3"] #sanity-fx .sfx-flicker,
 body[data-sanity="fraying"] #sanity-fx .sfx-flicker { opacity: 0.6; animation: sfx-flicker 6.3s steps(1) infinite; }
-body[data-sanity="3"] .app,
-body[data-sanity="fraying"] .app { animation: sfx-shake 3.7s ease-in-out infinite; }
+body[data-sanity="3"] .app-shell,
+body[data-sanity="fraying"] .app-shell { animation: sfx-shake 3.7s ease-in-out infinite; }
 
 /* Nível 4 (breaking) — <20%: colapso visual, animações instáveis, lampejos imprevisíveis */
-body[data-sanity="4"],
-body[data-sanity="breaking"] .app { filter: saturate(0.4) contrast(1.18) brightness(0.9) hue-rotate(-10deg); }
+body[data-sanity="4"] #sanity-fx .sfx-tone,
+body[data-sanity="breaking"] #sanity-fx .sfx-tone { backdrop-filter: saturate(0.4) contrast(1.18) brightness(0.9) hue-rotate(-10deg); -webkit-backdrop-filter: saturate(0.4) contrast(1.18) brightness(0.9) hue-rotate(-10deg); }
 body[data-sanity="4"] #sanity-fx .sfx-vignette,
 body[data-sanity="breaking"] #sanity-fx .sfx-vignette { --b: 1; opacity: var(--b); animation: sfx-breathe-erratic 3.3s ease-in-out infinite; }
 body[data-sanity="4"] #sanity-fx .sfx-grain,
@@ -1279,8 +1414,8 @@ body[data-sanity="4"] #sanity-fx .sfx-blur,
 body[data-sanity="breaking"] #sanity-fx .sfx-blur { backdrop-filter: blur(4.5px); -webkit-backdrop-filter: blur(4.5px); }
 body[data-sanity="4"] #sanity-fx .sfx-flicker,
 body[data-sanity="breaking"] #sanity-fx .sfx-flicker { opacity: 0.85; animation: sfx-flicker-erratic 4.9s steps(1) infinite; }
-body[data-sanity="4"] .app,
-body[data-sanity="breaking"] .app { animation: sfx-shake-hard 2.9s ease-in-out infinite; }
+body[data-sanity="4"] .app-shell,
+body[data-sanity="breaking"] .app-shell { animation: sfx-shake-hard 2.9s ease-in-out infinite; }
 
 /* ─────────────────── KEYFRAMES (transform/opacity = GPU) ─────────────────── */
 @keyframes sfx-breathe {
@@ -1346,11 +1481,11 @@ body[data-sanity-fx="reduced"] #sanity-fx .sfx-blur {
   -webkit-backdrop-filter: none !important;
 }
 body[data-sanity-fx="reduced"] #sanity-fx .sfx-vignette { animation: none !important; }
-body[data-sanity-fx="reduced"] .app { animation: none !important; }
+body[data-sanity-fx="reduced"] .app-shell { animation: none !important; }
 
 /* ─── MODO OFF: desliga tudo ─── */
 body[data-sanity-fx="off"] #sanity-fx { display: none !important; }
-body[data-sanity-fx="off"] .app { filter: none !important; animation: none !important; }
+body[data-sanity-fx="off"] .app-shell { animation: none !important; }
 
 /* ─── prefers-reduced-motion: corta movimento mesmo no modo COMPLETO ─── */
 @media (prefers-reduced-motion: reduce) {
@@ -1358,14 +1493,14 @@ body[data-sanity-fx="off"] .app { filter: none !important; animation: none !impo
   #sanity-fx .sfx-grain,
   #sanity-fx .sfx-chroma,
   #sanity-fx .sfx-flicker,
-  .app { animation: none !important; }
+  .app-shell { animation: none !important; }
   #sanity-fx .sfx-flicker { opacity: 0 !important; }
 }
 
 /* ─── Impressão: sem efeitos ─── */
 @media print {
   #sanity-fx { display: none !important; }
-  .app { filter: none !important; animation: none !important; }
+  .app-shell { animation: none !important; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1522,3 +1657,386 @@ input:focus, select:focus, textarea:focus {
 }
 
 .md-wikilink { color: var(--mist); border-bottom: 1px dotted var(--mist); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   APARÊNCIA — FUNDO COM TEXTURA + OPACIDADE (spec item 8)
+   ───────────────────────────────────────────────────────────────────────────
+   body[data-bg-texture="none|papel|couro|madeira|nebulosa|arquivo"] (settings.js)
+   Intensidade: --bg-texture-opacity (0–0.35 — teto blinda contraste ≥3:1).
+   Tudo CSS/SVG inline (offline-first, zero assets externos). A camada vive em
+   .app::before (fixed, z-index:-1): acima do gradiente do body, abaixo de todo
+   o conteúdo — e nunca interfere em position:fixed (sem filter/transform).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+body[data-bg-texture]:not([data-bg-texture="none"]) .app::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: var(--bg-texture-opacity, 0.18);
+  mix-blend-mode: overlay;
+  transition: opacity 0.4s ease;
+}
+/* Temas claros: multiply preserva o "papel" sem acinzentar */
+body[data-theme="arquivo"][data-bg-texture] .app::before,
+body[data-theme="hospital"][data-bg-texture] .app::before { mix-blend-mode: multiply; }
+
+/* Papel envelhecido: grão fino fractal */
+body[data-bg-texture="papel"] .app::before {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='p'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.65 0 0 0 0 0.55 0 0 0 0 0.40 0 0 0 0.9 0'/></filter><rect width='100%25' height='100%25' filter='url(%23p)'/></svg>");
+}
+
+/* Couro envelhecido: turbulência grossa + vinheta */
+body[data-bg-texture="couro"] .app::before {
+  background-image:
+    radial-gradient(ellipse 120% 120% at 50% 50%, transparent 55%, rgba(30, 16, 8, 0.8) 100%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='c'><feTurbulence type='fractalNoise' baseFrequency='0.16' numOctaves='4' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.45 0 0 0 0 0.28 0 0 0 0 0.14 0 0 0 0.85 0'/></filter><rect width='100%25' height='100%25' filter='url(%23c)'/></svg>");
+}
+
+/* Madeira escura: veios verticais (turbulência esticada) + tábuas */
+body[data-bg-texture="madeira"] .app::before {
+  background-image:
+    repeating-linear-gradient(90deg, transparent 0 117px, rgba(0, 0, 0, 0.55) 117px 120px),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='w'><feTurbulence type='fractalNoise' baseFrequency='0.012 0.35' numOctaves='4' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.38 0 0 0 0 0.24 0 0 0 0 0.12 0 0 0 0.9 0'/></filter><rect width='100%25' height='100%25' filter='url(%23w)'/></svg>");
+}
+
+/* Nebulosa cósmica: véus radiais nas cores do tema */
+body[data-bg-texture="nebulosa"] .app::before {
+  background-image:
+    radial-gradient(ellipse 55% 40% at 22% 28%, var(--accent-glow) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 55% at 78% 64%, rgba(94, 60, 160, 0.35) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 45% at 55% 12%, rgba(40, 90, 110, 0.30) 0%, transparent 65%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='s'><feTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.9 0 0 0 0 0.9 0 0 0 0 1 0 0 0 0.22 0'/></filter><rect width='100%25' height='100%25' filter='url(%23s)'/></svg>");
+}
+
+/* Arquivo policial: pautas horizontais + grão leve de papel batido */
+body[data-bg-texture="arquivo"] .app::before {
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0 27px, rgba(110, 96, 70, 0.55) 27px 28px),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='a'><feTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.6 0 0 0 0 0.55 0 0 0 0 0.45 0 0 0 0.5 0'/></filter><rect width='100%25' height='100%25' filter='url(%23a)'/></svg>");
+}
+
+/* Impressão: sem textura */
+@media print {
+  body[data-bg-texture] .app::before { display: none !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   APARÊNCIA — ESTILO DOS CARDS + BORDAS (spec item 9)
+   ───────────────────────────────────────────────────────────────────────────
+   body[data-card-style="arcano|moderno|arquivo|maquina"] ·
+   body[data-border-style="nenhuma|simples|vintage|runas|artdeco"] (settings.js)
+   "arcano" e "simples" são o visual atual (baseline — sem regras): zero
+   regressão para quem nunca abriu a Central de Configurações.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Moderno: bordas suaves, sombra leve, sem cantoneiras */
+body[data-card-style="moderno"] .section {
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--bg-card);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+}
+body[data-card-style="moderno"] .section::before,
+body[data-card-style="moderno"] .section::after { display: none; }
+
+/* Arquivo: borda dupla de dossiê, papel */
+body[data-card-style="arquivo"] .section {
+  border-radius: var(--radius);
+  border: 3px double var(--ink-faded);
+  background: var(--parchment);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+body[data-card-style="arquivo"] .section::before,
+body[data-card-style="arquivo"] .section::after { display: none; }
+
+/* Máquina de escrever: bordas retas, traço seco, títulos datilografados */
+body[data-card-style="maquina"] .section {
+  border-radius: 0;
+  border: 1px solid var(--ink-dim);
+  background: var(--bg-card);
+  box-shadow: none;
+}
+body[data-card-style="maquina"] .section::before,
+body[data-card-style="maquina"] .section::after { display: none; }
+body[data-card-style="maquina"] .section-title,
+body[data-card-style="maquina"] .section > h2,
+body[data-card-style="maquina"] .section > h3 {
+  font-family: var(--font-typewriter);
+  letter-spacing: 0.04em;
+}
+
+/* ── Bordas decorativas (independentes do estilo do card) ── */
+
+body[data-border-style="nenhuma"] .section { border-color: transparent; }
+body[data-border-style="nenhuma"] .section::before,
+body[data-border-style="nenhuma"] .section::after { display: none; }
+
+/* Vintage: filete duplo clássico */
+body[data-border-style="vintage"] .section {
+  border-width: 4px;
+  border-style: double;
+  border-color: var(--frame-line, var(--line));
+}
+
+/* Runas: glifos discretos correndo na moldura (SVG inline, tom neutro de latão) */
+body[data-border-style="runas"] .section {
+  border-width: 7px;
+  border-style: solid;
+  border-color: var(--frame-dim, var(--line));      /* fallback sem border-image */
+  border-image-source: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48'><g stroke='rgba(168,140,92,0.65)' stroke-width='1.3' fill='none'><path d='M8 2 l4 4 -4 4 M8 2 v8'/><path d='M24 2 v8 M20 4 l8 4 M28 4 l-8 4'/><path d='M40 2 l-4 8 M36 2 l4 8'/><path d='M2 8 l4 4 -4 4 M2 8 v8' transform='rotate(90 8 24) translate(0 -16)'/><path d='M8 38 l4 4 -4 4 M8 38 v8'/><path d='M24 38 v8 M20 40 l8 4 M28 40 l-8 4'/><path d='M40 38 l-4 8 M36 38 l4 8'/></g></svg>");
+  border-image-slice: 11;
+  border-image-repeat: round;
+}
+
+/* Art Déco: chevrons geométricos anos 20 */
+body[data-border-style="artdeco"] .section {
+  border-width: 6px;
+  border-style: solid;
+  border-color: var(--frame-line, var(--line));     /* fallback sem border-image */
+  border-image-source: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><g stroke='rgba(184,146,79,0.7)' stroke-width='1.4' fill='none'><path d='M0 6 L6 0 M4 10 L10 4 M30 0 L40 10 M30 10 L36 4'/><path d='M0 34 L6 40 M4 30 L10 36 M30 40 L40 30 M30 30 L36 36'/><path d='M14 0 l6 5 6 -5 M14 40 l6 -5 6 5 M0 14 l5 6 -5 6 M40 14 l-5 6 5 6'/></g></svg>");
+  border-image-slice: 12;
+  border-image-repeat: round;
+}
+body[data-border-style="runas"] .section::before,
+body[data-border-style="runas"] .section::after,
+body[data-border-style="artdeco"] .section::before,
+body[data-border-style="artdeco"] .section::after { display: none; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   APARÊNCIA — SISTEMA VISUAL DE ANOTAÇÕES (spec item 12)
+   ───────────────────────────────────────────────────────────────────────────
+   body[data-notes-style="caderno|dossie|diario|maquina"] (settings.js).
+   Pele puramente visual do Diário de Campanha e das entradas — nenhum dado
+   muda. "caderno" é o baseline (visual atual, sem regras).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Dossiê: papel de arquivo + carimbo datilografado no título da seção */
+body[data-notes-style="dossie"] .section[data-tab="diario"] {
+  background: var(--parchment);
+}
+body[data-notes-style="dossie"] .section[data-tab="diario"] .section-title {
+  font-family: var(--font-typewriter);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+body[data-notes-style="dossie"] .journal-entry {
+  background: var(--bg-card);
+  border-left: 3px solid var(--candle, var(--accent));
+}
+
+/* Diário: manuscrito (Caveat) sobre fundo levemente sépia */
+body[data-notes-style="diario"] .journal-entry-title,
+body[data-notes-style="diario"] .journal-entry-excerpt,
+body[data-notes-style="diario"] .section[data-tab="diario"] textarea {
+  font-family: var(--font-marginalia);
+  font-size: 1.15em;
+  line-height: 1.5;
+}
+body[data-notes-style="diario"] .section[data-tab="diario"] {
+  background:
+    linear-gradient(180deg, rgba(120, 90, 40, 0.06), rgba(120, 90, 40, 0.03)),
+    var(--bg-card);
+}
+
+/* Máquina de escrever: monoespaçada datilografada, espaçamento maior */
+body[data-notes-style="maquina"] .journal-entry-title,
+body[data-notes-style="maquina"] .journal-entry-excerpt,
+body[data-notes-style="maquina"] .section[data-tab="diario"] textarea {
+  font-family: var(--font-typewriter);
+  line-height: 1.65;
+}
+body[data-notes-style="maquina"] .journal-entry { border-radius: 0; }
+
+/* Caderno (baseline) ganha pautas sutis apenas na área de escrita */
+body[data-notes-style="caderno"] .section[data-tab="diario"] textarea {
+  background-image: repeating-linear-gradient(0deg, transparent 0 1.55em, var(--line) 1.55em calc(1.55em + 1px));
+  line-height: 1.55;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   APARÊNCIA — MOLDURAS DE AVATAR (spec item 11)
+   ───────────────────────────────────────────────────────────────────────────
+   Classes aplicadas em #portrait-main por js/views/identity.js a partir de
+   character._meta.avatarFrame / avatarShape (por personagem, normalizado em
+   schema.js). O retrato é background-image no próprio slot.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.character-portrait.frame-investigador {
+  border: 3px double var(--brass) !important;
+  box-shadow: inset 0 0 0 2px var(--bg-deep), 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+.character-portrait.frame-ocultista {
+  border: 2px solid #7B5EA7 !important;
+  box-shadow:
+    0 0 0 1px rgba(123, 94, 167, 0.35),
+    0 0 18px rgba(123, 94, 167, 0.45),
+    inset 0 0 24px rgba(123, 94, 167, 0.25);
+}
+
+.character-portrait.frame-militar {
+  border: 2px solid #6e7a84 !important;
+  border-radius: 0 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(220, 230, 240, 0.25),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    0 2px 8px rgba(0, 0, 0, 0.4);
+  background-color: #2a3036;
+}
+
+.character-portrait.frame-academico {
+  border: 6px ridge var(--candle, #C69C4D) !important;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.45), 0 3px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Formas: token redondo e silhueta */
+.character-portrait.shape-token {
+  border-radius: 50% !important;
+  aspect-ratio: 1 / 1 !important;
+  background-size: cover;
+  background-position: center top;
+}
+.character-portrait.shape-silhueta.has-image {
+  filter: grayscale(1) contrast(1.25) brightness(0.22);
+  background-color: var(--bg-card-hi);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   APARÊNCIA — SOM AMBIENTE VISUAL (spec item 13) — sem áudio
+   ───────────────────────────────────────────────────────────────────────────
+   body[data-ambient="none|rain|mist|dust|vhs|film"] (settings.js) ·
+   overlay #ambient-fx injetado por js/shared/ambient-fx.js.
+   z-index 35: acima do conteúdo, ABAIXO de #sanity-fx (40) — a insanidade
+   prevalece. pointer-events:none; opacidades sutis (nunca atrapalham leitura).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+#ambient-fx {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  pointer-events: none;
+  overflow: hidden;
+}
+#ambient-fx > div {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.2s ease-out;
+}
+
+/* ── Chuva: duas camadas de riscos diagonais em velocidades diferentes ── */
+body[data-ambient="rain"] #ambient-fx .amb-a {
+  opacity: 0.10;
+  background: repeating-linear-gradient(78deg, transparent 0 7px, rgba(180, 200, 220, 0.55) 7px 8px, transparent 8px 14px);
+  background-size: 200% 200%;
+  animation: amb-rain-a 0.7s linear infinite;
+}
+body[data-ambient="rain"] #ambient-fx .amb-b {
+  opacity: 0.07;
+  background: repeating-linear-gradient(75deg, transparent 0 12px, rgba(160, 185, 210, 0.45) 12px 13px, transparent 13px 24px);
+  background-size: 200% 200%;
+  animation: amb-rain-b 1.15s linear infinite;
+}
+@keyframes amb-rain-a { from { background-position: 0 0; } to { background-position: -18% 100%; } }
+@keyframes amb-rain-b { from { background-position: 0 0; } to { background-position: -12% 100%; } }
+
+/* ── Névoa: véus radiais à deriva ── */
+body[data-ambient="mist"] #ambient-fx .amb-a {
+  opacity: 0.14;
+  inset: -40%;
+  background:
+    radial-gradient(ellipse 45% 30% at 25% 60%, rgba(190, 200, 205, 0.5) 0%, transparent 70%),
+    radial-gradient(ellipse 55% 35% at 75% 30%, rgba(170, 185, 195, 0.4) 0%, transparent 70%);
+  animation: amb-drift 38s ease-in-out infinite;
+}
+body[data-ambient="mist"] #ambient-fx .amb-b {
+  opacity: 0.10;
+  inset: -40%;
+  background: radial-gradient(ellipse 60% 40% at 50% 80%, rgba(200, 210, 215, 0.45) 0%, transparent 72%);
+  animation: amb-drift 55s ease-in-out infinite reverse;
+}
+@keyframes amb-drift {
+  0%, 100% { transform: translate(0, 0); }
+  33%      { transform: translate(3%, -2%); }
+  66%      { transform: translate(-2%, 2%); }
+}
+
+/* ── Poeira: grão esparso flutuando ── */
+body[data-ambient="dust"] #ambient-fx .amb-a {
+  opacity: 0.12;
+  inset: -20%;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='d'><feTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.8 0 0 0 0 0.74 0 0 0 0 0.6 0 0 0 0.35 0'/></filter><rect width='100%25' height='100%25' filter='url(%23d)'/></svg>");
+  animation: amb-drift 26s ease-in-out infinite;
+}
+body[data-ambient="dust"] #ambient-fx .amb-b {
+  opacity: 0.10;
+  background-image: radial-gradient(rgba(220, 205, 170, 0.8) 1px, transparent 1.6px);
+  background-size: 90px 110px;
+  animation: amb-dust-fall 18s linear infinite;
+}
+@keyframes amb-dust-fall { from { background-position: 0 -110px; } to { background-position: 30px 110px; } }
+
+/* ── VHS: scanlines + franja cromática ── */
+body[data-ambient="vhs"] #ambient-fx .amb-a {
+  opacity: 0.16;
+  background: repeating-linear-gradient(0deg, transparent 0 2px, rgba(0, 0, 0, 0.55) 2px 3px);
+}
+body[data-ambient="vhs"] #ambient-fx .amb-b {
+  opacity: 0.08;
+  background:
+    linear-gradient(90deg, rgba(255, 50, 50, 0.35) 0%, transparent 4%),
+    linear-gradient(270deg, rgba(50, 180, 255, 0.35) 0%, transparent 4%);
+  animation: amb-vhs-jitter 6s steps(1) infinite;
+}
+body[data-ambient="vhs"] #ambient-fx .amb-c {
+  opacity: 0.10;
+  background: linear-gradient(0deg, transparent 49.4%, rgba(235, 235, 235, 0.5) 49.7%, transparent 50%);
+  background-size: 100% 220px;
+  animation: amb-vhs-roll 9s linear infinite;
+}
+@keyframes amb-vhs-jitter {
+  0%, 88%, 100% { transform: translateX(0); }
+  89% { transform: translateX(2px); }
+  92% { transform: translateX(-1.5px); }
+  95% { transform: translateX(1px); }
+}
+@keyframes amb-vhs-roll { from { background-position: 0 -220px; } to { background-position: 0 100vh; } }
+
+/* ── Filme antigo: grão + vinheta + flicker ── */
+body[data-ambient="film"] #ambient-fx .amb-a {
+  opacity: 0.14;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='f'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.85 0 0 0 0 0.85 0 0 0 0 0.8 0 0 0 0.5 0'/></filter><rect width='100%25' height='100%25' filter='url(%23f)'/></svg>");
+  animation: amb-grain 0.45s steps(3) infinite;
+}
+body[data-ambient="film"] #ambient-fx .amb-b {
+  opacity: 0.35;
+  background: radial-gradient(ellipse 115% 115% at 50% 50%, transparent 58%, rgba(10, 8, 6, 0.6) 100%);
+}
+body[data-ambient="film"] #ambient-fx .amb-c {
+  opacity: 0.05;
+  background: rgba(255, 244, 220, 0.5);
+  animation: amb-film-flicker 3.1s steps(1) infinite;
+}
+@keyframes amb-grain {
+  0%   { transform: translate(0, 0); }
+  33%  { transform: translate(-2%, 1.5%); }
+  66%  { transform: translate(1.5%, -2%); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes amb-film-flicker {
+  0%, 76%, 100% { opacity: 0.05; }
+  78% { opacity: 0.10; }
+  81% { opacity: 0.03; }
+  84% { opacity: 0.08; }
+}
+
+/* ── Acessibilidade: congela movimento; impressão: some ── */
+body.reduce-motion #ambient-fx > div { animation: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  #ambient-fx > div { animation: none !important; }
+}
+@media print {
+  #ambient-fx { display: none !important; }
+}

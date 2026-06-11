@@ -297,7 +297,12 @@ window.CoC.campaign = window.CoC.campaign || {};
       // embutido, para o replay no reload reconstruir a timeline sem o vivo.
       var sync = window.CoC.campaign && window.CoC.campaign.sync;
       if (sync && sync.isLive()) {
-        var durablePayload = Object.assign({ _actor: inv.name || _playerName || '?' }, data.payload || {});
+        var actorName = inv.name || _playerName || '?';
+        var actorPlayer = inv.playerName || _playerName || '';
+        if (inv.name && actorPlayer && actorPlayer !== inv.name) {
+          actorName = inv.name + ' (' + actorPlayer + ')';
+        }
+        var durablePayload = Object.assign({ _actor: actorName }, data.payload || {});
         sync.record({ type: data.type, payload: durablePayload });
       }
     });

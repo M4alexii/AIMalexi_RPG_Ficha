@@ -57,7 +57,7 @@ window.CoC = window.CoC || {};
     fx.id = "sanity-fx";
     fx.setAttribute("aria-hidden", "true");
     // Camadas estáticas, controladas 100% por CSS via body[data-sanity].
-    ["sfx-vignette", "sfx-blur", "sfx-chroma", "sfx-grain", "sfx-flicker"].forEach((cls) => {
+    ["sfx-tone", "sfx-vignette", "sfx-blur", "sfx-chroma", "sfx-grain", "sfx-flicker"].forEach((cls) => {
       const layer = document.createElement("div");
       layer.className = cls;
       fx.appendChild(layer);

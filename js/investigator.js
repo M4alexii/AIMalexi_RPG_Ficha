@@ -337,7 +337,8 @@
 
   // ─── TEMA ─────────────────────────────────────────────────────────────
   const _VALID_THEMES = ["arkham", "classico", "dossie", "lovecraft", "cosmic", "arquivo",
-                         "miskatonic", "sepia", "obsidian", "eldritch", "custom"];
+                         "miskatonic", "sepia", "obsidian", "eldritch",
+                         "noir", "hospital", "agencia", "custom"];
 
   function applyTheme(theme) {
     const t = _VALID_THEMES.includes(theme) ? theme : "arkham";
@@ -1010,10 +1011,15 @@
       inputEl:   $("#chat-input"),
       sendBtnEl: $("#chat-send"),
       hintEl:    $("#chat-hint"),
-      // Investigador: autor = nome do personagem (ou jogador), papel = player
+      // Investigador: autor = "Personagem (Jogador)" — o Guardião identifica
+      // quem rolou sem precisar decorar os nomes dos investigadores.
       getAuthor: function () {
         const c = state.character;
-        return (c && c.investigator && (c.investigator.name || c.investigator.playerName)) || "Investigador";
+        const inv = (c && c.investigator) || {};
+        const charName = inv.name || "Investigador";
+        return inv.playerName && inv.playerName !== charName
+          ? charName + " (" + inv.playerName + ")"
+          : charName;
       },
       getRole: function () { return "player"; }
     });

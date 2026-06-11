@@ -5,6 +5,67 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-11 - Fase RK-2: combate e timeline do Guardião
+
+### Adicionado (diretriz §8, etapa RK-2)
+
+- **Iniciativa no Encontro**: botão **⚡ Iniciativa** ordena o tracker em
+  ordem de DES decrescente (CoC 7e), mortos no fim; chip ⚡ DES em cada
+  criatura (capturado do bestiário ao adicionar).
+- **Munição no Encontro**: botão 🔫 define a munição inicial e gasta 1 por
+  clique; chip mostra o restante e avisa **"vazio"** ao zerar (re-clique
+  redefine). Valor vazio remove o controle.
+- **Ferimento Grave visível**: dano único ≥ metade do PV máximo marca o chip
+  **🩸 Fer. Grave** na criatura (antes era só um toast passageiro).
+- **Timeline manual**: campo "✍️ + Evento" na aba Timeline — o Guardião anota
+  eventos narrativos na linha do tempo **mesmo sem campanha ativa** (Enter
+  também envia).
+- **Avatar nas cartas dos investigadores**: círculo com iniciais no roster da
+  campanha (retrato leve, sem tráfego de imagem).
+- **Ambiente visual no Guardião**: `ambient-fx.js` agora carrega no
+  keeper.html — chuva/névoa/poeira/VHS/filme funcionam via ⚙️ Configurações.
+
+### Corrigido
+
+- **Ferimento Grave com PV ímpar**: o teste usava `floor(PV máx / 2)` e
+  marcava ferimento com 1 ponto a menos que a regra (ex.: 5 de dano com
+  PV 11); agora compara com a metade exata (≥ 5.5 ⇒ 6+).
+- SW: `CACHE_VERSION` v91.
+
+## 2026-06-11 - Personalização visual (itens 8–13) + correções críticas
+
+### Corrigido
+
+- **Abas/drawer sumiam com SAN baixa**: o `filter`/`animation` dos efeitos
+  de insanidade em `.app` virava containing block e soltava a barra de abas,
+  o drawer ☰ e os backdrops (`position:fixed`) da viewport a partir de
+  SAN <50%. A graduação de cor agora vive na camada `.sfx-tone` do overlay
+  (`backdrop-filter`) e o tremor em `.app-shell`.
+- **Checkboxes desalinhados** na Central de Configurações (o reset global de
+  `input` aplicava `width:100%` + padding a checkbox/radio).
+- **Identificação nas rolagens da campanha**: timeline do Guardião e chat
+  agora mostram **"Personagem (Jogador)"** em vez de só um dos nomes.
+
+### Adicionado (spec `Melhorias/PERSONALIZACAO_E_MODOS_V1.md`, itens 8–13)
+
+- **Temas extras**: Noir (P&B), Hospital Psiquiátrico (claro) e Agência
+  Federal (cinza/azul) — total de 13 presets + custom.
+- **Fundo com textura + opacidade** (⚙️ → 🎨 Aparência): papel, couro,
+  madeira, nebulosa e arquivo policial, intensidade 0–100% com teto real de
+  opacidade 0.35 (legibilidade blindada). 100% CSS/SVG inline, offline.
+- **Estilo dos cards**: Arcano (cantoneiras atuais — padrão), Moderno,
+  Arquivo e Máquina de escrever; **bordas** Nenhuma/Simples/Vintage/Runas/
+  Art Déco via border-image SVG com fallback sólido.
+- **Sistema visual de anotações**: Caderno/Dossiê/Diário/Máquina aplicado ao
+  Diário de Campanha (pele puramente visual).
+- **Molduras de avatar** por personagem (Investigador/Ocultista/Militar/
+  Acadêmico) + formas token redondo e silhueta (`_meta.avatarFrame/Shape`,
+  normalizado no schema; botão 🖼️ sob o retrato).
+- **Som ambiente visual** (sem áudio): chuva, névoa, poeira, VHS e filme
+  antigo em overlay próprio (`js/shared/ambient-fx.js`), desligado por
+  padrão e subordinado ao sanity-fx; respeita reduce-motion.
+- SW: `CACHE_VERSION` v90; `ambient-fx.js` no precache.
+
 ## 2026-06-11 - Modo Imersão (🕯️)
 
 ### Adicionado
