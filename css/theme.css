@@ -1803,3 +1803,54 @@ body[data-border-style="runas"] .section::before,
 body[data-border-style="runas"] .section::after,
 body[data-border-style="artdeco"] .section::before,
 body[data-border-style="artdeco"] .section::after { display: none; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   APARÊNCIA — SISTEMA VISUAL DE ANOTAÇÕES (spec item 12)
+   ───────────────────────────────────────────────────────────────────────────
+   body[data-notes-style="caderno|dossie|diario|maquina"] (settings.js).
+   Pele puramente visual do Diário de Campanha e das entradas — nenhum dado
+   muda. "caderno" é o baseline (visual atual, sem regras).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Dossiê: papel de arquivo + carimbo datilografado no título da seção */
+body[data-notes-style="dossie"] .section[data-tab="diario"] {
+  background: var(--parchment);
+}
+body[data-notes-style="dossie"] .section[data-tab="diario"] .section-title {
+  font-family: var(--font-typewriter);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+body[data-notes-style="dossie"] .journal-entry {
+  background: var(--bg-card);
+  border-left: 3px solid var(--candle, var(--accent));
+}
+
+/* Diário: manuscrito (Caveat) sobre fundo levemente sépia */
+body[data-notes-style="diario"] .journal-entry-title,
+body[data-notes-style="diario"] .journal-entry-excerpt,
+body[data-notes-style="diario"] .section[data-tab="diario"] textarea {
+  font-family: var(--font-marginalia);
+  font-size: 1.15em;
+  line-height: 1.5;
+}
+body[data-notes-style="diario"] .section[data-tab="diario"] {
+  background:
+    linear-gradient(180deg, rgba(120, 90, 40, 0.06), rgba(120, 90, 40, 0.03)),
+    var(--bg-card);
+}
+
+/* Máquina de escrever: monoespaçada datilografada, espaçamento maior */
+body[data-notes-style="maquina"] .journal-entry-title,
+body[data-notes-style="maquina"] .journal-entry-excerpt,
+body[data-notes-style="maquina"] .section[data-tab="diario"] textarea {
+  font-family: var(--font-typewriter);
+  line-height: 1.65;
+}
+body[data-notes-style="maquina"] .journal-entry { border-radius: 0; }
+
+/* Caderno (baseline) ganha pautas sutis apenas na área de escrita */
+body[data-notes-style="caderno"] .section[data-tab="diario"] textarea {
+  background-image: repeating-linear-gradient(0deg, transparent 0 1.55em, var(--line) 1.55em calc(1.55em + 1px));
+  line-height: 1.55;
+}
