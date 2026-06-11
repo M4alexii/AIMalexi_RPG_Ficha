@@ -5,6 +5,19 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-11 - Modo Imersão (🕯️)
+
+### Adicionado
+
+- **Modo Imersão** na toolbar (🕯️): silencia o aparato mecânico para
+  sessões de interpretação — frações ½⅕, orçamentos de pontos, stats
+  secundários (MOV/DB/Build/Mythos), marcadores de evolução e metas de
+  seção somem; vitais viram barras com números discretos; o log de
+  rolagem esmaece (volta no hover); diário e identidade ganham respiro.
+  Tudo CSS (`body.immersion`) — nada é perdido. Estado em sessionStorage.
+  Item nº 7 (último do ciclo) do roadmap de
+  `Melhorias/PERSONALIZACAO_E_MODOS_V1.md`.
+
 ## 2026-06-11 - Modo de sessão (🎬 cena: investigação/combate)
 
 ### Adicionado

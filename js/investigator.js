@@ -148,6 +148,7 @@
     if (window.CoC.sanityFx) window.CoC.sanityFx.init();   // overlay + modo de efeitos
     if (window.CoC.globalSearch) window.CoC.globalSearch.init();  // Ctrl+K + botão 🔍
     _initSessionMode();                                    // 🎬 cena (investigação/combate)
+    _initImmersionMode();                                  // 🕯️ imersão (menos números)
 
     // Sprint 6 — Render Pipeline: registry centralizado substituindo subscriptions manuais.
     // SPEND_LUCK e combat actions agora re-renderizam via RENDER_MAP em vez de
@@ -375,6 +376,23 @@
     try {
       const saved = sessionStorage.getItem("aimalexi-rpg/sessionMode");
       if (saved) applyScene(saved, false);
+    } catch (e) { /* sem sessionStorage */ }
+  }
+
+  // ─── MODO IMERSÃO (🕯️ menos números, mais narrativa) ──────────────────
+  // CSS-driven (body.immersion em investigator.css). Estado de cena:
+  // sessionStorage, não vai ao Store.
+  function _initImmersionMode() {
+    const btn = $("#btn-immersion");
+    if (!btn) return;
+    function applyImmersion(on) {
+      document.body.classList.toggle("immersion", on);
+      btn.classList.toggle("active", on);
+      try { sessionStorage.setItem("aimalexi-rpg/immersion", on ? "1" : ""); } catch (e) { /* sem sessionStorage */ }
+    }
+    btn.onclick = () => applyImmersion(!document.body.classList.contains("immersion"));
+    try {
+      if (sessionStorage.getItem("aimalexi-rpg/immersion") === "1") applyImmersion(true);
     } catch (e) { /* sem sessionStorage */ }
   }
 

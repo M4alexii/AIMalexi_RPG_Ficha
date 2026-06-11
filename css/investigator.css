@@ -3158,3 +3158,42 @@ body[data-ui-mode="player"] #finances-card {
 }
 .skill-fav:hover { color: var(--candle-bright); }
 .skill-fav.fav   { color: var(--candle-bright); text-shadow: 0 0 6px var(--brass-glow); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MODO IMERSÃO (🕯️) — menos números, mais narrativa
+   body.immersion: silencia o aparato mecânico (frações ½⅕, orçamentos,
+   stats secundários, log de rolagem) e deixa respirar o que conta história:
+   retrato, nome, vitais como barras, diário. Nada é perdido — é só CSS.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Números secundários e aparato de criação somem */
+body.immersion .sattr-fracs,
+body.immersion .skill-frac,
+body.immersion .attr-budget,
+body.immersion .points-badge,
+body.immersion #badge-occ,
+body.immersion #badge-pi,
+body.immersion .derived-card[data-key="MOV"],
+body.immersion .derived-card[data-key="DB"],
+body.immersion .derived-card[data-key="Build"],
+body.immersion .derived-card[data-key="Mitos"],
+body.immersion .skill-mark,
+body.immersion .section-title .meta {
+  display: none !important;
+}
+
+/* Vitais: a barra fala — números ficam discretos */
+body.immersion .svital-value,
+body.immersion .svital-max { opacity: 0.55; font-size: 0.92em; }
+body.immersion .svital-track { height: 12px; }
+
+/* Atributos: valor menor, sem brilho mecânico */
+body.immersion .sattr-row .sattr-value { font-size: 1.05rem; text-shadow: none; opacity: 0.85; }
+
+/* Log de rolagens e chat recolhem (a história está na mesa, não na tela) */
+body.immersion aside[data-tab="log"] { opacity: 0.4; transition: opacity 0.3s; }
+body.immersion aside[data-tab="log"]:hover { opacity: 1; }
+
+/* Respiro extra no diário e identidade */
+body.immersion section[data-tab="diario"],
+body.immersion .identity-section { font-size: 1.05em; }
