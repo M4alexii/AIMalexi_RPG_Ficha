@@ -207,6 +207,13 @@ window.CoC.core = window.CoC.core || {};
       status: 'live',
       resolved_fields: ['name', 'marked'],
     },
+    TOGGLE_SKILL_FAVORITE: {
+      aggregate: 'character', domain: 'skills',
+      renders: ['skills'], persists: true, sacred: false,
+      effects: [],
+      status: 'live',
+      resolved_fields: ['name', 'fav'],
+    },
 
     // ── Rolagens / sessão ─────────────────────────────────────────────────────
     ROLL_ATTRIBUTE: {

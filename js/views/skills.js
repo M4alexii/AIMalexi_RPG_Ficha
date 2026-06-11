@@ -244,6 +244,7 @@ window.CoC.views = window.CoC.views || {};
       const filtered = list.filter(s => {
         if (search && !s.name.toLowerCase().includes(search)) return false;
         if (filter === "occupation" && !occSkills.has(s.name)) return false;
+        if (filter === "fav" && !c.skills?.[s.name]?.fav) return false;
         if (filter === "used") {
           const sk   = c.skills?.[s.name];
           const base = _computeBaseValue(s, attrs);
@@ -252,6 +253,9 @@ window.CoC.views = window.CoC.views || {};
         return true;
       });
       if (filtered.length === 0) continue;
+      // Favoritas (★) sobem para o topo do grupo, mantendo a ordem entre si
+      filtered.sort((a, b) =>
+        (c.skills?.[b.name]?.fav ? 1 : 0) - (c.skills?.[a.name]?.fav ? 1 : 0));
 
       const group = el("div", { class: "skill-group" });
       group.innerHTML = `<h3 class="skill-group-title">${escapeHtml(labels[cat] || cat)}</h3>`;
@@ -278,9 +282,11 @@ window.CoC.views = window.CoC.views || {};
         const baseFormula = s.baseFormula    ? ` <span class="skill-tag" title="Base derivada">${escapeHtml(s.baseFormula)}=${base}</span>` : "";
         const occMark     = _occToggleHTML(s.name, ctx.mandatory.has(s.name), ctx.chosen.has(s.name));
         const markBtn     = `<button class="skill-mark btn-ghost${isMarked ? " marked" : ""}" data-mark-skill="${escapeHtml(s.name)}" title="${isMarked ? "Marcada para evolução (clique para desmarcar)" : "Marcar para evolução ao fim da sessão"}" aria-pressed="${isMarked}">${isMarked ? "✓" : "○"}</button>`;
+        const isFav       = !!(sk?.fav);
+        const favBtn      = `<button class="skill-fav btn-ghost${isFav ? " fav" : ""}" data-fav-skill="${escapeHtml(s.name)}" title="${isFav ? "Favorita (clique para remover)" : "Favoritar — sobe para o topo"}" aria-pressed="${isFav}">${isFav ? "★" : "☆"}</button>`;
         const infoBtn     = `<button class="skill-info-toggle" data-info-skill="${escapeHtml(s.name)}" title="Ver descrição da perícia" aria-expanded="false">ⓘ</button>`;
         row.innerHTML = `
-          <div class="skill-name">${occMark}${escapeHtml(s.name)}${specTag}${baseFormula} ${infoBtn}</div>
+          <div class="skill-name">${favBtn}${occMark}${escapeHtml(s.name)}${specTag}${baseFormula} ${infoBtn}</div>
           <input class="skill-input" type="number" min="0" max="99" value="${value}"
             data-skill="${escapeHtml(s.name)}"
             title="Total da perícia (Base ${base} + alocados)" />
@@ -300,9 +306,12 @@ window.CoC.views = window.CoC.views || {};
       const customFiltered = customNames.filter(name => {
         if (search && !name.toLowerCase().includes(search)) return false;
         if (filter === "occupation" && !occSkills.has(name)) return false;
+        if (filter === "fav" && !c.skills[name]?.fav) return false;
         if (filter === "used" && (Number(c.skills[name].value) || 0) === 0) return false;
         return true;
       });
+      customFiltered.sort((a, b) =>
+        (c.skills[b]?.fav ? 1 : 0) - (c.skills[a]?.fav ? 1 : 0));
 
       if (customFiltered.length > 0) {
         const group = el("div", { class: "skill-group" });
@@ -329,8 +338,10 @@ window.CoC.views = window.CoC.views || {};
           const parentTag = parent ? `<span class="skill-tag" title="Base herdada de ${escapeHtml(parent.name)}">base ${parentBase}</span>` : "";
           const occMark   = _occToggleHTML(name, ctx.mandatory.has(name), ctx.chosen.has(name));
           const markBtnC  = `<button class="skill-mark btn-ghost${isMarkedCustom ? " marked" : ""}" data-mark-skill="${escapeHtml(name)}" title="${isMarkedCustom ? "Marcada para evolução" : "Marcar para evolução"}" aria-pressed="${isMarkedCustom}">${isMarkedCustom ? "✓" : "○"}</button>`;
+          const isFavC    = !!(sk?.fav);
+          const favBtnC   = `<button class="skill-fav btn-ghost${isFavC ? " fav" : ""}" data-fav-skill="${escapeHtml(name)}" title="${isFavC ? "Favorita (clique para remover)" : "Favoritar — sobe para o topo"}" aria-pressed="${isFavC}">${isFavC ? "★" : "☆"}</button>`;
           row.innerHTML = `
-            <div class="skill-name">${occMark}${escapeHtml(name)}${parentTag}</div>
+            <div class="skill-name">${favBtnC}${occMark}${escapeHtml(name)}${parentTag}</div>
             <input class="skill-input" type="number" min="0" max="99" value="${value}" data-skill="${escapeHtml(name)}" />
             <div class="skill-frac"><span class="skill-frac-half" title="Difícil">${dice.half(value)}</span><span class="skill-frac-sep"> · </span><span class="skill-frac-fifth" title="Extremo">${dice.fifth(value)}</span></div>
             ${markBtnC}
@@ -455,6 +466,15 @@ window.CoC.views = window.CoC.views || {};
         cocExecutor.execute({ type: "TOGGLE_OCCUPATION_SKILL", payload: { skillName: occBtn.dataset.occToggle } });
         return;
       }
+      const favBtn = e.target.closest("[data-fav-skill]");
+      if (favBtn) {
+        const name    = favBtn.dataset.favSkill;
+        const current = !!(cocStore.getState().character?.skills?.[name]?.fav);
+        cocExecutor.execute({ type: "TOGGLE_SKILL_FAVORITE", payload: { name, fav: !current } });
+        bus.publish("skill:persist-requested", {});
+        return;
+      }
+
       const markBtn = e.target.closest("[data-mark-skill]");
       if (markBtn) {
         const name    = markBtn.dataset.markSkill;
