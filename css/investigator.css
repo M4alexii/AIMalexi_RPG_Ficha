@@ -3143,3 +3143,18 @@ body[data-ui-mode="player"] #finances-card {
   color: var(--ink-dim);
   border-top: 1px solid var(--line, var(--ink-faded));
 }
+
+/* ── Favoritos de perícias (★) ─────────────────────────────────────────── */
+.skill-fav {
+  padding: 0 0.25rem;
+  font-size: 0.95rem;
+  line-height: 1;
+  color: var(--ink-faded);
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  cursor: pointer;
+  vertical-align: baseline;
+}
+.skill-fav:hover { color: var(--candle-bright); }
+.skill-fav.fav   { color: var(--candle-bright); text-shadow: 0 0 6px var(--brass-glow); }

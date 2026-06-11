@@ -261,6 +261,19 @@ window.CoC = window.CoC || {};
         return Object.assign({}, state, { character: nc });
       }
 
+      // Favorito do jogador (★) — apenas conveniência de UI, persiste na ficha
+      case "TOGGLE_SKILL_FAVORITE": {
+        if (!c) return state;
+        const { name: favName, fav } = action.payload;
+        if (!favName) return state;
+        const nc = deepClone(c);
+        nc.skills = nc.skills || {};
+        nc.skills[favName] = Object.assign({}, nc.skills[favName] || {}, {
+          fav: !!fav
+        });
+        return Object.assign({}, state, { character: nc });
+      }
+
       // Aplica o ganho de evolução de perícia após rolagem de melhoria
       case "SKILL_IMPROVED": {
         if (!c) return state;

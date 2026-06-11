@@ -5,6 +5,17 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-11 - Favoritos de perícias (★)
+
+### Adicionado
+
+- **Favoritar perícias**: estrela ☆/★ em cada linha de perícia (catálogo e
+  específicas). Favoritas sobem para o topo do grupo e ganham o filtro
+  "★ Favoritas" ao lado de Todas/Ocupação/Com pontos. Persistido na ficha
+  (`skills[nome].fav`) via nova ação `TOGGLE_SKILL_FAVORITE` (registrada
+  na ontologia de eventos). Item nº 4 do roadmap de
+  `Melhorias/PERSONALIZACAO_E_MODOS_V1.md`.
+
 ## 2026-06-11 - Histórico narrativo de Sanidade
 
 ### Adicionado
