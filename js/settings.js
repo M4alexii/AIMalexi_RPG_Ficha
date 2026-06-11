@@ -131,8 +131,10 @@ window.CoC = window.CoC || {};
         }).join('') + '</select></div>' +
       // Cor de destaque
       '<div class="settings-row"><label>' + T('settings.accent') + '</label>' +
-        '<input type="color" id="set-accent" value="' + (s.accent || '#b8924f') + '" />' +
-        '<button type="button" id="set-accent-clear" class="btn-ghost btn-sm">✕</button></div>' +
+        '<div class="settings-inline">' +
+          '<input type="color" id="set-accent" value="' + (s.accent || '#b8924f') + '" />' +
+          '<button type="button" id="set-accent-clear" class="btn-ghost btn-sm" title="Voltar à cor do tema">✕</button>' +
+        '</div></div>' +
       // Idioma
       '<div class="settings-row"><label>' + T('settings.language') + '</label>' +
         '<select id="set-lang">' +
