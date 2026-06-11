@@ -38,6 +38,7 @@ window.CoC = window.CoC || {};
     language:     'pt',
     fontScale:    1.0,         // 0.85 – 1.3
     density:      'comfortable',
+    uiMode:       'investigator', // 'player' = tela limpa p/ iniciantes
     reduceMotion: false,
     highContrast: false,
     rollEffects:  true,
@@ -87,6 +88,19 @@ window.CoC = window.CoC || {};
     // Densidade / contraste / movimento / efeitos de rolagem → classes no body
     body.classList.toggle('density-compact', s.density === 'compact');
     body.classList.toggle('density-normal',  s.density === 'normal');
+
+    // Modo da ficha (Jogador = progressive disclosure; CSS em investigator.css)
+    body.dataset.uiMode = s.uiMode === 'player' ? 'player' : 'investigator';
+    // Se a aba ativa ficou oculta no Modo Jogador, volta para Personagem
+    if (s.uiMode === 'player') {
+      var activeHidden = document.querySelector(
+        '.mobile-tab.active[data-tab="diario"], .mobile-tab.active[data-tab="log"], ' +
+        '.desktop-tab.active[data-tab="diario"], .desktop-tab.active[data-tab="log"]');
+      if (activeHidden) {
+        var home = document.querySelector('.mobile-tab[data-tab="personagem"], .desktop-tab[data-tab="personagem"]');
+        if (home) home.click();
+      }
+    }
     body.classList.toggle('high-contrast',   !!s.highContrast);
     body.classList.toggle('reduce-motion',   !!s.reduceMotion);
     body.classList.toggle('no-roll-fx',      !s.rollEffects);
@@ -128,6 +142,12 @@ window.CoC = window.CoC || {};
       // Escala de fonte
       '<div class="settings-row"><label>' + T('settings.fontScale') + ' (<span id="set-scale-val">' + Math.round(s.fontScale * 100) + '%</span>)</label>' +
         '<input type="range" id="set-scale" min="0.85" max="1.3" step="0.05" value="' + s.fontScale + '" /></div>' +
+      // Modo da ficha (Jogador/Investigador)
+      '<div class="settings-row"><label>Modo da ficha</label>' +
+        '<select id="set-uimode">' +
+          '<option value="investigator"' + (s.uiMode !== 'player' ? ' selected' : '') + '>Investigador — ficha completa</option>' +
+          '<option value="player"' + (s.uiMode === 'player' ? ' selected' : '') + '>Jogador — tela limpa (iniciante)</option>' +
+        '</select></div>' +
       // Densidade
       '<div class="settings-row"><label>' + T('settings.density') + '</label>' +
         '<select id="set-density">' +
@@ -155,6 +175,7 @@ window.CoC = window.CoC || {};
       var lbl = $('set-scale-val'); if (lbl) lbl.textContent = Math.round(parseFloat(this.value) * 100) + '%';
     };
     $('set-density').onchange  = function () { set('density', this.value); };
+    $('set-uimode').onchange   = function () { set('uiMode', this.value); };
     $('set-motion').onchange   = function () { set('reduceMotion', this.checked); };
     $('set-contrast').onchange = function () { set('highContrast', this.checked); };
     $('set-rollfx').onchange   = function () { set('rollEffects', this.checked); };

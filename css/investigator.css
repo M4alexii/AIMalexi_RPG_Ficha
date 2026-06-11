@@ -3069,3 +3069,24 @@ body:has(.wz-backdrop) .fab { display: none !important; }
 .derived-card.tracker.pm  { --res-deep: var(--mp-deep);   --res-bright: rgba(123, 94, 167, 0.55); border-bottom: 2px solid var(--mp-bright); }
 .derived-card.tracker.san { --res-deep: var(--san-deep);  --res-bright: rgba(74, 138, 163, 0.55); border-bottom: 2px solid var(--san-bright); }
 .derived-card.tracker .derived-value { text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MODO JOGADOR — progressive disclosure (spec Personalização & Modos V1)
+   body[data-ui-mode="player"]: tela limpa p/ iniciantes — esconde as seções
+   avançadas (magia, grimórios, diário, log, finanças, slots de corpo) sem
+   perder dado algum: alternar de volta p/ Investigador restaura tudo.
+   Aplicado por js/settings.js (pref uiMode).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+body[data-ui-mode="player"] .desktop-tab[data-tab="diario"],
+body[data-ui-mode="player"] .desktop-tab[data-tab="log"],
+body[data-ui-mode="player"] .mobile-tab[data-tab="diario"],
+body[data-ui-mode="player"] .mobile-tab[data-tab="log"],
+body[data-ui-mode="player"] section[data-tab="diario"],
+body[data-ui-mode="player"] aside[data-tab="log"],
+body[data-ui-mode="player"] .sec-spells,
+body[data-ui-mode="player"] .sec-tomes,
+body[data-ui-mode="player"] #body-slots-section,
+body[data-ui-mode="player"] #finances-card {
+  display: none !important;
+}
