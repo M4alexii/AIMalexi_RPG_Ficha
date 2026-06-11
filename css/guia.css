@@ -30,7 +30,7 @@
 .guia-toc h3 {
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: var(--brass);
+  color: var(--brass-bright);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 0.75rem;
@@ -72,7 +72,7 @@
   transform: translateY(-50%);
   font-family: var(--font-mono);
   font-size: 0.7rem;
-  color: var(--brass);
+  color: var(--brass-bright);
   font-weight: 700;
   width: 1.1rem;
   text-align: center;
@@ -186,7 +186,7 @@
 .guia-section h4 {
   font-family: var(--font-mono);
   font-size: 0.8rem;
-  color: var(--brass);
+  color: var(--brass-bright);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin: 1rem 0 0.4rem;
@@ -225,7 +225,7 @@
 .section-divider {
   text-align: center;
   margin: 1.5rem 0;
-  color: var(--brass);
+  color: var(--brass-bright);
   font-size: 1.4rem;
   letter-spacing: 1.5rem;
   padding-left: 1.5rem;
@@ -266,7 +266,7 @@
 .callout.danger .callout-title  { color: #d66a6a; } /* --blood é escuro demais p/ fundo escuro */
 .callout.success .callout-title { color: var(--ok); }
 .callout.tip .callout-title     { color: var(--mist); }
-.callout .callout-title         { color: var(--brass); }
+.callout .callout-title         { color: var(--brass-bright); }
 
 /* Bloco de diálogo (Guardião ↔ Jogador) */
 .dialogue {
@@ -309,7 +309,7 @@
 
 .dialogue .turn.guardian .who { color: var(--blood); }
 .dialogue .turn.player .who   { color: var(--mist); }
-.dialogue .turn.action .who   { color: var(--brass); }
+.dialogue .turn.action .who   { color: var(--brass-bright); }
 .dialogue .turn.action       { font-style: italic; color: var(--ink-dim); }
 
 .dialogue .turn p {
@@ -494,7 +494,7 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--brass);
+  color: var(--brass-bright);
   text-align: left;
   padding: 0.6rem 0.8rem;
   border-bottom: 1px solid var(--brass);
@@ -722,7 +722,7 @@
 .section-summary .summary-label {
   font-family: var(--font-mono); font-size: 0.68rem;
   text-transform: uppercase; letter-spacing: 0.1em;
-  color: var(--brass); margin-bottom: 0.3rem;
+  color: var(--brass-bright); margin-bottom: 0.3rem;
 }
 .section-summary ul { margin: 0; padding-left: 1.1rem; }
 .section-summary li { margin: 0.15rem 0; font-size: 0.9rem; }
@@ -768,8 +768,8 @@
   max-width: 340px; width: 100%; font-size: 0.9rem;
 }
 .flow-node.decision { border-style: dashed; border-color: var(--mist); }
-.flow-node.start { background: var(--brass); color: var(--bg-deep); font-weight: 700; }
-.flow-arrow { color: var(--brass); font-size: 1.2rem; line-height: 1.4; }
+.flow-node.start { background: var(--brass); color: var(--on-accent, var(--bg-deep)); font-weight: 700; }
+.flow-arrow { color: var(--brass-bright); font-size: 1.2rem; line-height: 1.4; }
 .flow-branch { display: flex; gap: 1rem; width: 100%; max-width: 360px; justify-content: space-between; }
 .flow-branch .flow-node { font-size: 0.8rem; padding: 0.4rem 0.6rem; }
 

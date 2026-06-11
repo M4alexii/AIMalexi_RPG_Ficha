@@ -7,7 +7,7 @@
 
 :root {
   --keeper-accent: var(--blood);
-  --keeper-accent-bright: #c92929;
+  --keeper-accent-bright: #d84a4a;
   --keeper-accent-glow: var(--blood-glow);
 }
 
@@ -678,7 +678,7 @@
 .notes-section h3 {
   font-family: var(--font-mono);
   font-size: 0.7rem;
-  color: var(--brass);
+  color: var(--brass-bright);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 0.3rem;
@@ -691,7 +691,7 @@
   line-height: 1.5;
 }
 .notes-section li { margin-bottom: 0.2rem; }
-.notes-section li::before { content: "›  "; color: var(--brass); }
+.notes-section li::before { content: "›  "; color: var(--brass-bright); }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    MODO COMPLETO (editor) — escondido por default
@@ -1263,7 +1263,7 @@
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--brass);
+  color: var(--brass-bright);
   list-style: none;
 }
 .inv-card-detail > summary::-webkit-details-marker { display: none; }
@@ -1400,7 +1400,7 @@
 .tl-text b { color: var(--ink); }
 
 .tl-entry.ev-damage    .tl-text { color: var(--blood); }
-.tl-entry.ev-sanity    .tl-text { color: var(--brass); }
+.tl-entry.ev-sanity    .tl-text { color: var(--brass-bright); }
 .tl-entry.ev-magic     .tl-text { color: #9b7fd4; }
 .tl-entry.ev-roll      .tl-text { color: var(--mist); }
 .tl-entry.ev-combat    .tl-text { color: var(--keeper-accent-bright); }
@@ -1765,7 +1765,7 @@
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: var(--brass);
+  color: var(--brass-bright);
 }
 .chat-msg.player .chat-author { color: var(--mist, #9aa6b0); }
 .chat-time { font-family: var(--font-mono); font-size: 0.65rem; color: var(--ink-faded); }
@@ -1823,7 +1823,7 @@
   border-bottom: 1px dotted currentColor;
   cursor: pointer;
 }
-.journal-link:hover { color: var(--brass); }
+.journal-link:hover { color: var(--brass-bright); }
 .journal-card.journal-flash {
   animation: journal-flash 1.5s ease;
 }
@@ -2441,7 +2441,7 @@
   display: inline-block;
   background: rgba(184, 146, 79, 0.2);
   border: 1px solid var(--brass);
-  color: var(--brass);
+  color: var(--brass-bright);
   padding: 0.1rem 0.4rem;
   border-radius: 0.3rem;
   margin-right: 0.3rem;
@@ -2482,7 +2482,7 @@
 
 #note-backlinks li {
   cursor: pointer;
-  color: var(--brass);
+  color: var(--brass-bright);
   text-decoration: underline;
   margin-bottom: 0.3rem;
 }
@@ -2504,7 +2504,7 @@ textarea {
   cursor: pointer;
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--brass);
+  color: var(--brass-bright);
   padding: 0.4rem 0.2rem;
   border-bottom: 1px solid var(--ink-faded);
   margin-bottom: 0.4rem;

@@ -21,11 +21,15 @@ window.CoC = window.CoC || {};
   var KEY = 'aimalexi-rpg/settings';
 
   var THEMES = [
-    { id: 'arkham',     label: 'Arkham (Clássico CoC)' },
+    { id: 'arkham',     label: 'Arkham (Arquivo de Investigador — padrão)' },
+    { id: 'classico',   label: 'Clássico (Dourado original)' },
+    { id: 'lovecraft',  label: 'Lovecraft (Biblioteca Antiga)' },
+    { id: 'cosmic',     label: 'Cosmic (Horror Cósmico)' },
+    { id: 'arquivo',    label: 'Arquivo (Claro — Documento Investigativo)' },
     { id: 'miskatonic', label: 'Miskatonic (Acadêmico)' },
-    { id: 'sepia',      label: 'Sépia (Claro/Histórico)' },
+    { id: 'sepia',      label: 'Sépia (Documento Histórico)' },
     { id: 'obsidian',   label: 'Obsidian (Escuro/Moderno)' },
-    { id: 'eldritch',   label: 'Eldritch (Horror Cósmico)' },
+    { id: 'eldritch',   label: 'Eldritch (Vazio Púrpura)' },
   ];
 
   var DEFAULTS = {
@@ -82,6 +86,7 @@ window.CoC = window.CoC || {};
 
     // Densidade / contraste / movimento / efeitos de rolagem → classes no body
     body.classList.toggle('density-compact', s.density === 'compact');
+    body.classList.toggle('density-normal',  s.density === 'normal');
     body.classList.toggle('high-contrast',   !!s.highContrast);
     body.classList.toggle('reduce-motion',   !!s.reduceMotion);
     body.classList.toggle('no-roll-fx',      !s.rollEffects);
@@ -127,6 +132,7 @@ window.CoC = window.CoC || {};
       '<div class="settings-row"><label>' + T('settings.density') + '</label>' +
         '<select id="set-density">' +
           '<option value="comfortable"' + (s.density === 'comfortable' ? ' selected' : '') + '>' + T('settings.density.comfortable') + '</option>' +
+          '<option value="normal"' + (s.density === 'normal' ? ' selected' : '') + '>Normal (desktop)</option>' +
           '<option value="compact"' + (s.density === 'compact' ? ' selected' : '') + '>' + T('settings.density.compact') + '</option>' +
         '</select></div>' +
       // Toggles

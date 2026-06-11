@@ -21,20 +21,31 @@ window.CoC = window.CoC || {};
   var PREF_KEY = "customTheme";
 
   var DEFAULTS = {
-    bgDeep:  "#1B1A17",   // fundo geral
-    bgCard:  "#26231F",   // cards/painéis
-    ink:     "#E6E0D5",   // texto principal
-    inkDim:  "#B7B0A4",   // texto secundário
-    accent:  "#556B2F",   // cor de ação/destaque
-    font:    "default"    // família do corpo
+    bgDeep:    "#1B1A17",   // fundo geral
+    bgCard:    "#26231F",   // cards/painéis
+    ink:       "#E6E0D5",   // texto principal
+    inkDim:    "#B7B0A4",   // texto secundário
+    accent:    "#556B2F",   // cor de ação/destaque
+    font:      "default",   // fonte de leitura (corpo)
+    titleFont: "default"    // fonte temática (títulos/seções)
   };
 
+  // Camada funcional: fontes de LEITURA contínua (corpo)
   var FONTS = {
-    "default":    { label: "Crimson Pro (padrão)",  body: "'Crimson Pro', Georgia, serif",        serif: "'Cormorant Garamond', Georgia, serif" },
-    "garamond":   { label: "Cormorant Garamond",    body: "'Cormorant Garamond', Georgia, serif", serif: "'Cormorant Garamond', Georgia, serif" },
-    "typewriter": { label: "Máquina de escrever",   body: "'Special Elite', 'Courier New', monospace", serif: "'Special Elite', 'Courier New', monospace" },
-    "courier":    { label: "Courier Prime",         body: "'Courier Prime', monospace",           serif: "'Courier Prime', monospace" },
-    "system":     { label: "Sistema (sans-serif)",  body: "system-ui, -apple-system, sans-serif", serif: "system-ui, -apple-system, sans-serif" }
+    "default":    { label: "Crimson Pro (padrão)",       body: "'Crimson Pro', Georgia, serif" },
+    "inter":      { label: "Inter (leitura moderna)",     body: "'Inter', system-ui, sans-serif" },
+    "atkinson":   { label: "Atkinson Hyperlegible (acessível)", body: "'Atkinson Hyperlegible', system-ui, sans-serif" },
+    "courier":    { label: "Courier Prime",               body: "'Courier Prime', monospace" },
+    "typewriter": { label: "Máquina de escrever",         body: "'Special Elite', 'Courier New', monospace" },
+    "system":     { label: "Sistema (sans-serif)",        body: "system-ui, -apple-system, sans-serif" }
+  };
+
+  // Camada temática: fontes de TÍTULOS e seções
+  var TITLE_FONTS = {
+    "default":     { label: "Cormorant Garamond (padrão)", serif: "'Cormorant Garamond', Georgia, serif" },
+    "baskerville": { label: "Libre Baskerville",           serif: "'Libre Baskerville', Georgia, serif" },
+    "cinzel":      { label: "Cinzel (Art Déco anos 20)",   serif: "'Cinzel', 'Times New Roman', serif" },
+    "imfell":      { label: "IM Fell (oculto)",            serif: "'IM Fell English SC', 'Times New Roman', serif" }
   };
 
   var store = window.CoC.storage || null;
@@ -76,7 +87,8 @@ window.CoC = window.CoC || {};
   function normalize(palette) {
     var p = Object.assign({}, DEFAULTS, palette || {});
     Object.keys(DEFAULTS).forEach(function (k) {
-      if (k === "font") { if (!FONTS[p.font]) p.font = "default"; return; }
+      if (k === "font")      { if (!FONTS[p.font]) p.font = "default"; return; }
+      if (k === "titleFont") { if (!TITLE_FONTS[p.titleFont]) p.titleFont = "default"; return; }
       if (!hexToRgb(p[k])) p[k] = DEFAULTS[k];
     });
     return p;
@@ -117,9 +129,10 @@ window.CoC = window.CoC || {};
     s.setProperty("--body-grad-top", glow(p.accent, 0.08));
     s.setProperty("--body-grad-bottom", glow(p.accent, 0.04));
 
-    var font = FONTS[p.font] || FONTS["default"];
+    var font  = FONTS[p.font] || FONTS["default"];
+    var title = TITLE_FONTS[p.titleFont] || TITLE_FONTS["default"];
     s.setProperty("--font-body", font.body);
-    s.setProperty("--font-serif", font.serif);
+    s.setProperty("--font-serif", title.serif);
 
     document.body.style.colorScheme = isLight ? "light" : "dark";
   }
@@ -178,21 +191,25 @@ window.CoC = window.CoC || {};
       grid.appendChild(row);
     });
 
-    // Fonte
-    var fontRow = el("label", { style: { display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.8rem", gridColumn: "1 / -1" } });
-    var fontSel = el("select", { style: { flex: "1" } });
-    Object.keys(FONTS).forEach(function (k) {
-      var opt = el("option", { value: k, text: FONTS[k].label });
-      if (k === draft.font) opt.selected = true;
-      fontSel.appendChild(opt);
-    });
-    fontSel.addEventListener("change", function () {
-      draft.font = fontSel.value;
-      apply(draft);
-    });
-    fontRow.appendChild(el("span", { text: "Fonte:" }));
-    fontRow.appendChild(fontSel);
-    grid.appendChild(fontRow);
+    // Fontes — leitura (corpo) e temática (títulos), separadas
+    function _fontRow(labelText, catalog, key) {
+      var row = el("label", { style: { display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.8rem", gridColumn: "1 / -1" } });
+      var sel = el("select", { style: { flex: "1" } });
+      Object.keys(catalog).forEach(function (k) {
+        var opt = el("option", { value: k, text: catalog[k].label });
+        if (k === draft[key]) opt.selected = true;
+        sel.appendChild(opt);
+      });
+      sel.addEventListener("change", function () {
+        draft[key] = sel.value;
+        apply(draft);
+      });
+      row.appendChild(el("span", { style: { minWidth: "5.5rem" }, text: labelText }));
+      row.appendChild(sel);
+      return row;
+    }
+    grid.appendChild(_fontRow("Leitura:",  FONTS,       "font"));
+    grid.appendChild(_fontRow("Títulos:",  TITLE_FONTS, "titleFont"));
     wrap.appendChild(grid);
 
     var wasApplied = false;
@@ -236,7 +253,8 @@ window.CoC = window.CoC || {};
     load: load,
     save: save,
     DEFAULTS: DEFAULTS,
-    FONTS: FONTS
+    FONTS: FONTS,
+    TITLE_FONTS: TITLE_FONTS
   };
 
 })();
