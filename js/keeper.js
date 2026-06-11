@@ -687,8 +687,11 @@
       if (enc) {
         const armor = Number(enc.armor) || 0;
         const net = Math.max(0, d.total - armor);
-        const isMajorWound = d.total >= Math.floor(enc.hpMax / 2);
+        // CoC 7e: dano único ≥ metade do PV máximo = Ferimento Grave (sem floor —
+        // com PV ímpar o arredondamento p/ baixo marcava ferimento com 1 a menos).
+        const isMajorWound = enc.hpMax > 0 && d.total >= enc.hpMax / 2;
         enc.hpCur = Math.max(-10, enc.hpCur - net);
+        if (isMajorWound) enc.majorWound = true;
         if (enc.hpCur <= 0) enc.dead = true;
         renderEncounter();
         if (armor > 0 && net < d.total) {
@@ -940,6 +943,9 @@
       mov: c.derived?.mov ?? "—",
       armor: c.armor ?? 0,
       sanLoss: c.sanLoss ?? "—",
+      dex: Number(c.stats?.dex) || 0,
+      ammo: null,               // null = sem controle de munição; número = restante
+      majorWound: false,
       type: c.type,
       sourceId: state.activeSavedId || state.activeSourceId || null,
       dead: false
@@ -987,14 +993,18 @@
           <span class="ei-hp-label">${e.dead ? "💀 Morto" : `PV ${e.hpCur}<span class="ei-hp-max"> / ${e.hpMax}</span>`}</span>
         </div>
         <div class="ei-chips">
+          ${e.dex ? `<span class="ei-chip dex" title="Destreza (ordem de iniciativa)">⚡ ${Number(e.dex)}</span>` : ""}
           <span class="ei-chip" title="Movimento">🏃 ${escapeHtml(String(e.mov))}</span>
           <span class="ei-chip" title="Armadura">🛡 ${e.armor}</span>
           <span class="ei-chip" title="Perda de Sanidade">🧠 ${escapeHtml(String(e.sanLoss))}</span>
+          ${e.ammo != null ? `<span class="ei-chip ${e.ammo <= 0 ? "ammo-empty" : "ammo"}" title="Munição restante — clique em 🔫 para gastar">🔫 ${e.ammo <= 0 ? "vazio" : e.ammo}</span>` : ""}
+          ${e.majorWound && !e.dead ? `<span class="ei-chip mw" title="Ferimento Grave — dano ≥ metade do PV máximo (teste de CON ou inconsciente)">🩸 Fer. Grave</span>` : ""}
         </div>
         <div class="ei-controls">
           <button data-enc="${idx}" data-op="-1" title="Tirar 1 PV">−1</button>
           <button data-enc="${idx}" data-op="-X" title="Tirar X PV (número ou dado, ex: 1d6)">−X</button>
           <button data-enc="${idx}" data-op="+1" title="Curar 1 PV">+1</button>
+          <button data-enc="${idx}" data-op="ammo" title="${e.ammo == null || e.ammo <= 0 ? "Definir munição" : "Gastar 1 munição (zera → redefine)"}">🔫</button>
           <button data-enc="${idx}" data-op="kill" title="Alternar morto">💀</button>
           <button data-enc="${idx}" data-op="remove" title="Remover do encontro">✕</button>
         </div>
@@ -1005,6 +1015,17 @@
     $$("[data-enc]", list).forEach(b => {
       b.onclick = (e) => { e.stopPropagation(); adjustEncounter(parseInt(b.dataset.enc, 10), b.dataset.op); };
     });
+  }
+
+  // Ordena o tracker em ordem de iniciativa (CoC 7e: DES decrescente; mortos no fim).
+  function sortEncounterByInitiative() {
+    if (state.encounter.length < 2) return;
+    state.encounter = state.encounter
+      .map((e, i) => ({ e, i }))                       // índice preserva estabilidade
+      .sort((a, b) => ((a.e.dead ? 1 : 0) - (b.e.dead ? 1 : 0)) || ((b.e.dex || 0) - (a.e.dex || 0)) || (a.i - b.i))
+      .map(x => x.e);
+    renderEncounter();
+    toast("⚡ Ordem de iniciativa: DES decrescente (mortos no fim).", { type: "info", duration: 3000 });
   }
 
   // Avança/retrocede/zera o contador de rounds do encontro.
@@ -1028,6 +1049,21 @@
       if (/^-?\d+$/.test(t)) d = Math.abs(parseInt(t, 10));
       else { const r = dice.rollNotation(t); d = Math.abs(r.total); }
       e.hpCur = Math.max(-10, e.hpCur - d);
+      // CoC 7e: dano único ≥ metade do PV máximo = Ferimento Grave.
+      if (e.hpMax > 0 && d >= e.hpMax / 2) {
+        e.majorWound = true;
+        toast(`⚠ Ferimento Grave! ${escapeHtml(e.name)} sofreu ${d} dano — ≥ metade do PV máximo (${e.hpMax}).`, { type: "warn", duration: 6000 });
+      }
+    } else if (op === "ammo") {
+      if (e.ammo == null || e.ammo <= 0) {
+        const v = await prompt("Munição inicial (vazio remove o controle):", { title: `Munição — ${e.name}` });
+        if (v == null) return;
+        const n = parseInt(v.trim(), 10);
+        e.ammo = Number.isFinite(n) && n > 0 ? n : null;
+      } else {
+        e.ammo -= 1;
+        if (e.ammo === 0) toast(`🔫 ${escapeHtml(e.name)} ficou sem munição — precisa recarregar.`, { type: "warn", duration: 4000 });
+      }
     } else if (op === "kill") { e.dead = !e.dead; }
     else if (op === "remove") { state.encounter.splice(idx, 1); }
 
@@ -1059,6 +1095,7 @@
     $("#btn-round-prev")?.addEventListener("click", () => setRound("prev"));
     $("#btn-round-next")?.addEventListener("click", () => setRound("next"));
     $("#btn-round-reset")?.addEventListener("click", () => setRound("reset"));
+    $("#btn-enc-initiative")?.addEventListener("click", sortEncounterByInitiative);
   }
 
   // ═════════════════════════════════════════════════════════════════════

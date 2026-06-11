@@ -237,6 +237,22 @@ Auditoria de 2026-06-01 contra o código (não contra docs antigos):
   de Combate; dados de equipamentos/preços no Compêndio; entrada manual na Timeline. Requer
   verificação visual em navegador.
 
+### 2026-06-11 — Sessão 6 (Fase RK-2 — combate e timeline do Guardião)
+
+- *Anterior:* tracker de Encontro sem iniciativa/munição; Ferimento Grave era só toast (e com
+  `floor` no PV ímpar); Timeline só recebia eventos automáticos da campanha; cartas dos
+  investigadores sem retrato; ambient-fx só no investigador.
+- *Atual:* botão **⚡ Iniciativa** (DES decrescente, mortos no fim) + chip ⚡ DES; controle de
+  munição 🔫 por criatura (define/gasta/avisa "vazio"); chip persistente 🩸 Fer. Grave (teste
+  corrigido p/ metade exata do PV máx); entrada manual na Timeline (funciona sem campanha);
+  avatar de iniciais no roster; `ambient-fx.js` no keeper.html. SW v91. Verificação: 1086/1086
+  no runner + E2E Playwright (Chromium real: iniciativa ordena, munição zera, ferimento marca,
+  evento manual aparece, chuva ativa em ⚙️).
+- *Impacto:* a aba Encontro vira mesa de combate de verdade (ordem, recursos, estado visível) e a
+  Timeline aceita narrativa do Guardião — RK-2 concluída exceto equipamentos/preços no Compêndio.
+- *Próxima etapa:* dados de equipamentos/preços no Compêndio (conteúdo original, sem texto
+  proprietário); retrato real (thumbnail) no roster exige decisão de payload no transport.
+
 ---
 
 ## §9. Critérios de sucesso (da diretriz)

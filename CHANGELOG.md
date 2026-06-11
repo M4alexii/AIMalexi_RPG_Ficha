@@ -5,6 +5,33 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-11 - Fase RK-2: combate e timeline do Guardião
+
+### Adicionado (diretriz §8, etapa RK-2)
+
+- **Iniciativa no Encontro**: botão **⚡ Iniciativa** ordena o tracker em
+  ordem de DES decrescente (CoC 7e), mortos no fim; chip ⚡ DES em cada
+  criatura (capturado do bestiário ao adicionar).
+- **Munição no Encontro**: botão 🔫 define a munição inicial e gasta 1 por
+  clique; chip mostra o restante e avisa **"vazio"** ao zerar (re-clique
+  redefine). Valor vazio remove o controle.
+- **Ferimento Grave visível**: dano único ≥ metade do PV máximo marca o chip
+  **🩸 Fer. Grave** na criatura (antes era só um toast passageiro).
+- **Timeline manual**: campo "✍️ + Evento" na aba Timeline — o Guardião anota
+  eventos narrativos na linha do tempo **mesmo sem campanha ativa** (Enter
+  também envia).
+- **Avatar nas cartas dos investigadores**: círculo com iniciais no roster da
+  campanha (retrato leve, sem tráfego de imagem).
+- **Ambiente visual no Guardião**: `ambient-fx.js` agora carrega no
+  keeper.html — chuva/névoa/poeira/VHS/filme funcionam via ⚙️ Configurações.
+
+### Corrigido
+
+- **Ferimento Grave com PV ímpar**: o teste usava `floor(PV máx / 2)` e
+  marcava ferimento com 1 ponto a menos que a regra (ex.: 5 de dano com
+  PV 11); agora compara com a metade exata (≥ 5.5 ⇒ 6+).
+- SW: `CACHE_VERSION` v91.
+
 ## 2026-06-11 - Personalização visual (itens 8–13) + correções críticas
 
 ### Corrigido

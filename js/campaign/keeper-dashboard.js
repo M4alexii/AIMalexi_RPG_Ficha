@@ -123,6 +123,22 @@ window.CoC.campaign = window.CoC.campaign || {};
       if (_cs) _cs.clearTimeline();
       _renderTimeline([]);
     };
+
+    // Entrada manual na timeline (RK-2) — funciona com ou sem campanha ativa.
+    var tlInput  = $s('#timeline-input');
+    var btnAddTL = $s('#btn-add-timeline');
+    function addManualEvent() {
+      if (!tlInput || !_cs) return;
+      var text = tlInput.value.trim();
+      if (!text) return;
+      _cs.pushTimeline({ type: 'manual', text: '✍️ ' + _esc(text), cls: 'ev-manual' });
+      tlInput.value = '';
+      _renderTimeline(_cs.getState().timeline || []);
+    }
+    if (btnAddTL) btnAddTL.onclick = addManualEvent;
+    if (tlInput) tlInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); addManualEvent(); }
+    });
   }
 
   // ── Create Campaign ───────────────────────────────────────────────────────
@@ -289,6 +305,9 @@ window.CoC.campaign = window.CoC.campaign || {};
 
     var status = state.status || (state.connected ? 'active' : 'disconnected');
 
+    // A timeline vive em qualquer estado (eventos manuais existem sem campanha).
+    _renderTimeline(state.timeline || []);
+
     if (status === 'disconnected' || !state.connected) {
       if (setup)     setup.style.display     = '';
       if (stale)     stale.style.display     = 'none';
@@ -321,7 +340,6 @@ window.CoC.campaign = window.CoC.campaign || {};
     if (cbPlayers) cbPlayers.textContent = onlineN + ' conectado' + (onlineN !== 1 ? 's' : '');
 
     _renderInvestigatorCards(invs);
-    _renderTimeline(state.timeline || []);
   }
 
   // Grade chave→valor (atributos/perícias) para o detalhe do investigador.
@@ -377,6 +395,7 @@ window.CoC.campaign = window.CoC.campaign || {};
 
       return '<div class="inv-card ' + (inv.online ? 'online' : 'offline') + '">' +
         '<div class="inv-card-header">' +
+          '<span class="inv-avatar" aria-hidden="true">' + _esc(_initials(inv.characterName)) + '</span>' +
           '<span class="inv-card-online-dot"></span>' +
           '<span class="inv-card-name">' + _esc(inv.characterName || '?') + '</span>' +
           '<span class="inv-card-player">' + _esc(inv.playerName || '') + '</span>' +
@@ -495,6 +514,15 @@ window.CoC.campaign = window.CoC.campaign || {};
   // ── Utils ──────────────────────────────────────────────────────────────────
   function _esc(str) {
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // Iniciais do investigador para o avatar do roster (até 2 letras).
+  function _initials(name) {
+    var parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return '?';
+    var first = parts[0].charAt(0);
+    var last  = parts.length > 1 ? parts[parts.length - 1].charAt(0) : '';
+    return (first + last).toUpperCase();
   }
 
   function _fmtTime(ts) {

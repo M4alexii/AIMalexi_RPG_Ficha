@@ -221,6 +221,7 @@
           <span class="enc-round">Round <b id="enc-round-num">1</b></span>
           <button class="btn-ghost btn-icon" id="btn-round-next" title="Próximo round">▶</button>
           <button class="btn-ghost btn-sm" id="btn-round-reset" title="Reiniciar contagem de rounds">⟲ Reiniciar</button>
+          <button class="btn-ghost btn-sm" id="btn-enc-initiative" title="Ordenar por iniciativa (DES decrescente, mortos no fim)">⚡ Iniciativa</button>
         </div>
         <div class="encounter-list" id="encounter-list">
           <div class="encounter-empty">
@@ -241,6 +242,10 @@
         <div class="tp-header">
           <strong class="tp-title">📜 Timeline</strong>
           <button class="btn-ghost btn-icon" id="btn-clear-timeline" title="Limpar timeline">✕</button>
+        </div>
+        <div class="tp-compose">
+          <input type="text" id="timeline-input" class="tp-input" placeholder="Anotar evento manual... (ex: O grupo chegou à mansão)" maxlength="200" aria-label="Novo evento manual da timeline" />
+          <button id="btn-add-timeline" class="btn-primary btn-sm" type="button" title="Adicionar evento manual à timeline">+ Evento</button>
         </div>
         <ul class="timeline-list" id="timeline-list">
           <li class="tl-empty">Sem eventos ainda.</li>
@@ -373,6 +378,7 @@
 <script src="js/shared/media-picker.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/settings.js"></script>
+<script src="js/shared/ambient-fx.js"></script>
 <script src="js/keeper-tour.js"></script>
 <script src="js/keeper-notes-advanced.js"></script>
 <script src="js/keeper-notes-ui.js"></script>

@@ -875,6 +875,13 @@
   border-radius: var(--radius);
   padding: 0.12rem 0.4rem;
 }
+.ei-chip.dex        { color: var(--keeper-accent-bright, var(--brass-bright)); }
+.ei-chip.ammo-empty { color: var(--blood); font-weight: 700; }
+.ei-chip.mw {
+  color: var(--blood);
+  border: 1px solid var(--blood);
+  background: transparent;
+}
 
 .encounter-item .ei-controls {
   display: flex;
@@ -1165,9 +1172,27 @@
 
 .inv-card-header {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 0.4rem;
   margin-bottom: 0.4rem;
+}
+
+/* Avatar com iniciais (RK-2 — retrato leve, sem tráfego de imagem) */
+.inv-avatar {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--bg-deep);
+  border: 1px solid var(--keeper-accent, var(--brass));
+  color: var(--keeper-accent-bright, var(--brass-bright));
+  font-family: var(--font-serif);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .inv-card-name {
@@ -1355,6 +1380,27 @@
   color: var(--brass-bright);
 }
 
+/* Entrada manual de eventos (RK-2) */
+.tp-compose {
+  display: flex;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+}
+.tp-input {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.82rem;
+  padding: 0.35rem 0.5rem;
+  background: var(--bg-deep);
+  color: var(--ink);
+  border: 1px solid var(--ink-faded);
+  border-radius: var(--radius);
+}
+.tp-input:focus {
+  outline: none;
+  border-color: var(--keeper-accent, var(--brass));
+}
+
 .timeline-list {
   list-style: none;
   padding: 0;
@@ -1404,6 +1450,7 @@
 .tl-entry.ev-magic     .tl-text { color: #9b7fd4; }
 .tl-entry.ev-roll      .tl-text { color: var(--mist); }
 .tl-entry.ev-combat    .tl-text { color: var(--keeper-accent-bright); }
+.tl-entry.ev-manual    .tl-text { color: var(--ink); font-style: italic; }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    MODAL DE CAMPANHA
