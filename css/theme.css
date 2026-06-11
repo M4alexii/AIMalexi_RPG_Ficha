@@ -1721,3 +1721,85 @@ body[data-bg-texture="arquivo"] .app::before {
 @media print {
   body[data-bg-texture] .app::before { display: none !important; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   APARÊNCIA — ESTILO DOS CARDS + BORDAS (spec item 9)
+   ───────────────────────────────────────────────────────────────────────────
+   body[data-card-style="arcano|moderno|arquivo|maquina"] ·
+   body[data-border-style="nenhuma|simples|vintage|runas|artdeco"] (settings.js)
+   "arcano" e "simples" são o visual atual (baseline — sem regras): zero
+   regressão para quem nunca abriu a Central de Configurações.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Moderno: bordas suaves, sombra leve, sem cantoneiras */
+body[data-card-style="moderno"] .section {
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--bg-card);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+}
+body[data-card-style="moderno"] .section::before,
+body[data-card-style="moderno"] .section::after { display: none; }
+
+/* Arquivo: borda dupla de dossiê, papel */
+body[data-card-style="arquivo"] .section {
+  border-radius: var(--radius);
+  border: 3px double var(--ink-faded);
+  background: var(--parchment);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+body[data-card-style="arquivo"] .section::before,
+body[data-card-style="arquivo"] .section::after { display: none; }
+
+/* Máquina de escrever: bordas retas, traço seco, títulos datilografados */
+body[data-card-style="maquina"] .section {
+  border-radius: 0;
+  border: 1px solid var(--ink-dim);
+  background: var(--bg-card);
+  box-shadow: none;
+}
+body[data-card-style="maquina"] .section::before,
+body[data-card-style="maquina"] .section::after { display: none; }
+body[data-card-style="maquina"] .section-title,
+body[data-card-style="maquina"] .section > h2,
+body[data-card-style="maquina"] .section > h3 {
+  font-family: var(--font-typewriter);
+  letter-spacing: 0.04em;
+}
+
+/* ── Bordas decorativas (independentes do estilo do card) ── */
+
+body[data-border-style="nenhuma"] .section { border-color: transparent; }
+body[data-border-style="nenhuma"] .section::before,
+body[data-border-style="nenhuma"] .section::after { display: none; }
+
+/* Vintage: filete duplo clássico */
+body[data-border-style="vintage"] .section {
+  border-width: 4px;
+  border-style: double;
+  border-color: var(--frame-line, var(--line));
+}
+
+/* Runas: glifos discretos correndo na moldura (SVG inline, tom neutro de latão) */
+body[data-border-style="runas"] .section {
+  border-width: 7px;
+  border-style: solid;
+  border-color: var(--frame-dim, var(--line));      /* fallback sem border-image */
+  border-image-source: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48'><g stroke='rgba(168,140,92,0.65)' stroke-width='1.3' fill='none'><path d='M8 2 l4 4 -4 4 M8 2 v8'/><path d='M24 2 v8 M20 4 l8 4 M28 4 l-8 4'/><path d='M40 2 l-4 8 M36 2 l4 8'/><path d='M2 8 l4 4 -4 4 M2 8 v8' transform='rotate(90 8 24) translate(0 -16)'/><path d='M8 38 l4 4 -4 4 M8 38 v8'/><path d='M24 38 v8 M20 40 l8 4 M28 40 l-8 4'/><path d='M40 38 l-4 8 M36 38 l4 8'/></g></svg>");
+  border-image-slice: 11;
+  border-image-repeat: round;
+}
+
+/* Art Déco: chevrons geométricos anos 20 */
+body[data-border-style="artdeco"] .section {
+  border-width: 6px;
+  border-style: solid;
+  border-color: var(--frame-line, var(--line));     /* fallback sem border-image */
+  border-image-source: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><g stroke='rgba(184,146,79,0.7)' stroke-width='1.4' fill='none'><path d='M0 6 L6 0 M4 10 L10 4 M30 0 L40 10 M30 10 L36 4'/><path d='M0 34 L6 40 M4 30 L10 36 M30 40 L40 30 M30 30 L36 36'/><path d='M14 0 l6 5 6 -5 M14 40 l6 -5 6 5 M0 14 l5 6 -5 6 M40 14 l-5 6 5 6'/></g></svg>");
+  border-image-slice: 12;
+  border-image-repeat: round;
+}
+body[data-border-style="runas"] .section::before,
+body[data-border-style="runas"] .section::after,
+body[data-border-style="artdeco"] .section::before,
+body[data-border-style="artdeco"] .section::after { display: none; }

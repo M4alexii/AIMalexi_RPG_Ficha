@@ -48,7 +48,7 @@ window.CoC = window.CoC || {};
     // Aparência (camada temática — tudo via tokens, nunca quebra legibilidade)
     bgTexture:    'none',      // none|papel|couro|madeira|nebulosa|arquivo
     bgIntensity:  50,          // 0–100% (mapeado p/ opacidade real com teto 0.35)
-    cardStyle:    'moderno',   // moderno|arquivo|maquina|arcano
+    cardStyle:    'arcano',    // arcano (visual atual)|moderno|arquivo|maquina
     borderStyle:  'simples',   // nenhuma|simples|vintage|runas|artdeco
     notesStyle:   'caderno',   // caderno|dossie|diario|maquina
     ambient:      'none',      // none|rain|mist|dust|vhs|film
@@ -63,10 +63,10 @@ window.CoC = window.CoC || {};
     { id: 'arquivo',  label: 'Arquivo policial' },
   ];
   var CARD_STYLES = [
+    { id: 'arcano',  label: 'Arcano (cantoneiras de latão — padrão)' },
     { id: 'moderno', label: 'Moderno (bordas suaves, sombra leve)' },
     { id: 'arquivo', label: 'Arquivo (borda dupla, papel)' },
     { id: 'maquina', label: 'Máquina de escrever (bordas retas)' },
-    { id: 'arcano',  label: 'Arcano (ornamentos discretos)' },
   ];
   var BORDER_STYLES = [
     { id: 'nenhuma', label: 'Nenhuma' },
@@ -158,7 +158,7 @@ window.CoC = window.CoC || {};
     document.documentElement.style.setProperty('--bg-texture-opacity', (pct / 100 * 0.35).toFixed(3));
 
     // Aparência: estilo dos cards, bordas e anotações
-    body.dataset.cardStyle   = CARD_STYLES.some(function (c2) { return c2.id === s.cardStyle; }) ? s.cardStyle : 'moderno';
+    body.dataset.cardStyle   = CARD_STYLES.some(function (c2) { return c2.id === s.cardStyle; }) ? s.cardStyle : 'arcano';
     body.dataset.borderStyle = BORDER_STYLES.some(function (b2) { return b2.id === s.borderStyle; }) ? s.borderStyle : 'simples';
     body.dataset.notesStyle  = NOTES_STYLES.some(function (n2) { return n2.id === s.notesStyle; }) ? s.notesStyle : 'caderno';
 
