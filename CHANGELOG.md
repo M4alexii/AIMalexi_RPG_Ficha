@@ -5,6 +5,19 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-11 - Modo de sessão (🎬 cena: investigação/combate)
+
+### Adicionado
+
+- **Modo de sessão** na toolbar: o botão 🎬 alterna neutro → 🔎 Investigação
+  → ⚔️ Combate. Ao ativar, a ficha navega para a aba da cena e as perícias
+  relevantes sobem dentro de cada grupo (abaixo das favoritas ★):
+  investigação prioriza Encontrar/Escutar/Usar Bibliotecas/Psicologia/
+  Ocultismo/…; combate prioriza Esquivar/Lutar/Armas de Fogo/Primeiros
+  Socorros/…. Estado de cena vive em `sessionStorage` (não é dado de
+  ficha — conforme a regra de camadas de estado). Item nº 6 do roadmap
+  de `Melhorias/PERSONALIZACAO_E_MODOS_V1.md`.
+
 ## 2026-06-11 - Favoritos de perícias (★)
 
 ### Adicionado
