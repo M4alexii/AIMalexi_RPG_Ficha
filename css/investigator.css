@@ -428,6 +428,9 @@ body[data-difficulty="extreme"] .skill-frac-sep {
 .theme-swatch[data-theme="sepia"]      { background: #c08030; }
 .theme-swatch[data-theme="obsidian"]   { background: #4888c8; }
 .theme-swatch[data-theme="eldritch"]   { background: #7848c8; }
+.theme-swatch[data-theme="noir"]       { background: linear-gradient(135deg, #0d0d0d 50%, #c4c4c4 50%); }
+.theme-swatch[data-theme="hospital"]   { background: #F2F5F1; border-color: #3F6E58; }
+.theme-swatch[data-theme="agencia"]    { background: #4A6B8A; }
 .theme-swatch[data-theme="custom"]     { background: conic-gradient(#8A3B3B, #C69C4D, #4F7A4F, #5D8B84, #8A3B3B); }
 
 /* Main panel: right of character sidebar */

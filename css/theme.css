@@ -1082,6 +1082,104 @@ body[data-theme="arquivo"] {
   --body-grad-bottom: rgba(122, 46, 46, 0.04);
 }
 
+/* ── Noir · Filme policial · Preto e branco ──
+   Quase monocromático: o único vermelho que sobra é o sangue. */
+body[data-theme="noir"] {
+  --bg-deep:          #0d0d0d;
+  --bg-mid:           #141414;
+  --bg-card:          #1a1a1a;
+  --bg-card-hi:       #232323;
+  --bg-overlay:       rgba(13, 13, 13, 0.92);
+  --ink:              #e8e8e8;
+  --ink-dim:          #a8a8a8;
+  --ink-faded:        #555555;
+  --line:             #383838;
+  --brass:            #9a9a9a;
+  --brass-bright:     #c4c4c4;
+  --brass-glow:       rgba(154, 154, 154, 0.35);
+  --on-accent:        #0d0d0d;
+  --candle:           #b8b8b8;
+  --candle-bright:    #d8d8d8;
+  --crit:             #d8d8d8;
+  --extreme:          #b8b8b8;
+  --hard:             #a8a8a8;
+  --regular:          #888888;
+  --fail:             #6e3a3a;
+  --ok:               #8a8a8a;
+  --warn:             #b8b8b8;
+  --err:              #8A3B3B;
+  --san-tone:         #9a9a9a;
+  --title-ink:        #d8d8d8;
+  --num-ink:          #f0f0f0;
+  --num-accent:       #d8d8d8;
+  --accent:           var(--brass);
+  --accent-glow:      var(--brass-glow);
+  --body-grad-top:    rgba(60, 60, 60, 0.18);
+  --body-grad-bottom: rgba(30, 30, 30, 0.10);
+}
+
+/* ── Hospital Psiquiátrico · TEMA CLARO · Branco-gelo + verde hospitalar ── */
+body[data-theme="hospital"] {
+  color-scheme: light;
+  --bg-deep:          #F2F5F1;
+  --bg-mid:           #EAEFE8;
+  --bg-card:          #E2E9E0;
+  --bg-card-hi:       #D6E0D3;
+  --bg-overlay:       rgba(242, 245, 241, 0.94);
+  --ink:              #25302A;
+  --ink-dim:          #4E5F55;
+  --ink-faded:        #7E8F84;
+  --line:             #BECABF;
+  --brass:            #3F6E58;
+  --brass-bright:     #54866E;
+  --brass-glow:       rgba(63, 110, 88, 0.30);
+  --blood:            #8C3030;
+  --err:              #8C3030;
+  --fail:             #8C3030;
+  --crit:             #2F5D47;
+  --extreme:          #6e5a32;
+  --hard:             #4E5F55;
+  --regular:          #5d6570;
+  --ok:               #3F6E58;
+  --warn:             #9a7a30;
+  --title-ink:        #3F6E58;
+  --num-ink:          #25302A;
+  --num-accent:       #2F5D47;
+  --parchment:        #E9EFE7;
+  --parchment-dim:    #C2CFC3;
+  --ink-doc:          #25302A;
+  --ink-doc-faded:    #5E6F65;
+  --accent:           var(--brass);
+  --accent-glow:      var(--brass-glow);
+  --body-grad-top:    rgba(63, 110, 88, 0.05);
+  --body-grad-bottom: rgba(63, 110, 88, 0.03);
+}
+
+/* ── Agência Federal · Dossiê confidencial · Cinza + azul-aço ── */
+body[data-theme="agencia"] {
+  --bg-deep:          #101418;
+  --bg-mid:           #161B21;
+  --bg-card:          #1A2026;
+  --bg-card-hi:       #232B33;
+  --bg-overlay:       rgba(16, 20, 24, 0.92);
+  --ink:              #D6DCE2;
+  --ink-dim:          #94A0AC;
+  --ink-faded:        #4E5A66;
+  --line:             #303A44;
+  --brass:            #4A6B8A;
+  --brass-bright:     #6E92B2;
+  --brass-glow:       rgba(74, 107, 138, 0.40);
+  --candle:           #A8915C;
+  --candle-bright:    #C4AE78;
+  --san-tone:         #6A8294;
+  --title-ink:        #8FA8BE;
+  --num-accent:       #8FA8BE;
+  --accent:           var(--brass);
+  --accent-glow:      var(--brass-glow);
+  --body-grad-top:    rgba(40, 60, 84, 0.18);
+  --body-grad-bottom: rgba(20, 34, 48, 0.10);
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    SANIDADE EM COLAPSO — cor da barra de SAN acompanha o estado mental
    (body[data-sanity] já é mantido por js/shared/sanity-fx.js)

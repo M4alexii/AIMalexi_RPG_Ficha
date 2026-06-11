@@ -337,7 +337,8 @@
 
   // ─── TEMA ─────────────────────────────────────────────────────────────
   const _VALID_THEMES = ["arkham", "classico", "dossie", "lovecraft", "cosmic", "arquivo",
-                         "miskatonic", "sepia", "obsidian", "eldritch", "custom"];
+                         "miskatonic", "sepia", "obsidian", "eldritch",
+                         "noir", "hospital", "agencia", "custom"];
 
   function applyTheme(theme) {
     const t = _VALID_THEMES.includes(theme) ? theme : "arkham";

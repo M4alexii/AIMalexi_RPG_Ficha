@@ -30,6 +30,9 @@ window.CoC = window.CoC || {};
     { id: 'sepia',      label: 'Sépia (Documento Histórico)' },
     { id: 'obsidian',   label: 'Obsidian (Escuro/Moderno)' },
     { id: 'eldritch',   label: 'Eldritch (Vazio Púrpura)' },
+    { id: 'noir',       label: 'Noir (Preto e Branco)' },
+    { id: 'hospital',   label: 'Hospital Psiquiátrico (Claro)' },
+    { id: 'agencia',    label: 'Agência Federal (Cinza/Azul)' },
   ];
 
   var DEFAULTS = {
