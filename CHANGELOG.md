@@ -5,6 +5,20 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-11 - Sidebar do investigador volta ao modelo escuro (parchment segue o tema)
+
+### Corrigido
+
+- **Área do retrato/atributos bege em temas escuros** (feedback do usuário):
+  as variáveis do "parchment world" (`--parchment`/`--ink-doc`…) eram fixas
+  em bege independente do tema. Agora são *aliases* do tema ativo — em temas
+  escuros a sidebar é escura (modelo clássico da ficha); o papel bege real
+  só existe no tema claro **Arquivo**. Consequência: o editor de tema custom
+  (🎨) e todos os presets agora controlam também a sidebar/dossiês.
+- `.sidebar-name`: sombra branca difusa (assumia papel claro) trocada por
+  sombra de recorte escura.
+- Varreduras de regressão: 0 elementos <2.5:1 no tema escuro e <3:1 no claro.
+
 ## 2026-06-10 - Novos temas (claro/escuro), tema custom do jogador e SAN com cor de estado
 
 ### Adicionado

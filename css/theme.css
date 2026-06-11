@@ -19,11 +19,14 @@
   --ink-dim:        #a89580;
   --ink-faded:      #6b5d4a;
 
-  /* === Parchment world (documento de jogo) === */
-  --parchment:      #E7DABA;
-  --parchment-dim:  #CDBC97;
-  --ink-doc:        #2B241A;
-  --ink-doc-faded:  #6B5F49;
+  /* === Parchment world (documento de jogo) ===
+     Aliased ao tema: em temas escuros o "papel" é o card escuro (modelo
+     clássico da ficha); o bege real só existe no tema claro "arquivo".
+     Assim a sidebar/dossiês seguem o tema escolhido — inclusive o custom. */
+  --parchment:      var(--bg-card-hi);
+  --parchment-dim:  var(--ink-faded);
+  --ink-doc:        var(--ink);
+  --ink-doc-faded:  var(--ink-dim);
 
   /* === Acentos === */
   --brass:          #b8924f;
@@ -1038,6 +1041,11 @@ body[data-theme="arquivo"] {
   --title-ink:        #5C4033;
   --num-ink:          #2A2522;
   --num-accent:       #5C4033;
+  /* papel verdadeiro: no tema claro o dossiê é bege de arquivo */
+  --parchment:        #E7DABA;
+  --parchment-dim:    #CDBC97;
+  --ink-doc:          #2B241A;
+  --ink-doc-faded:    #6B5F49;
   --accent:           var(--brass);
   --accent-glow:      var(--brass-glow);
   --body-grad-top:    rgba(92, 64, 51, 0.06);
