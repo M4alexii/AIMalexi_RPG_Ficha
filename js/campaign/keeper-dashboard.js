@@ -260,7 +260,11 @@ window.CoC.campaign = window.CoC.campaign || {};
   function _handleExecutionTrace(event) {
     if (!event.entry) return;
     var entry = event.entry;
+    // "Personagem (Jogador)" — o Guardião sabe quem rolou sem decorar nomes.
     var actor = event.characterName || event.playerName || '?';
+    if (event.characterName && event.playerName && event.playerName !== event.characterName) {
+      actor = event.characterName + ' (' + event.playerName + ')';
+    }
     // Fonte única de formatação (compartilhada com o replay durável).
     var sync = window.CoC.campaign && window.CoC.campaign.sync;
     var fmt  = (sync && sync.formatTraceEntry)
