@@ -42,7 +42,7 @@
 .hero-badge {
   display: inline-block;
   font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.18em;
-  text-transform: uppercase; color: var(--brass);
+  text-transform: uppercase; color: var(--brass-bright);
   border: 1px solid var(--brass); border-radius: 999px;
   padding: 0.25rem 0.85rem; margin-bottom: 1.2rem;
   background: rgba(184,146,79,0.06);
@@ -80,7 +80,7 @@
   transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
 }
 .hero-cta .cta-primary {
-  background: var(--brass); color: var(--bg-deep); font-weight: 700;
+  background: var(--brass); color: var(--on-accent, var(--bg-deep)); font-weight: 700;
   box-shadow: 0 6px 22px var(--brass-glow);
 }
 .hero-cta .cta-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px var(--brass-glow); }
@@ -134,7 +134,7 @@
 }
 .features-title {
   text-align: center; font-family: var(--font-display); font-weight: 600;
-  font-size: clamp(1.2rem, 4vw, 1.7rem); color: var(--brass);
+  font-size: clamp(1.2rem, 4vw, 1.7rem); color: var(--brass-bright);
   letter-spacing: 0.05em; margin-bottom: 1.2rem;
 }
 .feature-grid {
@@ -191,7 +191,7 @@
   font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em;
   text-transform: uppercase; color: var(--ink-faded);
 }
-.home-footer a { color: var(--brass); }
+.home-footer a { color: var(--brass-bright); }
 
 /* ── Responsivo ── */
 @media (max-width: 600px) {

@@ -5,6 +5,51 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-11 - Estrutura AIMalexi vira o padrão + camada funcional de personalização
+
+### Mudado
+
+- **Paleta padrão do site inteiro** agora é a "Estrutura AIMalexi" (arquivo
+  antigo de investigador): fundo `#1B1A17`, cards `#26231F`, ação verde-oliva
+  `#556B2F`, alerta `#C69C4D`, sucesso/falha dessaturados (`#4F7A4F`/`#8A3B3B`).
+  Aplica a portal, guia, compêndio e keeper (que não têm seletor de tema).
+  O dourado original vive no novo tema **Clássico**.
+- Novo token `--on-accent` (texto sobre a cor de ação) — claro sobre oliva,
+  escuro sobre o dourado do Clássico; aplicado a `.btn-primary`, `.btn-export`,
+  CTA do portal e fluxograma do guia.
+- `--ink-faded` recalibrado p/ texto terciário ≥3:1; bordas puras da spec em
+  `--line: #3D3831`. Textos que usavam `--brass` elevados a `--brass-bright`
+  (96 substituições nos 6 CSS).
+
+### Adicionado
+
+- **Fontes da camada funcional** no editor 🎨, separadas em **Leitura**
+  (Crimson, Inter, Atkinson Hyperlegible, Courier, máquina de escrever,
+  sistema) e **Títulos** (Cormorant, Libre Baskerville, Cinzel, IM Fell).
+- **Densidade "Normal"** (3 níveis: Confortável/Normal/Compacta) em ⚙️.
+- **SAN com 4 estados**: verde → âmbar (instável) → vermelho (crítica) →
+  **roxo (insano)** na barra, via `body[data-sanity]`.
+- Lista de temas do ⚙️ sincronizada com os 9 presets.
+- `Melhorias/PERSONALIZACAO_E_MODOS_V1.md`: spec consolidada das duas
+  propostas do proprietário (camadas de personalização + modos
+  Jogador/Investigador/Keeper) com status e prioridades.
+- Varreduras de contraste pós-mudança: **0 elementos <3:1 nas 5 páginas**
+  (incluindo botões antes não-mensuráveis por gradiente).
+
+## 2026-06-11 - Sidebar do investigador volta ao modelo escuro (parchment segue o tema)
+
+### Corrigido
+
+- **Área do retrato/atributos bege em temas escuros** (feedback do usuário):
+  as variáveis do "parchment world" (`--parchment`/`--ink-doc`…) eram fixas
+  em bege independente do tema. Agora são *aliases* do tema ativo — em temas
+  escuros a sidebar é escura (modelo clássico da ficha); o papel bege real
+  só existe no tema claro **Arquivo**. Consequência: o editor de tema custom
+  (🎨) e todos os presets agora controlam também a sidebar/dossiês.
+- `.sidebar-name`: sombra branca difusa (assumia papel claro) trocada por
+  sombra de recorte escura.
+- Varreduras de regressão: 0 elementos <2.5:1 no tema escuro e <3:1 no claro.
+
 ## 2026-06-10 - Novos temas (claro/escuro), tema custom do jogador e SAN com cor de estado
 
 ### Adicionado

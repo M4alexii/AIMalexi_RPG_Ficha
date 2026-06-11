@@ -89,7 +89,7 @@
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--brass);
+  color: var(--brass-bright);
   background: var(--bg-deep);
   padding: 0.45rem 0.65rem;
   text-align: left;
@@ -133,7 +133,7 @@ ol.comp-list { counter-reset: comp-ol; }
 ol.comp-list li { counter-increment: comp-ol; }
 ol.comp-list li::before {
   content: counter(comp-ol) ". ";
-  color: var(--brass);
+  color: var(--brass-bright);
   font-family: var(--font-mono);
   font-weight: 700;
 }

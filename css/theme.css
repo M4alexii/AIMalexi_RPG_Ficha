@@ -3,34 +3,41 @@
    theme.css — variáveis, tipografia, reset e componentes compartilhados
    ═══════════════════════════════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=IM+Fell+English+SC:wght@400&family=Cormorant+Garamond:wght@400;500;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Courier+Prime:wght@400;700&family=Special+Elite:wght@400&family=Caveat:wght@400;600&family=JetBrains+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IM+Fell+English+SC:wght@400&family=Cormorant+Garamond:wght@400;500;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Courier+Prime:wght@400;700&family=Special+Elite:wght@400&family=Caveat:wght@400;600&family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&family=Atkinson+Hyperlegible:wght@400;700&family=Libre+Baskerville:wght@400;700&family=Cinzel:wght@400;600&display=swap');
 
 :root {
   color-scheme: dark;
 
-  /* === Cores base === */
-  --bg-deep:        #0a0807;
-  --bg-mid:         #15110d;
-  --bg-card:        #1c1813;
-  --bg-card-hi:     #241e17;
-  --bg-overlay:     rgba(10, 8, 7, 0.92);
+  /* === Cores base (Estrutura AIMalexi — arquivo antigo de investigador) ===
+     Neutros quentes dessaturados p/ leitura em sessões de 4-6h; o dourado
+     clássico anterior vive no tema "classico". */
+  --bg-deep:        #1B1A17;
+  --bg-mid:         #211F1B;
+  --bg-card:        #26231F;
+  --bg-card-hi:     #2E2A25;
+  --bg-overlay:     rgba(27, 26, 23, 0.92);
 
-  --ink:            #e8dcc4;
-  --ink-dim:        #a89580;
-  --ink-faded:      #6b5d4a;
+  --ink:            #E6E0D5;
+  --ink-dim:        #B7B0A4;
+  --ink-faded:      #807767;   /* texto terciário (≥3:1 sobre cards); bordas puras da spec em --line */
+  --line:           #3D3831;   /* bordas da spec */
 
-  /* === Parchment world (documento de jogo) === */
-  --parchment:      #E7DABA;
-  --parchment-dim:  #CDBC97;
-  --ink-doc:        #2B241A;
-  --ink-doc-faded:  #6B5F49;
+  /* === Parchment world (documento de jogo) ===
+     Aliased ao tema: em temas escuros o "papel" é o card escuro (modelo
+     clássico da ficha); o bege real só existe no tema claro "arquivo".
+     Assim a sidebar/dossiês seguem o tema escolhido — inclusive o custom. */
+  --parchment:      var(--bg-card-hi);
+  --parchment-dim:  var(--ink-faded);
+  --ink-doc:        var(--ink);
+  --ink-doc-faded:  var(--ink-dim);
 
   /* === Acentos === */
-  --brass:          #b8924f;
-  --brass-bright:   #d4a960;
-  --brass-glow:     rgba(184, 146, 79, 0.45);
-  --candle:         #C28E2D;
-  --candle-bright:  #E3B65A;
+  --brass:          #556B2F;   /* ação (verde-oliva) */
+  --brass-bright:   #7A934B;
+  --brass-glow:     rgba(85, 107, 47, 0.45);
+  --on-accent:      #F2EFE7;   /* texto sobre a cor de ação (oliva pede claro) */
+  --candle:         #C69C4D;   /* alerta (dourado dessaturado) */
+  --candle-bright:  #D8B36A;
   --burgundy:       #4a1c1c;
   --burgundy-hi:    #6b2a2a;
   --blood:          #8b1a1a;
@@ -43,17 +50,20 @@
   --spectral:       #6E8585;
 
   /* === Resultado de testes === */
-  --crit:           #d4a960;
+  --crit:           #C69C4D;
   --extreme:        #c87a4f;
-  --hard:           #a89580;
+  --hard:           #B7B0A4;
   --regular:        #7a8590;
-  --fail:           #6b3232;
+  --fail:           #8A3B3B;
   --fumble:         #3a0a0a;
 
   /* === Validação === */
-  --ok:             #5a8a5a;
-  --warn:           #c8924f;
-  --err:            #8b1a1a;
+  --ok:             #4F7A4F;
+  --warn:           #C69C4D;
+  --err:            #8A3B3B;
+
+  /* === Sanidade (cor base da barra) === */
+  --san-tone:       #6A8F6A;
 
   /* === Tipografia (spec 1920s archive) === */
   --font-display:   'IM Fell English SC', 'Times New Roman', serif;    /* títulos occult-only */
@@ -87,8 +97,8 @@
   --num-accent:     var(--candle-bright);   /* números dourados (atributos) */
 
   /* === Gradiente de fundo do body (override por tema) === */
-  --body-grad-top:    rgba(74, 28, 28, 0.15);
-  --body-grad-bottom: rgba(90, 122, 138, 0.08);
+  --body-grad-top:    rgba(61, 56, 49, 0.20);
+  --body-grad-bottom: rgba(85, 107, 47, 0.06);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -201,7 +211,7 @@ body::after {
 }
 .app-title-link:hover,
 .app-title-link:focus-visible {
-  color: var(--brass);
+  color: var(--brass-bright);
   text-shadow: 0 0 26px var(--brass-glow), 0 2px 0 rgba(0,0,0,0.8);
 }
 
@@ -244,6 +254,8 @@ body::after {
 }
 
 /* Densidade compacta — reduz paddings/gaps globais */
+body.density-normal  { --gap-lg: 1.1rem; }
+body.density-normal .section { padding: 0.9rem 1rem; }
 body.density-compact { --gap-lg: 0.75rem; }
 body.density-compact .section { padding: 0.6rem 0.75rem; }
 body.density-compact .derived-card,
@@ -353,15 +365,15 @@ button:disabled, .btn:disabled {
 }
 
 .btn-primary {
-  background: linear-gradient(180deg, var(--brass) 0%, #8c6e3a 100%);
+  background: linear-gradient(180deg, var(--brass-bright) 0%, var(--brass) 100%);
   border-color: var(--brass-bright);
-  color: var(--bg-deep);
+  color: var(--on-accent, var(--bg-deep));
   font-weight: 700;
   box-shadow: 0 2px 12px var(--brass-glow);
 }
 .btn-primary:hover {
-  background: linear-gradient(180deg, var(--brass-bright) 0%, var(--brass) 100%);
-  color: var(--bg-deep);
+  background: linear-gradient(180deg, var(--brass-bright) 0%, var(--brass-bright) 100%);
+  color: var(--on-accent, var(--bg-deep));
 }
 
 .btn-danger {
@@ -390,9 +402,9 @@ button:disabled, .btn:disabled {
 
 /* Botão de Export JSON com destaque permanente */
 .btn-export {
-  background: linear-gradient(180deg, var(--brass) 0%, #8c6e3a 100%);
+  background: linear-gradient(180deg, var(--brass-bright) 0%, var(--brass) 100%);
   border-color: var(--brass-bright);
-  color: var(--bg-deep);
+  color: var(--on-accent, var(--bg-deep));
   font-weight: 700;
   position: relative;
 }
@@ -453,7 +465,7 @@ button:disabled, .btn:disabled {
   display: inline-block;
   font-family: var(--font-mono);
   font-size: 0.7rem;
-  color: var(--brass);
+  color: var(--brass-bright);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   padding: 0.15rem 0.5rem;
@@ -600,7 +612,7 @@ label {
   background: linear-gradient(90deg, rgba(139, 26, 26, 0.15), var(--bg-card-hi));
 }
 .roll-entry.fumble .level {
-  color: var(--bg-deep);
+  color: var(--ink);
   background: var(--blood);
   border-color: var(--blood);
 }
@@ -660,7 +672,7 @@ label {
   font-size: 0.68em;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--brass);
+  color: var(--brass-bright);
   border: 1px solid var(--brass);
   border-radius: 0.4rem;
   padding: 0 0.3rem;
@@ -820,7 +832,7 @@ label {
 .tab:hover, .nav-tab:hover, [role="tab"]:hover {
   background: var(--bg-card-hi);
   border-color: var(--brass);
-  color: var(--brass);
+  color: var(--brass-bright);
   transform: translateY(-1px);
 }
 
@@ -941,31 +953,35 @@ body[data-theme="eldritch"] {
   --body-grad-bottom: rgba(20, 8, 60, 0.12);
 }
 
-/* ── Dossiê · Estrutura AIMalexi · Arquivo de investigador ──
-   Paleta de leitura prolongada: neutros quentes, acentos dessaturados. */
-body[data-theme="dossie"] {
-  --bg-deep:          #1B1A17;
-  --bg-mid:           #211F1B;
-  --bg-card:          #26231F;
-  --bg-card-hi:       #2E2A25;
-  --bg-overlay:       rgba(27, 26, 23, 0.92);
-  --ink:              #E6E0D5;
-  --ink-dim:          #B7B0A4;
-  --ink-faded:        #3D3831;
-  --brass:            #556B2F;
-  --brass-bright:     #7A934B;
-  --brass-glow:       rgba(85, 107, 47, 0.45);
-  --ok:               #4F7A4F;
-  --err:              #8A3B3B;
-  --warn:             #C69C4D;
-  --crit:             #C69C4D;
-  --fail:             #8A3B3B;
-  --num-accent:       #C69C4D;
-  --title-ink:        #C69C4D;
+/* ── Clássico · O dourado original do AIMalexi (pré-Estrutura) ──
+   A paleta âmbar/brass que era o :root antes da Estrutura AIMalexi
+   virar padrão. "dossie" agora resolve para o próprio :root. */
+body[data-theme="classico"] {
+  --bg-deep:          #0a0807;
+  --bg-mid:           #15110d;
+  --bg-card:          #1c1813;
+  --bg-card-hi:       #241e17;
+  --bg-overlay:       rgba(10, 8, 7, 0.92);
+  --ink:              #e8dcc4;
+  --ink-dim:          #a89580;
+  --ink-faded:        #6b5d4a;
+  --line:             #3a342a;
+  --brass:            #b8924f;
+  --brass-bright:     #d4a960;
+  --brass-glow:       rgba(184, 146, 79, 0.45);
+  --on-accent:        #0a0807;   /* dourado luminoso pede texto escuro */
+  --candle:           #C28E2D;
+  --candle-bright:    #E3B65A;
+  --crit:             #d4a960;
+  --hard:             #a89580;
+  --fail:             #6b3232;
+  --ok:               #5a8a5a;
+  --warn:             #c8924f;
+  --err:              #8b1a1a;
   --accent:           var(--brass);
   --accent-glow:      var(--brass-glow);
-  --body-grad-top:    rgba(61, 56, 49, 0.20);
-  --body-grad-bottom: rgba(85, 107, 47, 0.06);
+  --body-grad-top:    rgba(74, 28, 28, 0.15);
+  --body-grad-bottom: rgba(90, 122, 138, 0.08);
 }
 
 /* ── Lovecraft · Clássica Lovecraftiana · Biblioteca antiga ── */
@@ -1038,6 +1054,11 @@ body[data-theme="arquivo"] {
   --title-ink:        #5C4033;
   --num-ink:          #2A2522;
   --num-accent:       #5C4033;
+  /* papel verdadeiro: no tema claro o dossiê é bege de arquivo */
+  --parchment:        #E7DABA;
+  --parchment-dim:    #CDBC97;
+  --ink-doc:          #2B241A;
+  --ink-doc-faded:    #6B5F49;
   --accent:           var(--brass);
   --accent-glow:      var(--brass-glow);
   --body-grad-top:    rgba(92, 64, 51, 0.06);
@@ -1050,15 +1071,16 @@ body[data-theme="arquivo"] {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  --san-state-ok:   #8F9E7A;   /* sanidade normal  */
-  --san-state-low:  #C28E3B;   /* sanidade baixa   */
-  --san-state-crit: #8C3030;   /* sanidade crítica */
+  --san-state-ok:     #8F9E7A;   /* sanidade normal   (verde-sálvia) */
+  --san-state-low:    #C28E3B;   /* instável          (âmbar)        */
+  --san-state-crit:   #8C3030;   /* crítica           (vermelho)     */
+  --san-state-insane: #7B5EA7;   /* insano            (roxo)         */
 }
-body[data-sanity="lucid"]  .svital-san .svital-fill { background-color: var(--san-state-ok); }
-body[data-sanity="uneasy"] .svital-san .svital-fill { background-color: var(--san-state-ok); }
-body[data-sanity="shaken"] .svital-san .svital-fill { background-color: var(--san-state-low); }
+body[data-sanity="lucid"]    .svital-san .svital-fill { background-color: var(--san-state-ok); }
+body[data-sanity="uneasy"]   .svital-san .svital-fill { background-color: var(--san-state-ok); }
+body[data-sanity="shaken"]   .svital-san .svital-fill { background-color: var(--san-state-low); }
 body[data-sanity="fraying"]  .svital-san .svital-fill { background-color: var(--san-state-crit); }
-body[data-sanity="breaking"] .svital-san .svital-fill { background-color: var(--san-state-crit); }
+body[data-sanity="breaking"] .svital-san .svital-fill { background-color: var(--san-state-insane); }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    PRINT (PDF export via window.print)
@@ -1470,7 +1492,7 @@ input:focus, select:focus, textarea:focus {
 .md-ul, .md-ol, .md-checklist { margin: 0.35em 0 0.35em 1.25em; padding: 0; }
 .md-checklist { list-style: none; margin-left: 0.2em; }
 .md-check.done { color: var(--ink-faded); text-decoration: line-through; }
-.md-check .md-checkbox { color: var(--brass); text-decoration: none; display: inline-block; }
+.md-check .md-checkbox { color: var(--brass-bright); text-decoration: none; display: inline-block; }
 .md-check.done .md-checkbox { color: var(--ok); }
 
 .md-quote {

@@ -333,7 +333,7 @@
   }
 
   // ─── TEMA ─────────────────────────────────────────────────────────────
-  const _VALID_THEMES = ["arkham", "dossie", "lovecraft", "cosmic", "arquivo",
+  const _VALID_THEMES = ["arkham", "classico", "dossie", "lovecraft", "cosmic", "arquivo",
                          "miskatonic", "sepia", "obsidian", "eldritch", "custom"];
 
   function applyTheme(theme) {
