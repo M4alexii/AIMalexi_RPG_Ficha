@@ -5,6 +5,18 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-11 - Modo Jogador (progressive disclosure)
+
+### Adicionado
+
+- **Modo da ficha** em ⚙️ Configurações: **Investigador** (ficha completa,
+  padrão) ou **Jogador** (tela limpa p/ iniciantes). O Modo Jogador esconde
+  as seções avançadas — Magias e Rituais, Grimórios, Diário, Log, Finanças
+  e Slots de Corpo — sem perder dado algum (alternar de volta restaura).
+  Se a aba ativa ficar oculta, volta para Personagem automaticamente.
+  Persistido por dispositivo (`uiMode` em `aimalexi-rpg/settings`).
+  Item nº 1 do roadmap de `Melhorias/PERSONALIZACAO_E_MODOS_V1.md`.
+
 ## 2026-06-11 - Regras: armadura absorve dano (QA-001) + loucura automática/interativa (QA-003)
 
 ### Corrigido
