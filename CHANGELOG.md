@@ -5,6 +5,19 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-11 - Histórico narrativo de Sanidade
+
+### Adicionado
+
+- **Perda de SAN com motivo**: o botão −X do card de SAN abre um modal
+  único com quantidade (aceita 1D6/1D10…) e motivo opcional ("Ao ver o
+  ritual de invocação") — sem passo extra para quem não quer narrar.
+- **Timeline de Sanidade** (botão ≡ no card de SAN): histórico persistido
+  de perdas e recuperações com motivo e horário ("−5 · Ao ver o ritual ·
+  11/06 09:12"). Guardado em `status.sanHistory` (cap 50), sobrevive a
+  reload e viaja com o export JSON.
+  Item nº 3 do roadmap de `Melhorias/PERSONALIZACAO_E_MODOS_V1.md`.
+
 ## 2026-06-11 - Busca global Ctrl+K
 
 ### Adicionado

@@ -58,10 +58,14 @@ window.CoC.views = window.CoC.views || {};
 
       let actions = "";
       if (isTracker) {
+        const histBtn = key === "SAN"
+          ? `<button data-derived="SAN" data-op="hist" title="Histórico narrativo de Sanidade">≡</button>`
+          : "";
         actions = `<div class="derived-actions no-print">
           <button data-derived="${key}" data-op="-1">-1</button>
           <button data-derived="${key}" data-op="+1">+1</button>
           <button data-derived="${key}" data-op="X">-X</button>
+          ${histBtn}
         </div>`;
       } else if (key === "Mitos") {
         actions = `<div class="derived-actions no-print">
@@ -196,6 +200,10 @@ window.CoC.views = window.CoC.views || {};
     const c = cocStore.getState().character;
     if (!c?.derived?.[key]) return;
 
+    // SAN tem fluxo narrativo próprio: −X abre modal com motivo; "hist" abre a timeline
+    if (key === "SAN" && op === "hist") { _sanHistoryModal(); return; }
+    if (key === "SAN" && op === "X")    { _sanLossModal();    return; }
+
     let delta = 0;
     if      (op === "+1") delta =  1;
     else if (op === "-1") delta = -1;
@@ -285,6 +293,85 @@ window.CoC.views = window.CoC.views || {};
     RESTORE_MAGIC:  { key: "PM",  sign:  1 },
     ADD_MYTHOS:     { key: "Mitos", sign: 1 },
   };
+
+  // ── Histórico narrativo de SAN (spec Personalização & Modos V1, item 3) ──
+  // Perda com motivo num único modal (sem fricção extra) + timeline persistida
+  // em status.sanHistory (reducer LOSE/RECOVER_SANITY, cap 50).
+  function _sanLossModal() {
+    const ui = window.CoC.ui;
+    if (!ui || typeof ui.modal !== "function") return;
+    const amountInput = ui.el("input", {
+      type: "text", placeholder: "Quanto? (5, 1D6, 1D10…)",
+      style: { marginBottom: "0.5rem" }, inputmode: "numeric"
+    });
+    const reasonInput = ui.el("input", {
+      type: "text", placeholder: "Motivo (opcional): ex. Ao ver o ritual…",
+      maxlength: "120"
+    });
+    const body = ui.el("div", {}, [amountInput, reasonInput]);
+    function _commit() {
+      const v = (amountInput.value || "").trim();
+      if (!v) return;
+      let raw;
+      if (/^-?\d+$/.test(v)) raw = Math.abs(parseInt(v, 10));
+      else {
+        try { raw = Math.abs(dice.rollNotation(v).total); }
+        catch (e) { toast("Notação inválida: " + v, { type: "warn" }); return false; }
+      }
+      if (!raw) return;
+      const reason = (reasonInput.value || "").trim();
+      cocExecutor.execute({ type: "LOSE_SANITY", payload: { amount: raw, reason } });
+      bus.publish("roll:logged", { skill: "Perda SAN", d100: null, level: "fail",
+        dmg: `${v} → ${raw}` + (reason ? ` · ${reason}` : "") });
+    }
+    ui.modal({
+      title: "🧠 Perda de Sanidade",
+      body,
+      actions: [
+        { label: "Cancelar" },
+        { label: "Aplicar", primary: true, onClick: _commit }
+      ]
+    });
+    amountInput.focus();
+    amountInput.addEventListener("keydown", e => { if (e.key === "Enter") reasonInput.focus(); });
+    reasonInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        const apply = document.querySelector(".modal-actions .btn-primary");
+        if (apply) apply.click();
+      }
+    });
+  }
+
+  function _sanHistoryModal() {
+    const ui = window.CoC.ui;
+    if (!ui || typeof ui.modal !== "function") return;
+    const c = cocStore.getState().character;
+    const hist = (c?.status?.sanHistory || []).slice().reverse();
+    const body = ui.el("div", { style: { maxHeight: "55vh", overflowY: "auto" } });
+    if (!hist.length) {
+      body.appendChild(ui.el("p", { style: { color: "var(--ink-dim)", fontStyle: "italic" },
+        text: "Nenhum evento de Sanidade registrado ainda. Use −X no card de SAN para registrar perdas com motivo." }));
+    } else {
+      hist.forEach(h => {
+        const when = new Date(h.ts);
+        const hh = String(when.getHours()).padStart(2, "0") + ":" + String(when.getMinutes()).padStart(2, "0");
+        const dd = String(when.getDate()).padStart(2, "0") + "/" + String(when.getMonth() + 1).padStart(2, "0");
+        const row = ui.el("div", { style: {
+          display: "flex", gap: "0.6rem", alignItems: "baseline",
+          padding: "0.4rem 0.2rem", borderBottom: "1px dashed var(--line, var(--ink-faded))"
+        } }, [
+          ui.el("b", { style: { color: h.delta < 0 ? "var(--err)" : "var(--ok)", minWidth: "2.6rem", fontFamily: "var(--font-mono)" },
+            text: (h.delta > 0 ? "+" : "") + h.delta }),
+          ui.el("span", { style: { flex: "1" },
+            text: h.reason || "—" }),
+          ui.el("span", { style: { fontSize: "0.7rem", color: "var(--ink-dim)", fontFamily: "var(--font-mono)", whiteSpace: "nowrap" },
+            text: dd + " " + hh }),
+        ]);
+        body.appendChild(row);
+      });
+    }
+    ui.modal({ title: "🧠 Histórico de Sanidade", body, actions: [{ label: "Fechar", primary: true }] });
+  }
 
   // ── Fluxo interativo de Loucura Temporária (CoC 7e p.161) ────────────────
   // Disparado pela state-machine (regra "Cheque de Loucura Temporária").

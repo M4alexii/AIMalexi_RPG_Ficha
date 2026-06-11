@@ -100,6 +100,11 @@ window.CoC = window.CoC || {};
         // Rastreia TODAS as perdas de SAN da sessão (threshold de loucura indefinida: ≥1/5 do SAN atual)
         nc.status = nc.status || {};
         nc.status.sanLossesToday = (nc.status.sanLossesToday || 0) + action.payload.amount;
+        // Histórico narrativo persistido (cap 50): "−5 · Ao ver o ritual"
+        nc.status.sanHistory = (nc.status.sanHistory || []).concat([{
+          ts: Date.now(), delta: -action.payload.amount,
+          reason: String(action.payload.reason || "").slice(0, 120)
+        }]).slice(-50);
         return Object.assign({}, state, { character: nc });
       }
 
@@ -108,6 +113,11 @@ window.CoC = window.CoC || {};
         const nc = deepClone(c);
         const cur = nc.derived.SAN.current != null ? nc.derived.SAN.current : nc.derived.SAN.value;
         nc.derived.SAN.current = Math.max(0, Math.min(nc.derived.SAN.max, cur + action.payload.amount));
+        nc.status = nc.status || {};
+        nc.status.sanHistory = (nc.status.sanHistory || []).concat([{
+          ts: Date.now(), delta: +action.payload.amount,
+          reason: String(action.payload.reason || "").slice(0, 120)
+        }]).slice(-50);
         return Object.assign({}, state, { character: nc });
       }
 
