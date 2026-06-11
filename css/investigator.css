@@ -3090,3 +3090,56 @@ body[data-ui-mode="player"] #body-slots-section,
 body[data-ui-mode="player"] #finances-card {
   display: none !important;
 }
+
+/* ── Busca global (Ctrl+K) ─────────────────────────────────────────────── */
+.gs-overlay {
+  position: fixed; inset: 0; z-index: 400;
+  background: rgba(10, 9, 8, 0.6);
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 10vh 1rem 1rem;
+}
+.gs-box {
+  width: 100%; max-width: 540px;
+  background: var(--bg-card);
+  border: 1px solid var(--brass);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.gs-input {
+  border: none; border-bottom: 1px solid var(--line, var(--ink-faded));
+  border-radius: 0;
+  background: var(--bg-card-hi);
+  font-size: 1.05rem;
+  padding: 0.8rem 1rem;
+}
+.gs-input:focus { box-shadow: none; border-color: var(--brass); }
+.gs-results { max-height: 50vh; overflow-y: auto; }
+.gs-item {
+  display: flex; align-items: center; gap: 0.6rem;
+  width: 100%; text-align: left;
+  background: transparent; border: none; border-radius: 0;
+  padding: 0.55rem 1rem; cursor: pointer;
+  color: var(--ink);
+  font-family: var(--font-body); font-size: 0.95rem;
+  box-shadow: none;
+}
+.gs-item.active, .gs-item:hover { background: var(--bg-card-hi); }
+.gs-item.active { border-left: 3px solid var(--brass); padding-left: calc(1rem - 3px); }
+.gs-cat {
+  font-family: var(--font-mono); font-size: 0.62rem;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--ink-dim);
+  border: 1px solid var(--line, var(--ink-faded));
+  border-radius: 0.5rem; padding: 0.05rem 0.4rem;
+  flex-shrink: 0; min-width: 4.2rem; text-align: center;
+}
+.gs-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gs-empty { padding: 1rem; color: var(--ink-dim); font-style: italic; }
+.gs-hint {
+  padding: 0.4rem 1rem;
+  font-family: var(--font-mono); font-size: 0.65rem;
+  color: var(--ink-dim);
+  border-top: 1px solid var(--line, var(--ink-faded));
+}

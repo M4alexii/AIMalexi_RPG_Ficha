@@ -5,6 +5,19 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-11 - Busca global Ctrl+K
+
+### Adicionado
+
+- **Busca global da ficha** (`js/shared/global-search.js`): Ctrl+K/Cmd+K
+  ou botão 🔍 na toolbar. Pesquisa perícias (catálogo + valores do
+  personagem), atributos, armas, inventário, magias, grimórios, diário e
+  abas — ignorando acentos ("revolver" acha "Revólver"). Selecionar uma
+  perícia navega até a aba e aplica o filtro; demais resultados navegam
+  para a aba correspondente. ↑↓ navegam, Enter abre, Esc fecha. No Modo
+  Jogador, os resultados de seções ocultas não aparecem.
+  Item nº 2 do roadmap de `Melhorias/PERSONALIZACAO_E_MODOS_V1.md`.
+
 ## 2026-06-11 - Modo Jogador (progressive disclosure)
 
 ### Adicionado

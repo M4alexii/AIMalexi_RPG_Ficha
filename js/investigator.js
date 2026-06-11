@@ -146,6 +146,7 @@
     bindRollLog();
     bindDirtyTracking();
     if (window.CoC.sanityFx) window.CoC.sanityFx.init();   // overlay + modo de efeitos
+    if (window.CoC.globalSearch) window.CoC.globalSearch.init();  // Ctrl+K + botão 🔍
 
     // Sprint 6 — Render Pipeline: registry centralizado substituindo subscriptions manuais.
     // SPEND_LUCK e combat actions agora re-renderizam via RENDER_MAP em vez de
