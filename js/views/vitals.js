@@ -216,16 +216,15 @@ window.CoC.views = window.CoC.views || {};
         delta = -raw;
         bus.publish("roll:logged", { skill: `Perda ${key}`, d100: null, level: "fail", dmg: `${trimmed} → ${r.total}` });
       }
-      // §3.12 — Armadura absorve dano de PV (não afeta SAN/PM)
+      // §3.12 — Armadura absorve dano de PV (não afeta SAN/PM).
+      // A absorção real acontece no reducer APPLY_DAMAGE (store.js) para
+      // valer em TODOS os caminhos (keeper remoto incluído) — aqui apenas
+      // antecipamos o aviso ao jogador.
       if (key === "PV") {
         const armor = Number(c.status && c.status.armor) || 0;
         if (armor > 0) {
           const absorbed = Math.min(armor, raw);
-          const net = raw - absorbed;
-          delta = -net;
-          if (absorbed > 0) {
-            toast(`🛡️ Armadura absorveu ${absorbed} de ${raw} dano (${net} em PV).`, { type: "info", duration: 4000 });
-          }
+          toast(`🛡️ Armadura absorveu ${absorbed} de ${raw} dano (${raw - absorbed} em PV).`, { type: "info", duration: 4000 });
         }
       }
     }
@@ -237,13 +236,16 @@ window.CoC.views = window.CoC.views || {};
     }
 
     const amount = Math.abs(delta);
-    if      (key === "PV")  cocExecutor.execute({ type: delta < 0 ? "APPLY_DAMAGE"  : "HEAL_DAMAGE",    payload: { amount } });
+    if (key === "PV") {
+      const payload = { amount };
+      // ±1 são ajustes manuais de ficha — não passam pela armadura
+      if (delta < 0 && op !== "X") payload.ignoreArmor = true;
+      cocExecutor.execute({ type: delta < 0 ? "APPLY_DAMAGE" : "HEAL_DAMAGE", payload });
+    }
     else if (key === "SAN") cocExecutor.execute({ type: delta < 0 ? "LOSE_SANITY"   : "RECOVER_SANITY", payload: { amount } });
     else if (key === "PM")  cocExecutor.execute({ type: delta < 0 ? "SPEND_MAGIC"   : "RESTORE_MAGIC",  payload: { amount } });
-
-    if (key === "SAN" && delta < -4) {
-      toast(`⚠ Perda de ${amount} SAN: Teste de Loucura Temporária (INT×5)!`, { type: "warn", duration: 6000 });
-    }
+    // Aviso de loucura temporária migrou para o fluxo interativo dirigido
+    // pela state-machine (bus "executor:action" → _insanityPrompts).
     // renderVitals() + _flashCard() triggered reactively via bus subscription below
   }
 
@@ -284,6 +286,52 @@ window.CoC.views = window.CoC.views || {};
     ADD_MYTHOS:     { key: "Mitos", sign: 1 },
   };
 
+  // ── Fluxo interativo de Loucura Temporária (CoC 7e p.161) ────────────────
+  // Disparado pela state-machine (regra "Cheque de Loucura Temporária").
+  // RAW: perdeu 5+ SAN de uma vez → rola INT; SUCESSO = compreendeu o horror
+  // → loucura temporária. Falha = a mente reprime; segue abalado mas funcional.
+  function _tempInsanityPrompt() {
+    const ui = window.CoC.ui;
+    const c  = cocStore.getState().character;
+    const intVal = Number(c?.attributes?.INT?.value) || 0;
+    if (!ui || typeof ui.modal !== "function") {
+      toast(`⚠ Perda brutal de SAN: role INT (≤ ${intVal}). Sucesso = Loucura Temporária!`, { type: "warn", duration: 8000 });
+      return;
+    }
+    const body = ui.el("div", {}, [
+      ui.el("p", { style: { marginBottom: "0.6rem" } },
+        ["Perda de 5+ pontos de Sanidade de uma vez. Role ", ui.el("b", { text: "INT" }),
+         ` (≤ ${intVal}): se compreender o que viu, a mente quebra.`]),
+      ui.el("p", { style: { fontSize: "0.82rem", color: "var(--ink-dim)", fontStyle: "italic" } },
+        ["Sucesso = Loucura Temporária (1d10 horas). Falha = reprime o horror."]),
+    ]);
+    ui.modal({
+      title: "🌀 Cheque de Loucura Temporária",
+      body,
+      actions: [
+        { label: "Agora não" },
+        {
+          label: "🎲 Rolar INT", primary: true,
+          onClick: function () {
+            const r = dice.rollD100();
+            const success = r.value <= intVal;
+            bus.publish("roll:logged", {
+              skill: "INT (Loucura Temporária)", d100: r.value,
+              level: success ? "regular" : "fail",
+              dmg: success ? "compreendeu o horror" : "reprimiu"
+            });
+            if (success) {
+              cocExecutor.execute({ type: "ADD_STATUS", payload: { status: "tempInsane" } });
+              toast(`🎲 ${r.value} ≤ ${intVal} — compreendeu o horror: LOUCURA TEMPORÁRIA (1d10 horas).`, { type: "error", duration: 8000 });
+            } else {
+              toast(`🎲 ${r.value} > ${intVal} — a mente reprimiu o que viu. Sem loucura (por enquanto).`, { type: "warn", duration: 6000 });
+            }
+          }
+        }
+      ]
+    });
+  }
+
   function initVitals() {
     bus.subscribe("store:dispatch", function (event) {
       if (!event.changed) return;
@@ -291,6 +339,16 @@ window.CoC.views = window.CoC.views || {};
       if (!mapping) return;
       // Render delegado ao render-pipeline (Sprint 6). Flash é efeito local desta view.
       _flashCard(mapping.key, mapping.sign);
+    });
+    // Transições da state-machine → prompts narrativos (loucura)
+    bus.subscribe("executor:action", function (event) {
+      if (event.type !== "LOSE_SANITY" || !Array.isArray(event.transitions)) return;
+      if (event.transitions.indexOf("Cheque de Loucura Temporária") !== -1) {
+        _tempInsanityPrompt();
+      }
+      if (event.transitions.indexOf("Loucura Indefinida (1/5 no dia)") !== -1) {
+        toast("🧠 Perdeu ≥1/5 da Sanidade no dia — LOUCURA INDEFINIDA aplicada.", { type: "error", duration: 8000 });
+      }
     });
     // renderVitals() on first paint is called by render-pipeline via SET_CHARACTER
   }

@@ -57,7 +57,12 @@ window.CoC = window.CoC || {};
         if (!c || !c.derived || !c.derived.PV) return state;
         const nc = deepClone(c);
         const cur = nc.derived.PV.current != null ? nc.derived.PV.current : nc.derived.PV.value;
-        nc.derived.PV.current = Math.max(PV_MIN, Math.min(nc.derived.PV.value, cur - action.payload.amount));
+        // §3.12 / CoC 7e p.110 — armadura absorve dano por golpe.
+        // payload.ignoreArmor: ajustes manuais (±1) e dano que já foi absorvido na origem.
+        const raw   = Number(action.payload.amount) || 0;
+        const armor = action.payload.ignoreArmor ? 0 : (Number(nc.status && nc.status.armor) || 0);
+        const net   = Math.max(0, raw - armor);
+        nc.derived.PV.current = Math.max(PV_MIN, Math.min(nc.derived.PV.value, cur - net));
         return Object.assign({}, state, { character: nc });
       }
 

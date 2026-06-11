@@ -5,6 +5,27 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-11 - Regras: armadura absorve dano (QA-001) + loucura automática/interativa (QA-003)
+
+### Corrigido
+
+- **P0 — Armadura não subtraía dano** (`APPLY_DAMAGE`): a absorção agora
+  acontece no reducer (`js/core/store.js`), valendo para TODOS os caminhos —
+  inclusive dano remoto do Guardião via campanha. `payload.ignoreArmor`
+  preserva ajustes manuais (±1) com dano integral. Os guards da
+  state-machine (Major Wound, Inconsciente, Morrendo, Morte) avaliam o
+  dano LÍQUIDO (CoC 7e p.109-112), com `armor` exposto no contexto.
+- **P1 — Loucura indefinida por 1/5 no dia agora é automática** (RAW p.162):
+  a regra aplica `ADD_STATUS{indefInsane}` direto, com aviso ao jogador.
+- **P1 — Loucura temporária ganhou fluxo interativo** (RAW p.161): perda de
+  5+ SAN de uma vez abre o cheque de INT (🎲 no modal); sucesso =
+  compreendeu o horror → status `tempInsane` aplicado; falha = reprimiu.
+  Disparado pela state-machine via novo campo `transitions` no evento
+  `executor:action` (labels das regras), então funciona também quando a
+  perda vem do Guardião.
+- +9 asserções novas (armadura no reducer e nos guards; indef automática;
+  `armor` no buildContext). Suíte: 1084/1084.
+
 ## 2026-06-11 - Estrutura AIMalexi vira o padrão + camada funcional de personalização
 
 ### Mudado

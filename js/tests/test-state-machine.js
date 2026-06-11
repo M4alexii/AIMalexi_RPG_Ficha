@@ -60,6 +60,9 @@ assertEq(_c.sanLossToday, 8,   'buildContext: sanLossToday = status.sanLossesTod
 assertEq(_c.currentPM,    10,  'buildContext: currentPM = PM.current');
 assertEq(_c.maxPM,        12,  'buildContext: maxPM = PM.value');
 assertEq(_c.mythos,       5,   'buildContext: mythos = Mitos.value');
+assertEq(_c.armor,        0,   'buildContext: armor ausente → 0');
+assertEq(_ctx(Object.assign({}, _char, { status: Object.assign({}, _char.status, { armor: 2 }) })).armor,
+  2, 'buildContext: armor = status.armor');
 assert(_c.status === _char.status,       'buildContext: status é referência ao original');
 assert(_c.attributes === _char.attributes, 'buildContext: attributes é referência ao original');
 
@@ -108,6 +111,32 @@ const _alreadyMW = _ev('APPLY_DAMAGE', { payload: { amount: 8 } },
   Object.assign({}, _ctxFull, { status: { majorWound: true, unconscious: false, dying: false } }));
 assert(!_alreadyMW.transitions.some(function (r) { return r.label === 'Major Wound'; }),
   'já tem majorWound → regra não re-dispara');
+
+// ── APPLY_DAMAGE — armadura (dano líquido, QA-001) ─────────────────────────
+group('state-machine — APPLY_DAMAGE: armadura absorve antes dos guards');
+
+// armor 3: golpe 6 → líquido 3 < 6 → Major Wound NÃO dispara
+const _ctxArmor = Object.assign({}, _ctxFull, { armor: 3 });
+const _mwArm = _ev('APPLY_DAMAGE', { payload: { amount: 6 } }, _ctxArmor);
+assert(!_mwArm.transitions.some(function (r) { return r.label === 'Major Wound'; }),
+  'armor 3, golpe 6 → líquido 3 → Major Wound NÃO dispara');
+
+// armor 3: golpe 9 → líquido 6 ≥ 6 → dispara
+const _mwArm2 = _ev('APPLY_DAMAGE', { payload: { amount: 9 } }, _ctxArmor);
+assert(_mwArm2.transitions.some(function (r) { return r.label === 'Major Wound'; }),
+  'armor 3, golpe 9 → líquido 6 → Major Wound dispara');
+
+// ignoreArmor: golpe 6 com armor 3 → integral → dispara
+const _mwIgn = _ev('APPLY_DAMAGE', { payload: { amount: 6, ignoreArmor: true } }, _ctxArmor);
+assert(_mwIgn.transitions.some(function (r) { return r.label === 'Major Wound'; }),
+  'ignoreArmor → guards usam o dano integral');
+
+// inconsciente também usa líquido: HP 5, armor 3, golpe 7 → líquido 4 → HP 1 > 0
+const _uncArm = _ev('APPLY_DAMAGE', { payload: { amount: 7 } },
+  { currentHP: 5, maxHP: 12, armor: 3,
+    status: { majorWound: true, unconscious: false, dying: false, dead: false }, attributes: {} });
+assert(!_uncArm.transitions.some(function (r) { return r.label === 'Inconsciente'; }),
+  'armor 3, HP 5, golpe 7 → líquido 4 → HP 1 → NÃO fica inconsciente');
 
 // ── APPLY_DAMAGE — Inconsciente ────────────────────────────────────────────
 group('state-machine — APPLY_DAMAGE: Inconsciente');
@@ -261,21 +290,25 @@ assert(!_noTemp.transitions.some(function (r) {
 // ── LOSE_SANITY — Cheque de Loucura Indefinida ────────────────────────────
 group('state-machine — LOSE_SANITY: Cheque de Loucura Indefinida (1/5 acumulado)');
 
-// SAN atual = 50; 1/5 = 10; sanLossToday = 7, perda = 4 → total = 11 ≥ 10 → indef check
+// SAN atual = 50; 1/5 = 10; sanLossToday = 7, perda = 4 → total = 11 ≥ 10 → indef
 const _ctxSanIndef = { currentSAN: 50, maxSAN: 60, sanLossToday: 7, mythos: 0,
                        status: { tempInsane: false, indefInsane: false, incurablyInsane: false },
                        attributes: {} };
 const _indefChk = _ev('LOSE_SANITY', { payload: { amount: 4 } }, _ctxSanIndef);
 assert(_indefChk.transitions.some(function (r) {
-  return r.label === 'Cheque de Loucura Indefinida';
-}), 'acumulado ≥ 1/5 SAN atual → cheque indefinido dispara');
+  return r.label === 'Loucura Indefinida (1/5 no dia)';
+}), 'acumulado ≥ 1/5 SAN atual → loucura indefinida dispara');
+// RAW p.162: 1/5 no dia é automática — aplica o status direto
+assert(_indefChk.effects.some(function (e) {
+  return e.payload && e.payload.status === 'indefInsane';
+}), 'Loucura 1/5 no dia produz ADD_STATUS{indefInsane} (automática, RAW)');
 
 // sanLossToday = 2, perda = 3 → total = 5 < 10 → não dispara
 const _noIndef = _ev('LOSE_SANITY', { payload: { amount: 3 } },
   Object.assign({}, _ctxSanIndef, { sanLossToday: 2 }));
 assert(!_noIndef.transitions.some(function (r) {
-  return r.label === 'Cheque de Loucura Indefinida';
-}), 'acumulado < 1/5 SAN → cheque indefinido NÃO dispara');
+  return r.label === 'Loucura Indefinida (1/5 no dia)';
+}), 'acumulado < 1/5 SAN → loucura indefinida NÃO dispara');
 
 // ── LOSE_SANITY — Loucura Indefinida (SAN a 0) ────────────────────────────
 group('state-machine — LOSE_SANITY: Loucura Indefinida (SAN = 0)');

@@ -110,6 +110,24 @@ const statePvNull = store.getState();
 act('APPLY_DAMAGE', { amount: 5 });
 assert(store.getState() === statePvNull, 'APPLY_DAMAGE sem personagem: no-op (mesma referência)');
 
+// §3.12 / CoC 7e p.110 — armadura absorve dano por golpe (QA-001)
+group('PV — APPLY_DAMAGE com armadura');
+
+reset();
+act('SET_ARMOR', { armor: 3 });
+act('APPLY_DAMAGE', { amount: 5 });
+assertEq(char().derived.PV.current, 8, 'armor=3, dano 5 → líquido 2: 10→8');
+
+act('APPLY_DAMAGE', { amount: 2 });
+assertEq(char().derived.PV.current, 8, 'armor=3, dano 2 → totalmente absorvido: 8→8');
+
+act('APPLY_DAMAGE', { amount: 4, ignoreArmor: true });
+assertEq(char().derived.PV.current, 4, 'ignoreArmor: dano integral 4: 8→4');
+
+reset();
+act('APPLY_DAMAGE', { amount: 5 });
+assertEq(char().derived.PV.current, 5, 'sem armadura definida → dano integral: 10→5');
+
 // ─────────────────────────────────────────────────────────────────────────────
 //  3. SAN — LOSE_SANITY / RECOVER_SANITY
 //     piso = 0, teto = SAN.max = 90

@@ -41,6 +41,14 @@ window.CoC.core = window.CoC.core || {};
     return maxHP > 0 && dmg >= Math.ceil(maxHP / 2);
   }
 
+  // CoC 7e p.110 — armadura absorve dano por golpe. Os guards avaliam o dano
+  // LÍQUIDO (o mesmo que o reducer aplicará); payload.ignoreArmor pula a absorção.
+  function _netDamage(action, ctx) {
+    var raw = Number(action.payload && action.payload.amount) || 0;
+    if (action.payload && action.payload.ignoreArmor) return raw;
+    return Math.max(0, raw - (Number(ctx.armor) || 0));
+  }
+
   // Porcentagem de SAN perdida em relação ao valor máximo de referência
   // CoC 7e p.161 — Loucura Indefinida se perder ≥ 1/5 do valor de SAN ATUAL
   function _isIndefInsanityThreshold(totalLostToday, currentSAN) {
@@ -64,7 +72,7 @@ window.CoC.core = window.CoC.core || {};
         ref:   'CoC 7e p.109',
         guard: function (action, ctx) {
           return !ctx.status.majorWound &&
-                 _isMajorWound(action.payload.amount, ctx.maxHP);
+                 _isMajorWound(_netDamage(action, ctx), ctx.maxHP);
         },
         effects: [
           { type: 'ADD_STATUS', payload: { status: 'majorWound' } }
@@ -76,7 +84,7 @@ window.CoC.core = window.CoC.core || {};
         ref:   'CoC 7e p.112',
         guard: function (action, ctx) {
           return !ctx.status.unconscious &&
-                 (ctx.currentHP - action.payload.amount) <= 0;
+                 (ctx.currentHP - _netDamage(action, ctx)) <= 0;
         },
         effects: [
           { type: 'ADD_STATUS', payload: { status: 'unconscious' } }
@@ -88,7 +96,7 @@ window.CoC.core = window.CoC.core || {};
         ref:   'CoC 7e p.112',
         guard: function (action, ctx) {
           return !ctx.status.dying &&
-                 (ctx.currentHP - action.payload.amount) <= PV_MIN;
+                 (ctx.currentHP - _netDamage(action, ctx)) <= PV_MIN;
         },
         effects: [
           { type: 'ADD_STATUS', payload: { status: 'dying' } }
@@ -100,7 +108,7 @@ window.CoC.core = window.CoC.core || {};
         ref:   'CoC 7e p.112',
         guard: function (action, ctx) {
           // Golpe único que excede o PV máximo em negativo → morte imediata
-          return (ctx.currentHP - action.payload.amount) < PV_MIN - ctx.maxHP;
+          return (ctx.currentHP - _netDamage(action, ctx)) < PV_MIN - ctx.maxHP;
         },
         effects: [
           { type: 'ADD_STATUS', payload: { status: 'dead' } }
@@ -151,7 +159,7 @@ window.CoC.core = window.CoC.core || {};
         note: 'Perda > 4 SAN de uma vez. INT roll ou o personagem entra em choque.',
       },
       {
-        label: 'Cheque de Loucura Indefinida',
+        label: 'Loucura Indefinida (1/5 no dia)',
         ref:   'CoC 7e p.162',
         guard: function (action, ctx) {
           // Perda acumulada na sessão ≥ 1/5 do SAN ANTES da perda atual
@@ -159,8 +167,12 @@ window.CoC.core = window.CoC.core || {};
           return !ctx.status.indefInsane &&
                  _isIndefInsanityThreshold(totalLost, ctx.currentSAN);
         },
-        effects: [],  // POW roll — o resultado decide o efeito
-        note: 'Perdeu ≥ 1/5 do SAN na sessão. Rola POW ou loucura indefinida.',
+        // RAW: perder ≥ 1/5 do SAN no mesmo dia → loucura indefinida
+        // automática (sem rolagem) — o status aplica direto.
+        effects: [
+          { type: 'ADD_STATUS', payload: { status: 'indefInsane' } }
+        ],
+        note: 'Perdeu ≥ 1/5 do SAN no dia → loucura indefinida (automática, p.162).',
       },
       {
         label: 'Loucura Indefinida (SAN a 0)',
@@ -283,6 +295,7 @@ window.CoC.core = window.CoC.core || {};
       currentPM:    pm.current  != null ? pm.current  : (pm.value  || 0),
       maxPM:        pm.value    || 0,
       mythos:       (d.Mitos && d.Mitos.value) || 0,
+      armor:        (character.status && Number(character.status.armor)) || 0,
       status:       character.status || {},
       attributes:   character.attributes || {},
     };
