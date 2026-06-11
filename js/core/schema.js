@@ -65,6 +65,17 @@ window.CoC = window.CoC || {};
     if (c._meta.createdAt === undefined) c._meta.createdAt = null;
     if (c._meta.updatedAt === undefined) c._meta.updatedAt = null;
     if (!c._meta.version) c._meta.version = '1.0.0';
+    // Moldura/forma do retrato (visual, por personagem) — coage a valores válidos
+    const VALID_FRAMES = ['', 'investigador', 'ocultista', 'militar', 'academico'];
+    const VALID_SHAPES = ['', 'token', 'silhueta'];
+    if (c._meta.avatarFrame !== undefined && !VALID_FRAMES.includes(c._meta.avatarFrame)) {
+      warn('_meta.avatarFrame "' + c._meta.avatarFrame + '" inválido — reset');
+      c._meta.avatarFrame = '';
+    }
+    if (c._meta.avatarShape !== undefined && !VALID_SHAPES.includes(c._meta.avatarShape)) {
+      warn('_meta.avatarShape "' + c._meta.avatarShape + '" inválido — reset');
+      c._meta.avatarShape = '';
+    }
 
     // ── attributes ────────────────────────────────────────────────────────
     if (!c.attributes || typeof c.attributes !== 'object' || Array.isArray(c.attributes)) {

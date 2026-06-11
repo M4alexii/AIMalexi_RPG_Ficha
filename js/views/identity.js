@@ -139,6 +139,64 @@ window.CoC.views = window.CoC.views || {};
     if (!window.CoC.mediaPicker) return;
     // Main portrait (in identity section) — primary editing interaction
     _setupSlot($s('#portrait-main'), 'portraitId', c, { maxDim: 640, label: 'retrato' });
+    _applyAvatarFrame(c);
+    _bindFrameButton(c);
+  }
+
+  // ── Moldura do retrato (spec item 11 — visual, por personagem em _meta) ─────
+  var FRAMES = [
+    { id: '',             label: 'Nenhuma' },
+    { id: 'investigador', label: 'Investigador (filete sóbrio)' },
+    { id: 'ocultista',    label: 'Ocultista (aura arcana)' },
+    { id: 'militar',      label: 'Militar (cantoneiras de aço)' },
+    { id: 'academico',    label: 'Acadêmico (moldura clássica)' }
+  ];
+  var SHAPES = [
+    { id: '',         label: 'Retrato (padrão)' },
+    { id: 'token',    label: 'Token redondo' },
+    { id: 'silhueta', label: 'Silhueta' }
+  ];
+
+  function _applyAvatarFrame(c) {
+    var slot = $s('#portrait-main');
+    if (!slot) return;
+    var meta = (c && c._meta) || {};
+    FRAMES.forEach(function (f) { if (f.id) slot.classList.remove('frame-' + f.id); });
+    SHAPES.forEach(function (s) { if (s.id) slot.classList.remove('shape-' + s.id); });
+    if (meta.avatarFrame) slot.classList.add('frame-' + meta.avatarFrame);
+    if (meta.avatarShape) slot.classList.add('shape-' + meta.avatarShape);
+  }
+
+  function _bindFrameButton(c) {
+    var btn = $s('#btn-avatar-frame');
+    var ui  = window.CoC.ui;
+    if (!btn || !ui || !ui.modal) return;
+    btn.onclick = function () {
+      var meta = c._meta = c._meta || {};
+      var body = document.createElement('div');
+      body.className = 'settings-form';
+      body.innerHTML =
+        '<div class="settings-row"><label>Moldura</label><select id="avf-frame">' +
+          FRAMES.map(function (f) {
+            return '<option value="' + f.id + '"' + ((meta.avatarFrame || '') === f.id ? ' selected' : '') + '>' + f.label + '</option>';
+          }).join('') + '</select></div>' +
+        '<div class="settings-row"><label>Forma</label><select id="avf-shape">' +
+          SHAPES.map(function (s) {
+            return '<option value="' + s.id + '"' + ((meta.avatarShape || '') === s.id ? ' selected' : '') + '>' + s.label + '</option>';
+          }).join('') + '</select></div>';
+      // Live preview ao trocar
+      body.querySelector('#avf-frame').onchange = function () {
+        meta.avatarFrame = this.value; _applyAvatarFrame(c); _persist();
+      };
+      body.querySelector('#avf-shape').onchange = function () {
+        meta.avatarShape = this.value; _applyAvatarFrame(c); _persist();
+      };
+      ui.modal({
+        title: '🖼️ Moldura do Retrato',
+        body: body,
+        actions: [{ label: 'Fechar', primary: true }]
+      });
+    };
   }
 
   function _setupSlot(slotEl, field, c, opts) {
