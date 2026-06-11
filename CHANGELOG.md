@@ -5,6 +5,40 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-11 - Personalização visual (itens 8–13) + correções críticas
+
+### Corrigido
+
+- **Abas/drawer sumiam com SAN baixa**: o `filter`/`animation` dos efeitos
+  de insanidade em `.app` virava containing block e soltava a barra de abas,
+  o drawer ☰ e os backdrops (`position:fixed`) da viewport a partir de
+  SAN <50%. A graduação de cor agora vive na camada `.sfx-tone` do overlay
+  (`backdrop-filter`) e o tremor em `.app-shell`.
+- **Checkboxes desalinhados** na Central de Configurações (o reset global de
+  `input` aplicava `width:100%` + padding a checkbox/radio).
+- **Identificação nas rolagens da campanha**: timeline do Guardião e chat
+  agora mostram **"Personagem (Jogador)"** em vez de só um dos nomes.
+
+### Adicionado (spec `Melhorias/PERSONALIZACAO_E_MODOS_V1.md`, itens 8–13)
+
+- **Temas extras**: Noir (P&B), Hospital Psiquiátrico (claro) e Agência
+  Federal (cinza/azul) — total de 13 presets + custom.
+- **Fundo com textura + opacidade** (⚙️ → 🎨 Aparência): papel, couro,
+  madeira, nebulosa e arquivo policial, intensidade 0–100% com teto real de
+  opacidade 0.35 (legibilidade blindada). 100% CSS/SVG inline, offline.
+- **Estilo dos cards**: Arcano (cantoneiras atuais — padrão), Moderno,
+  Arquivo e Máquina de escrever; **bordas** Nenhuma/Simples/Vintage/Runas/
+  Art Déco via border-image SVG com fallback sólido.
+- **Sistema visual de anotações**: Caderno/Dossiê/Diário/Máquina aplicado ao
+  Diário de Campanha (pele puramente visual).
+- **Molduras de avatar** por personagem (Investigador/Ocultista/Militar/
+  Acadêmico) + formas token redondo e silhueta (`_meta.avatarFrame/Shape`,
+  normalizado no schema; botão 🖼️ sob o retrato).
+- **Som ambiente visual** (sem áudio): chuva, névoa, poeira, VHS e filme
+  antigo em overlay próprio (`js/shared/ambient-fx.js`), desligado por
+  padrão e subordinado ao sanity-fx; respeita reduce-motion.
+- SW: `CACHE_VERSION` v90; `ambient-fx.js` no precache.
+
 ## 2026-06-11 - Modo Imersão (🕯️)
 
 ### Adicionado

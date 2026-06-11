@@ -13,7 +13,7 @@
    Para forçar atualização imediata: incremente CACHE_VERSION abaixo.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const CACHE_VERSION = "v89";
+const CACHE_VERSION = "v90";
 const CACHE_NAME = "aimalexi-rpg-" + CACHE_VERSION;
 
 // Assets que devem estar disponíveis offline imediatamente após instalação.
@@ -40,6 +40,7 @@ const PRECACHE_URLS = [
   "./js/shared/validators.js",
   "./js/shared/pdf-export.js",
   "./js/shared/sanity-fx.js",
+  "./js/shared/ambient-fx.js",
   "./js/shared/theme-custom.js",
   "./js/shared/global-search.js",
   "./js/shared/media-picker.js",
