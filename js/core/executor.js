@@ -65,6 +65,8 @@ window.CoC.core = window.CoC.core || {};
         payload: action.payload,
         // Objetos completos (não só types) — replay usa payload dos efeitos
         effects: effects.slice(),
+        // Labels das regras disparadas — views reagem (ex.: prompt de loucura)
+        transitions: (result.transitions || []).map(function (t) { return t.label; }),
         ts:      (typeof performance !== 'undefined' ? performance.now() : Date.now()),
       });
     }
