@@ -333,11 +333,15 @@
   }
 
   // ─── TEMA ─────────────────────────────────────────────────────────────
-  const _VALID_THEMES = ["arkham", "miskatonic", "sepia", "obsidian", "eldritch"];
+  const _VALID_THEMES = ["arkham", "dossie", "lovecraft", "cosmic", "arquivo",
+                         "miskatonic", "sepia", "obsidian", "eldritch", "custom"];
 
   function applyTheme(theme) {
     const t = _VALID_THEMES.includes(theme) ? theme : "arkham";
     document.body.dataset.theme = t;
+    // Tema custom: paleta do jogador via variáveis inline; os demais limpam o inline
+    const tc = window.CoC.themeCustom;
+    if (tc) { if (t === "custom") tc.applySaved(); else tc.clear(); }
     $$(".theme-swatch").forEach(s => s.classList.toggle("active", s.dataset.theme === t));
   }
 
@@ -609,16 +613,29 @@
     // #btn-add-weapon handled by window.CoC.views.combat.init()
 
     // Theme picker swatches (M3.5.3)
+    function _setTheme(theme) {
+      applyTheme(theme);
+      if (state.character) {
+        const c = state.character;
+        c._meta = c._meta || {};
+        c._meta.theme = theme;
+        persistCurrent();
+      }
+    }
     $$(".theme-swatch").forEach(swatch => {
       swatch.onclick = () => {
         const theme = swatch.dataset.theme;
-        applyTheme(theme);
-        if (state.character) {
-          const c = state.character;
-          c._meta = c._meta || {};
-          c._meta.theme = theme;
-          persistCurrent();
+        // Swatch custom: 1º clique abre o editor; se já houver paleta salva, aplica direto
+        if (theme === "custom" && window.CoC.themeCustom) {
+          const tc = window.CoC.themeCustom;
+          const hasSaved = !!(window.CoC.storage && window.CoC.storage.getPref &&
+                              window.CoC.storage.getPref("customTheme", null));
+          if (!hasSaved || document.body.dataset.theme === "custom") {
+            tc.openEditor(() => _setTheme("custom"));
+            return;
+          }
         }
+        _setTheme(theme);
       };
     });
 

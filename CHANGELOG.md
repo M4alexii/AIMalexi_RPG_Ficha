@@ -5,6 +5,31 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-10 - Novos temas (claro/escuro), tema custom do jogador e SAN com cor de estado
+
+### Adicionado
+
+- **4 temas novos** (`css/theme.css`, paletas dessaturadas p/ sessões longas):
+  - **Dossiê** — arquivo de investigador (neutros quentes, verde-oliva,
+    dourado de alerta) — a estrutura recomendada do AIMalexi;
+  - **Lovecraft** — biblioteca antiga (bronze envelhecido, verde antigo);
+  - **Cosmic** — horror cósmico (verde eldritch, turquesa sombrio);
+  - **Arquivo** — **primeiro tema CLARO** (papel #F4EFD8, tinta #2A2522,
+    marrom/vermelho escuros) — documento investigativo p/ leitura de 4-6h.
+- **Tema personalizado do jogador** (`js/shared/theme-custom.js`): editor
+  visual (🎨 no seletor de temas) com 5 cores (fundo, cards, texto, texto
+  secundário, destaque) + 5 fontes, preview ao vivo, tons intermediários
+  derivados automaticamente (claro/escuro detectado por luminância).
+  Paleta salva como preferência do dispositivo; escolha do tema continua
+  em `character._meta.theme`.
+- **Barra de SAN com cor de estado** ("Sanidade em Colapso"): verde-sálvia
+  (normal) → âmbar (abalada) → vermelho (em colapso), dirigida pelo
+  `body[data-sanity]` que o sanity-fx já mantém.
+- Variáveis tema-conscientes `--title-ink`/`--num-ink`/`--num-accent`
+  substituem cores fixas de títulos e números (necessário p/ tema claro).
+- Varredura de contraste no tema claro: 0 elementos <3:1 nas 5 abas
+  (`--ink-faded` e botão de gasto ajustados).
+
 ## 2026-06-10 - Efeitos de insanidade ativos por padrão + contraste no site inteiro + Notas no mobile
 
 ### Corrigido

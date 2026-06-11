@@ -40,6 +40,7 @@ const PRECACHE_URLS = [
   "./js/shared/validators.js",
   "./js/shared/pdf-export.js",
   "./js/shared/sanity-fx.js",
+  "./js/shared/theme-custom.js",
   "./js/shared/media-picker.js",
   "./js/engine/storage.js",
   "./js/engine/dice.js",
