@@ -96,7 +96,7 @@ Critério de aceite: `node js/tests/runner.js` verde; CI verde.
 - ✅ Headers de página compactos (E13).
 - ✅ Stepper do wizard + chips de traço (E14).
 - ✅ Painéis ✕ → "Limpar" (E11); ✅ alvos de toque ≥44px (F-019).
-- 🟡 Densidade da aba Perícias (E15) — ícone + quebra ok; modo compacto a explorar.
+- ✅ Densidade da aba Perícias (E15) — `density-compact`/`density-roomy` + transições tokenizadas.
 - ✅ Onboarding/first-run: `#welcome-state` na aba Personagem quando banco vazio —
   "Criar investigador" e "Importar JSON" delegam para os botões do toolbar.
 - ✅ Tokens de motion (`--dur-*`/`--ease`) em `home.css`, `investigator.css`,
