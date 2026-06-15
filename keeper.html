@@ -52,8 +52,8 @@
 
     <span class="toolbar-spacer"></span>
 
-    <button id="btn-overflow" class="btn-ghost no-print" title="Mais ações"
-            aria-expanded="false" aria-controls="toolbar-actions">⋮</button>
+    <button id="btn-overflow" class="btn-ghost no-print" data-tooltip="Mais ações" aria-label="Mais ações"
+            aria-expanded="false" aria-controls="toolbar-actions"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-mais-horizontal"></use></svg></button>
 
     <div class="toolbar-actions" id="toolbar-actions" role="menu">
       <div class="sheet-handle" aria-hidden="true"></div>
@@ -218,11 +218,11 @@
           <button class="btn-ghost btn-sm" id="btn-clear-encounter" title="Limpar tracker do encontro"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-lixeira"></use></svg> Limpar</button>
         </h3>
         <div class="enc-round-bar">
-          <button class="btn-ghost btn-icon" id="btn-round-prev" title="Round anterior">◀</button>
+          <button class="btn-ghost btn-icon" id="btn-round-prev" data-tooltip="Round anterior" aria-label="Round anterior"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-seta-esq"></use></svg></button>
           <span class="enc-round">Round <b id="enc-round-num">1</b></span>
-          <button class="btn-ghost btn-icon" id="btn-round-next" title="Próximo round">▶</button>
-          <button class="btn-ghost btn-sm" id="btn-round-reset" title="Reiniciar contagem de rounds">⟲ Reiniciar</button>
-          <button class="btn-ghost btn-sm" id="btn-enc-initiative" title="Ordenar por iniciativa (DES decrescente, mortos no fim)">⚡ Iniciativa</button>
+          <button class="btn-ghost btn-icon" id="btn-round-next" data-tooltip="Próximo round" aria-label="Próximo round"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-seta-dir"></use></svg></button>
+          <button class="btn-ghost btn-sm" id="btn-round-reset" title="Reiniciar contagem de rounds"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-recarregar"></use></svg> Reiniciar</button>
+          <button class="btn-ghost btn-sm" id="btn-enc-initiative" title="Ordenar por iniciativa (DES decrescente, mortos no fim)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-raio"></use></svg> Iniciativa</button>
         </div>
         <div class="encounter-list" id="encounter-list">
           <div class="encounter-empty">
