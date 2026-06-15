@@ -5,6 +5,19 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-15 - Migração tipográfica (E16)
+
+### Corrigido
+
+- **E16 — Mistura tipográfica**: 56 ocorrências de `font-size` com valores literais que
+  tinham correspondência exata nos tokens (`0.72rem`→`var(--text-xs)`, `0.78rem`→
+  `var(--text-sm)`, `1.1rem`→`var(--text-md)`, `1.25rem`→`var(--text-lg)`,
+  `1.5rem`→`var(--text-xl)`) convertidas em `investigator.css`, `keeper.css` e `home.css`.
+- `14px`/`16px` em `.sheet-card label`/inputs convertidos para `0.875rem`/`var(--text-base)`
+  — agora escalam com a configuração de escala de fonte do usuário.
+
+---
+
 ## 2026-06-15 - Tooltips, density skills e motion tokens
 
 ### Adicionado / corrigido

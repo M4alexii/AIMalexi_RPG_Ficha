@@ -59,7 +59,7 @@ sólido de profissional · S3 separa profissional de referência.
 | E13 | S1 | Headers consumindo espaço | ✅ `app-header` compacto (margem/teto reduzidos) |
 | E14 | S2 | Stepper do wizard com baixa affordance | ✅ Dots numerados + chips com seleção clara |
 | E15 | S1 | Densidade hostil na aba Perícias | ✅ `density-compact`/`density-roomy` cobrem skills; transições tokenizadas |
-| E16 | S1 | Mistura tipográfica sem papéis | 🟡 Escala/tokens definidos; migração incremental |
+| E16 | S1 | Mistura tipográfica sem papéis | ✅ 56 ocorrências convertidas para tokens; `14px`/`16px` → rem; pixels removidos |
 | E17 | S1 | Estados vazios desiguais | ✅ `.empty-state` padrão + Diário/Arsenal |
 | F-003 | S1 | Foco invisível | ✅ Já existia; tokenizado em `--focus-ring` |
 | F-008 | S2 | Tooltips só via `title` | ✅ Rollout completo: swatches de tema (13), `#btn-overflow`, `#btn-copy-log` em ambas as páginas |

@@ -63,7 +63,7 @@
   border-bottom: 2px solid transparent;
   color: var(--ink-dim);
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: var(--text-sm);
   letter-spacing: 0.03em;
   padding: 0.55rem 0.8rem;
   cursor: pointer;
@@ -112,7 +112,7 @@
 .lore-card { display: flex; flex-direction: column; }
 .lore-card label {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--keeper-accent, var(--brass));
@@ -253,7 +253,7 @@
 .keeper-overview.ko-collapsed { display: none; }
 .ko-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.4rem; }
 .ko-title { font-family: var(--font-serif); font-size: 1.3rem; color: var(--keeper-accent-bright, var(--brass-bright)); letter-spacing: 0.03em; }
-.ko-status { font-family: var(--font-mono); font-size: 0.78rem; color: var(--ink-dim); }
+.ko-status { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--ink-dim); }
 .ko-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; }
 .ko-kpi {
   background: var(--bg-card-hi);
@@ -422,7 +422,7 @@
 
 .creature-header .creature-title {
   font-family: var(--font-serif);
-  font-size: 1.5rem;
+  font-size: var(--text-xl);
   color: var(--keeper-accent-bright);
   text-shadow: 0 0 14px var(--keeper-accent-glow);
   outline: none;
@@ -483,13 +483,13 @@
   border-left: 1px solid var(--ink-faded);
 }
 .creature-header-actions .btn-group:first-of-type { border-left: none; padding-left: 0; }
-.creature-header-actions button { font-size: 0.78rem; padding: 0.35rem 0.65rem; }
+.creature-header-actions button { font-size: var(--text-sm); padding: 0.35rem 0.65rem; }
 
 /* TOGGLE DE MODO — botão destacado, visualmente diferente dos demais */
 .mode-toggle-btn {
   font-family: var(--font-mono);
   font-weight: 700;
-  font-size: 0.78rem !important;
+  font-size: var(--text-sm) !important;
   padding: 0.45rem 0.85rem !important;
   letter-spacing: 0.04em;
   border-radius: var(--radius);
@@ -639,7 +639,7 @@
 .attack-card .attack-meta { font-family: var(--font-mono); font-size: 0.8rem; color: var(--ink-dim); }
 .attack-card .attack-roll {
   padding: 0.25rem 0.5rem;
-  font-size: 0.78rem;
+  font-size: var(--text-sm);
   background: var(--keeper-accent);
   color: var(--ink);
   border-color: var(--keeper-accent-bright);
@@ -649,7 +649,7 @@
   grid-column: 1 / -1;
   font-style: italic;
   color: var(--ink-faded);
-  font-size: 0.78rem;
+  font-size: var(--text-sm);
   padding-top: 0.2rem;
   border-top: 1px dotted var(--ink-faded);
   margin-top: 0.2rem;
@@ -751,7 +751,7 @@
 }
 .encounter-panel h3 {
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: var(--text-sm);
   color: var(--keeper-accent-bright);
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -798,7 +798,7 @@
 }
 .enc-empty-ico { font-size: 2rem; opacity: 0.35; display: block; margin-bottom: 0.4rem; }
 .encounter-empty p { margin: 0.2rem 0; }
-.enc-empty-hint { font-size: 0.78rem; color: var(--ink-dim); line-height: 1.5; }
+.enc-empty-hint { font-size: var(--text-sm); color: var(--ink-dim); line-height: 1.5; }
 
 /* Grade de criaturas — preenche a largura da aba (antes: lista de 1 coluna). */
 .encounter-list {
@@ -902,7 +902,7 @@
   border-top: 1px dashed var(--ink-faded);
 }
 .encounter-item .ei-controls button {
-  font-size: 0.72rem;
+  font-size: var(--text-xs);
   padding: 0.22rem 0.3rem;
   flex: 1;
 }
@@ -1021,7 +1021,7 @@
   border-radius: var(--radius-lg);
   padding: 0.4rem 0.85rem;
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: var(--text-sm);
   flex-wrap: wrap;
 }
 
@@ -1045,7 +1045,7 @@
 
 .cb-players {
   color: var(--ink-faded);
-  font-size: 0.72rem;
+  font-size: var(--text-xs);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1077,13 +1077,13 @@
 
 .cs-divider {
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: var(--text-sm);
   color: var(--ink-dim);
   padding: 0 0.25rem;
 }
 
 .cs-hint {
-  font-size: 0.72rem;
+  font-size: var(--text-xs);
   color: var(--ink-dim);
   font-family: var(--font-mono);
   letter-spacing: 0.02em;
@@ -1098,7 +1098,7 @@
 .pin-input {
   width: 130px;
   font-family: var(--font-mono);
-  font-size: 1.1rem;
+  font-size: var(--text-md);
   text-align: center;
   letter-spacing: 0.12em;
   font-weight: 700;
@@ -1202,7 +1202,7 @@
   border: 1px solid var(--keeper-accent, var(--brass));
   color: var(--keeper-accent-bright, var(--brass-bright));
   font-family: var(--font-serif);
-  font-size: 0.78rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   letter-spacing: 0.02em;
 }
@@ -1570,7 +1570,7 @@
 }
 
 .cp-name { color: var(--ink); flex: 1; }
-.cp-char { color: var(--ink-dim); font-size: 0.78rem; }
+.cp-char { color: var(--ink-dim); font-size: var(--text-sm); }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    SESSÃO STALE — painel de recuperação
@@ -1663,7 +1663,7 @@
   /* Header compacto */
   .app { padding: 0.5rem 0.5rem 1.5rem; }
   .app-header { flex-direction: column; align-items: stretch; gap: 0.3rem; margin-bottom: 0.4rem; }
-  .app-title { font-size: 1.1rem; }
+  .app-title { font-size: var(--text-md); }
   .app-subtitle { display: none; }
 
   .toolbar {
@@ -2042,7 +2042,7 @@
   margin-top: 0.55rem;
   padding-top: 0.45rem;
   border-top: 1px dashed var(--frame-dim);
-  font-size: 0.78rem;
+  font-size: var(--text-sm);
   color: var(--ink-faded);
 }
 .journal-backlinks .journal-link {
@@ -2234,7 +2234,7 @@
   padding-bottom: 0.6rem;
   border-bottom: 2px solid #8b6f47;
   font-family: var(--font-display);
-  font-size: 1.1rem;
+  font-size: var(--text-md);
   color: #5a4a35;
   letter-spacing: 0.08em;
 }
@@ -2262,7 +2262,7 @@
   padding-top: 0.6rem;
   border-top: 1px solid #a89878;
   font-family: var(--font-marginalia);
-  font-size: 1.1rem;
+  font-size: var(--text-md);
   color: #5a4a35;
 }
 
