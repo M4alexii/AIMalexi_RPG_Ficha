@@ -5,6 +5,24 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-15 - Correções de regras CoC7e (#8, #12, #15)
+
+### Corrigido
+
+- **#8 — Armadura em `rollDamage`**: parâmetro `armor` opcional em
+  `dice.rollDamage(weaponStr, db, impale, armor)`. Quando passado, `total`
+  retorna `max(0, dano - armor)` e `totalBeforeArmor` preserva o dano bruto
+  (útil para detecção de Ferimento Grave, que usa o dano bruto per CoC7e p.111).
+  7 asserções de regressão adicionadas em `test-dice.js`.
+- **#12 — `validateCharacter` por atributo**: bounds agora são per-atributo:
+  TAM/INT/EDU usam mín 30 (2D6+6×5 com ajuste de idade conservador);
+  EDU aceita até 99 (via verificações de melhoria); demais atributos usam mín 5
+  (age adj. pode reduzir FOR/CON/DES/APA significativamente).
+- **#15 — `rollMods.bp` null**: inicializado como `null` em vez de `""`,
+  alinhando com o contrato documentado em `dice.rollD100` (`null | "bonus" | "penalty"`).
+
+---
+
 ## 2026-06-15 - Migração tipográfica (E16)
 
 ### Corrigido

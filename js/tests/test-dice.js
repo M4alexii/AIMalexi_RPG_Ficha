@@ -394,3 +394,24 @@ group('rollDamage — empala: máximo + rolagem extra (PDF p.104)');
   }
   assert(min >= 5 && max <= 15, `rollDamage normal 2D6+3: faixa [${min},${max}] contida em [5,15]`);
 })();
+
+// rollDamage — armadura (PDF p.111: armadura é subtraída do dano; mínimo 0)
+group('rollDamage — armor reduz dano (CoC7e p.111)');
+(() => {
+  // armor=3: dano mínimo de 2D6+3 é 5; 5-3=2 ≥ 0
+  const r = dice.rollDamage('2D6+3', '0', false, 3);
+  assert(typeof r.totalBeforeArmor === 'number', 'armor: totalBeforeArmor presente');
+  assert(r.armor === 3, 'armor: campo armor preservado');
+  assert(r.total === Math.max(0, r.totalBeforeArmor - 3), 'armor: total = max(0, bruto - armor)');
+  assert(r.total >= 0, 'armor: dano líquido nunca negativo');
+
+  // armor que absorve todo o dano (armor grande vs dano pequeno)
+  const r2 = dice.rollDamage('1D2', '0', false, 999);
+  assert(r2.total === 0, 'armor: dano totalmente absorvido → 0');
+  assert(r2.totalBeforeArmor >= 1, 'armor: totalBeforeArmor ainda registra o dano bruto');
+
+  // sem armor: sem campos extras, backward-compatible
+  const r3 = dice.rollDamage('1D6', '0', false);
+  assert(r3.totalBeforeArmor === undefined, 'sem armor: totalBeforeArmor ausente');
+  assert(r3.armor === undefined, 'sem armor: campo armor ausente');
+})();

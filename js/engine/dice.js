@@ -225,7 +225,9 @@ window.CoC = window.CoC || {};
    * Ex. do livro: arma 1D4, DB +1D4 → 4 + 4 + 1D4 = faixa 9–12.
    * (A versão anterior parava no máximo — faltava a rolagem extra.)
    */
-  function rollDamage(weaponDamageString, db = "0", impale = false) {
+  function rollDamage(weaponDamageString, db = "0", impale = false, armor = 0) {
+    armor = Math.max(0, Number(armor) || 0);
+
     if (impale) {
       // Parte 1 — máximo de arma + DB: rola a notação só para obter a estrutura
       // (dados + constantes já com o DB substituído) e re-totaliza no máximo.
@@ -243,16 +245,28 @@ window.CoC = window.CoC || {};
       // Parte 2 — rolagem extra da arma (DB zerado: o bônus não rola de novo).
       const extra = rollNotation(weaponDamageString, "0");
 
+      const rawTotal = max + constants + extra.total;
       return {
-        total: max + constants + extra.total,
+        total: Math.max(0, rawTotal - armor),
         rolls: extra.rolls,   // dados exibíveis = só a rolagem extra (o resto é máximo fixo)
         expression: "MÁX(" + maxPart.expression + ") + " + extra.expression,
         impale: true,
         maxDamage: max + constants,
-        extraRoll: extra.total
+        extraRoll: extra.total,
+        ...(armor > 0 ? { armor, totalBeforeArmor: rawTotal } : {})
       };
     }
-    return rollNotation(weaponDamageString, db);
+
+    const result = rollNotation(weaponDamageString, db);
+    if (armor > 0) {
+      return {
+        ...result,
+        totalBeforeArmor: result.total,
+        total: Math.max(0, result.total - armor),
+        armor
+      };
+    }
+    return result;
   }
 
   /**

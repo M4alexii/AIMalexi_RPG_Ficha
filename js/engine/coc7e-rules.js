@@ -541,14 +541,20 @@ window.CoC = window.CoC || {};
       }
     }
 
-    // Atributos dentro da faixa esperada (15-90 = 3-18 × 5).
-    // Valor 0 = "ainda não rolado": coberto pelo aviso de ficha zerada em
-    // validators.js — alertar os 9 atributos um a um aqui seria só ruído.
+    // Atributos dentro da faixa esperada, per-atributo:
+    //   - TAM/INT/EDU: 2D6+6×5 → mín 40; EDU pode atingir 99 via melhorias.
+    //   - Demais: 3D6×5 → mín 15, máx 90. Mas ajustes de idade podem reduzir.
+    //   - Valor 0 = "ainda não rolado": coberto pelo aviso de ficha zerada em
+    //     validators.js — alertar os 9 atributos um a um seria só ruído.
+    const ATTR_MAX = { EDU: 99 };
+    const ATTR_MIN = { TAM: 30, INT: 30, EDU: 30 }; // 30 = mín conservador (2D6+6×5 com ajuste de idade)
     if (character.attributes) {
       for (const [name, attr] of Object.entries(character.attributes)) {
         const v = num(typeof attr === "object" ? attr.value : attr);
-        if (v !== 0 && (v < 15 || v > 90)) {
-          warnings.push(`${name}: ${v} fora da faixa típica (15-90)`);
+        const lo = ATTR_MIN[name] ?? 5;   // mínimo conservador para qualquer atributo (age adj.)
+        const hi = ATTR_MAX[name] ?? 90;
+        if (v !== 0 && (v < lo || v > hi)) {
+          warnings.push(`${name}: ${v} fora da faixa típica (${lo}–${hi})`);
         }
       }
     }
