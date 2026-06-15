@@ -50,7 +50,7 @@
   transform: rotate(-1.5deg);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
   cursor: pointer;
-  transition: transform 0.2s, filter 0.2s;
+  transition: transform var(--dur-base) var(--ease), filter var(--dur-base) var(--ease);
 }
 
 .character-sidebar .character-portrait:hover {
@@ -142,7 +142,7 @@
 .svital-fill {
   height: 100%;
   border-radius: 2px;
-  transition: width 0.3s ease;
+  transition: width var(--dur-slow) var(--ease);
 }
 .svital-pv  .svital-fill {
   background: linear-gradient(90deg, var(--blood), #c92929);
@@ -1029,7 +1029,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   padding: 0.6rem;
   text-align: center;
   position: relative;
-  transition: border-color 0.2s, transform 0.2s;
+  transition: border-color var(--dur-base) var(--ease), transform var(--dur-base) var(--ease);
 }
 .attr-card:hover { border-color: var(--brass); transform: translateY(-1px); }
 
@@ -1143,7 +1143,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
     inset 0 1px 0 rgba(231, 218, 186, 0.3),
     inset 0 -1px 0 rgba(0, 0, 0, 0.06),
     0 6px 18px rgba(0, 0, 0, 0.2);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease);
 }
 
 .derived-card:hover {
@@ -1203,7 +1203,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   background: linear-gradient(90deg, var(--accent, var(--brass-glow)) var(--fill, 100%), transparent 0%);
   opacity: 0.18;
   z-index: 0;
-  transition: opacity 0.4s;
+  transition: opacity var(--dur-slow) var(--ease);
 }
 
 .derived-card.tracker::after {
@@ -1393,7 +1393,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   color: var(--ink-faded);
   vertical-align: baseline;
 }
-.skill-row .skill-occ-toggle { cursor: pointer; transition: color 0.15s, transform 0.1s; }
+.skill-row .skill-occ-toggle { cursor: pointer; transition: color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease); }
 .skill-row .skill-occ-toggle:hover { color: var(--brass-bright); transform: scale(1.15); }
 .skill-row .skill-occ-toggle.on { color: var(--brass-bright); }
 .skill-row .skill-occ.mandatory { color: var(--brass-bright); cursor: default; }
@@ -1723,7 +1723,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   border-radius: var(--radius);
   padding: 0.8rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: border-color var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease);
   position: relative;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 4px 12px rgba(0,0,0,0.15);
 }
@@ -1867,7 +1867,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   padding: 1.5rem 1rem;
   text-align: center;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: border-color var(--dur-base) var(--ease), background var(--dur-base) var(--ease);
 }
 .wizard-options .wizard-option:hover {
   border-color: var(--brass);
@@ -3103,7 +3103,7 @@ body:has(.wz-backdrop) .fab { display: none !important; }
 .wz-exit { background: none; border: 1px solid var(--ink-faded); color: var(--ink-dim); border-radius: var(--radius); padding: 0.3rem 0.6rem; cursor: pointer; font-size: 0.82rem; }
 .wz-exit:hover { border-color: var(--brass); color: var(--brass-bright); }
 .wz-progress { height: 3px; background: var(--bg-deep); }
-.wz-progress-bar { height: 100%; background: var(--brass); transition: width 0.3s ease; }
+.wz-progress-bar { height: 100%; background: var(--brass); transition: width var(--dur-slow) var(--ease); }
 /* E14: stepper com dots numerados (maior affordance) + chip selecionado claro */
 .wz-stepper { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.7rem 1.1rem; border-bottom: 1px solid var(--border-1); }
 .wz-step-dot { display: inline-flex; align-items: center; gap: 0.4rem; background: none; border: none; color: var(--text-3); font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; cursor: default; padding: 0.15rem 0.2rem; }
@@ -3401,7 +3401,7 @@ body.immersion .svital-track { height: 12px; }
 body.immersion .sattr-row .sattr-value { font-size: 1.05rem; text-shadow: none; opacity: 0.85; }
 
 /* Log de rolagens e chat recolhem (a história está na mesa, não na tela) */
-body.immersion aside[data-tab="log"] { opacity: 0.4; transition: opacity 0.3s; }
+body.immersion aside[data-tab="log"] { opacity: 0.4; transition: opacity var(--dur-slow) var(--ease); }
 body.immersion aside[data-tab="log"]:hover { opacity: 1; }
 
 /* Respiro extra no diário e identidade */

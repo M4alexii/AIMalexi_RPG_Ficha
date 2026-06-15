@@ -434,7 +434,7 @@ a {
   color: var(--brass-bright);
   text-decoration: none;
   border-bottom: 1px dotted var(--brass);
-  transition: color 0.2s, border-color 0.2s;
+  transition: color var(--dur-base) var(--ease), border-color var(--dur-base) var(--ease);
 }
 a:hover {
   color: var(--ink);
@@ -513,7 +513,10 @@ button, .btn {
   border-radius: var(--radius);
   padding: 0.5rem 0.9rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background var(--dur-base) var(--ease),
+              color var(--dur-base) var(--ease),
+              border-color var(--dur-base) var(--ease),
+              box-shadow var(--dur-base) var(--ease);
   text-transform: uppercase;
 }
 
@@ -980,7 +983,9 @@ label {
   padding: 2rem 1.5rem;
   text-align: center;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: transform var(--dur-slow) var(--ease),
+              box-shadow var(--dur-slow) var(--ease),
+              border-color var(--dur-slow) var(--ease);
   text-decoration: none;
   color: var(--ink);
   position: relative;
@@ -993,7 +998,7 @@ label {
   inset: 0;
   background: radial-gradient(circle at center, var(--accent-glow) 0%, transparent 70%);
   opacity: 0;
-  transition: opacity 0.4s;
+  transition: opacity var(--dur-slow) var(--ease);
 }
 
 .portal-card:hover {
@@ -1059,7 +1064,7 @@ label {
   border-radius: var(--radius) var(--radius) 0 0;
   padding: 0.55rem 0.95rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background var(--dur-base) var(--ease), color var(--dur-base) var(--ease);
   position: relative;
   white-space: nowrap;
 }
@@ -1885,7 +1890,7 @@ body[data-bg-texture]:not([data-bg-texture="none"]) .app::before {
   pointer-events: none;
   opacity: var(--bg-texture-opacity, 0.18);
   mix-blend-mode: overlay;
-  transition: opacity 0.4s ease;
+  transition: opacity var(--dur-slow) var(--ease);
 }
 /* Temas claros: multiply preserva o "papel" sem acinzentar */
 body[data-theme="arquivo"][data-bg-texture] .app::before,
