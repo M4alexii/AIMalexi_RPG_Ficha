@@ -5,6 +5,41 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-15 - Polimento de design · Fase 1 (fundação) + início da Fase 2
+
+Implementa o roadmap da auditoria de produto/UX/UI/Design System
+(`Melhorias/AUDITORIA_DESIGN_V2.md`). Sem rewrite; identidade temática 1920s
+preservada.
+
+### Adicionado
+
+- **Fundação de tokens em 3 camadas** (`css/theme.css`): camada semântica
+  (`--bg`, `--surface-1/2/3`, `--text-1/2/3`, `--border-1/2`, `--danger`,
+  `--success`, `--warning`, `--focus-ring`, raios, sombras, z-index,
+  durações/easing, escala 8pt `--space-*`) como aliases dos primitivos —
+  cascateia automaticamente para os 13 temas.
+- **Sistema de ícones SVG** local (`assets/icons/sprite.svg`, ~33 ícones) +
+  favicon de marca (`assets/icons/favicon.svg`); helpers `CoC.ui.icon/iconHTML`.
+  Emojis funcionais substituídos nas toolbars, abas e feature cards.
+- **Estados vazios padronizados**: `CoC.ui.emptyState` + `.empty-state`.
+- **Componentes (Fase 2)**: `<select>` tematizado (chevron próprio), estados de
+  input (disabled/aria-invalid), botão `aria-busy` (loading); `accent-color`
+  global nos controles nativos.
+- **Home**: Open Graph/Twitter meta para compartilhamento.
+
+### Corrigido
+
+- **E2**: `.btn-export` deixa de ser ação primária permanente (verde + glow).
+- **E7**: separa a marca do Guardião (`--keeper-accent` oxblood) do vermelho de
+  perigo (`--danger`); HP crítico e excluir usam `--danger`.
+- **E3**: grid de recursos da home vira 2×2 (sem card órfão).
+- **E8**: sem overflow horizontal no theme-picker e na lista do bestiário.
+- **E9/E12**: molduras vazias do dashboard do investigador e do Resumo da
+  Campanha não aparecem sem dados.
+- **E10**: preview de Notas Avançadas renderiza Markdown de verdade (miniMD).
+- **i18n**: tipo de ataque de NPC exibido em pt-BR ("Corpo a corpo"/"À
+  distância"); E5/E6 da auditoria não se confirmaram no código.
+
 ## 2026-06-11 - Fase RK-2: combate e timeline do Guardião
 
 ### Adicionado (diretriz §8, etapa RK-2)
