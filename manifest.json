@@ -62,10 +62,10 @@
       "description": "Abrir ficha de personagem"
     },
     {
-      "name": "Ficha do Mestre",
-      "short_name": "Mestre",
+      "name": "Guardião — Centro de Campanha",
+      "short_name": "Guardião",
       "url": "./keeper.html",
-      "description": "Abrir ferramentas do Mestre"
+      "description": "Abrir ferramentas do Mestre (Guardião)"
     }
   ],
   "categories": ["games", "utilities"]
