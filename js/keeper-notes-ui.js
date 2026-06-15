@@ -947,10 +947,20 @@ window.CoC.keeperNotesUI = window.CoC.keeperNotesUI || {};
     function renderPreview() {
       var pane = $("note-preview");
       if (!pane) return;
-      var content = contentInput.value;
-      // Render markdown (basic) + wikilinks
-      content = notes.processWikilinks(content);
-      pane.innerHTML = content;
+      var raw = contentInput.value;
+      // E10: renderizar Markdown de verdade (títulos, quebras de linha, listas)
+      // via miniMD, delegando os [[wikilinks]] ao resolvedor já testado das notas.
+      if (window.CoC.miniMD && typeof window.CoC.miniMD.render === "function") {
+        pane.innerHTML = window.CoC.miniMD.render(raw, {
+          wikilink: function (token) {
+            // miniMD entrega o miolo cru de [[...]]; reusa processWikilinks
+            // (que faz o split alvo|exibição e escapa o resultado).
+            return notes.processWikilinks("[[" + token + "]]");
+          }
+        });
+      } else {
+        pane.innerHTML = notes.processWikilinks(raw);
+      }
     }
 
     function renderBacklinks() {

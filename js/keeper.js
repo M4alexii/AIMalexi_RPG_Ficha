@@ -16,6 +16,9 @@
 
   const SCHEMA_VERSION = 1;
 
+  // Rótulos pt-BR para o tipo de ataque (dados guardam a chave em inglês).
+  const ATK_TYPE_LABELS = { melee: "Corpo a corpo", ranged: "À distância", special: "Especial" };
+
   // ─── Estado em memória (DDAU) ─────────────────────────────────────────
   const state = {
     active: null,            // criatura aberta no workspace (clone editável)
@@ -341,11 +344,11 @@
           <div class="attack-meta">
             ${escapeHtml(String(a.chance ?? "—"))}% ·
             <b>${escapeHtml(a.damage || "—")}</b>
-            ${a.type ? ` · ${escapeHtml(a.type)}` : ""}
+            ${a.type ? ` · ${escapeHtml(ATK_TYPE_LABELS[a.type] || a.type)}` : ""}
           </div>
         </div>
         <div class="attack-meta">${a.note ? "<i>nota</i>" : ""}</div>
-        <button class="attack-roll" data-attack-roll="${idx}" title="Rolar ataque + dano">🎯</button>
+        <button class="attack-roll" data-attack-roll="${idx}" title="Rolar ataque + dano"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-dado"></use></svg></button>
         ${a.note ? `<div class="attack-note">${escapeHtml(a.note)}</div>` : ""}
       </div>
     `).join("");
@@ -547,9 +550,13 @@
         <label>Nome<input type="text" data-atk="${i}" data-field="name" value="${escapeHtml(a.name || "")}" /></label>
         <label>Chance %<input type="number" data-atk="${i}" data-field="chance" value="${a.chance ?? 0}" /></label>
         <label>Dano<input type="text" data-atk="${i}" data-field="damage" value="${escapeHtml(a.damage || "")}" /></label>
-        <label>Tipo<input type="text" data-atk="${i}" data-field="type" value="${escapeHtml(a.type || "")}" /></label>
+        <label>Tipo<select data-atk="${i}" data-field="type">${
+          Object.keys(ATK_TYPE_LABELS).map(function (key) {
+            return `<option value="${key}"${(a.type || "melee") === key ? " selected" : ""}>${ATK_TYPE_LABELS[key]}</option>`;
+          }).join("")
+        }</select></label>
         <label style="grid-column: 1 / -1;">Nota<input type="text" data-atk="${i}" data-field="note" value="${escapeHtml(a.note || "")}" /></label>
-        <button class="btn-danger btn-icon" data-atk-del="${i}" title="Remover">🗑</button>
+        <button class="btn-danger btn-icon" data-atk-del="${i}" title="Remover"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-lixeira"></use></svg></button>
       </div>
     `).join("") || `<div class="dim">Sem ataques. Clique em "+ Novo Ataque".</div>`;
 

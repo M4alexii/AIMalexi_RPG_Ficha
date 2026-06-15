@@ -110,11 +110,12 @@ window.CoC.views = window.CoC.views || {};
     function cards(list, sel, key, withDiff) {
       return list.map(function (it) {
         var id = it.id || it, lab = it.label || it;
-        var on = d[key] === id ? ' on' : '';
-        var diff = withDiff && it.diff ? '<span class="wz-diff" title="Dificuldade de interpretar">' + '⭐'.repeat(it.diff) + '</span>' : '';
+        var sel = d[key] === id;
+        var on = sel ? ' on' : '';
+        var diff = withDiff && it.diff ? '<span class="wz-diff" title="Dificuldade de interpretar">' + '★'.repeat(it.diff) + '</span>' : '';
         var icon = it.icon ? '<span class="wz-card-ico">' + it.icon + '</span>' : '';
         var desc = it.desc ? '<span class="wz-card-desc">' + _esc(it.desc) + '</span>' : '';
-        return '<button type="button" class="wz-card' + on + '" data-grp="' + key + '" data-val="' + _esc(id) + '">' +
+        return '<button type="button" class="wz-card' + on + '" aria-pressed="' + (sel ? 'true' : 'false') + '" data-grp="' + key + '" data-val="' + _esc(id) + '">' +
           icon + '<span class="wz-card-t">' + _esc(lab) + '</span>' + diff + desc + '</button>';
       }).join('');
     }
@@ -177,7 +178,7 @@ window.CoC.views = window.CoC.views || {};
         '<button type="button" class="wz-step" data-step="-5" aria-label="−">−</button>' +
         '<span class="wz-attr-val">' + a.Sorte + '</span>' +
         '<button type="button" class="wz-step" data-step="5" aria-label="+">+</button>' +
-        '<button type="button" class="wz-roll-luck btn-sm">🎲 Rolar</button>' +
+        '<button type="button" class="wz-roll-luck btn-sm"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-dado"></use></svg> Rolar</button>' +
       '</div>' +
       '<h4 class="wz-dv-title">Derivados (atualizam ao vivo)</h4>' + derived;
   }
@@ -304,7 +305,9 @@ window.CoC.views = window.CoC.views || {};
   function _render() {
     var stepper = STEPS.map(function (s, i) {
       var cls = i === W.step ? 'on' : (i < W.step ? 'done' : '');
-      return '<button type="button" class="wz-step-dot ' + cls + '" data-goto="' + i + '"><i></i>' + _esc(s.label) + '</button>';
+      var mark = i < W.step ? '✓' : (i + 1);
+      var cur = i === W.step ? ' aria-current="step"' : '';
+      return '<button type="button" class="wz-step-dot ' + cls + '" data-goto="' + i + '"' + cur + '><i>' + mark + '</i><span class="wz-step-label">' + _esc(s.label) + '</span></button>';
     }).join('');
     var pct = Math.round(((W.step + 1) / STEPS.length) * 100);
     var last = W.step === STEPS.length - 1;

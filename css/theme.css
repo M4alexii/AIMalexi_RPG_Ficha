@@ -102,6 +102,86 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   CAMADA SEMÂNTICA DE TOKENS (auditoria de design · 3 camadas)
+   ───────────────────────────────────────────────────────────────────────────
+   Primitivos (acima) → Semânticos (aqui) → Componente (nas specs).
+   Estes tokens são ALIASES dos primitivos: como referenciam via var(), eles
+   cascateiam automaticamente para os 13 temas (que sobrescrevem os primitivos).
+   NÃO renomeie os primitivos — só adicione aliases aqui.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* — Superfícies — */
+  --bg:           var(--bg-deep);
+  --surface-1:    var(--bg-mid);
+  --surface-2:    var(--bg-card);
+  --surface-3:    var(--bg-card-hi);
+
+  /* — Texto (cor) — (distinto de --text-xs..xl, que são TAMANHOS) */
+  --text-1:       var(--ink);       /* primário      */
+  --text-2:       var(--ink-dim);   /* secundário    */
+  --text-3:       var(--ink-faded); /* terciário ≥3:1 */
+
+  /* — Bordas — */
+  --border-1:     var(--line);      /* divisórias sutis */
+  --border-2:     var(--ink-faded); /* bordas de componente */
+
+  /* — Ação / estado semântico — */
+  --accent-hover: var(--brass-bright);
+  --danger:       var(--blood);     /* destrutivo (excluir/lixeira) */
+  --danger-hover: var(--burgundy);
+  --on-danger:    var(--ink);
+  --success:      var(--ok);
+  --warning:      var(--warn);
+  --focus-ring:   var(--brass-bright);
+
+  /* — Raios — (sm/md são aliases não-quebráveis dos existentes) */
+  --radius-sm:    var(--radius);    /* 3px */
+  --radius-md:    var(--radius-lg); /* 6px */
+  --radius-pill:  999px;
+
+  /* — Sombras (3 níveis) — */
+  --shadow-1: 0 1px 2px rgba(0,0,0,.35);
+  --shadow-2: 0 4px 12px rgba(0,0,0,.45);
+  --shadow-3: 0 12px 32px rgba(0,0,0,.55);
+
+  /* — Camadas (z-index) — */
+  --z-dropdown: 100;
+  --z-sheet:    200;
+  --z-modal:    300;
+  --z-toast:    400;
+
+  /* — Movimento — */
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 320ms;
+  --ease:     cubic-bezier(.2,0,.2,1);
+
+  /* — Espaçamento grid 8pt — */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-7:  32px;
+  --space-8:  40px;
+  --space-9:  48px;
+  --space-10: 64px;
+  --space-11: 80px;
+  --space-12: 96px;
+
+  /* — Ícones — */
+  --icon-size: 1.05em;
+
+  /* Chevron do <select> (cinza neutro legível em temas claros e escuros) */
+  --select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23998f7a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+
+  /* Controles nativos (checkbox/radio/range/progress) herdam o tema — resolve E4 */
+  accent-color: var(--accent);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    PARCHMENT WORLD — Two-world strategy
    ───────────────────────────────────────────────────────────────────────────
    Dark archive room (--abyss/--charcoal): Keeper view, system UI, settings.
@@ -189,16 +269,16 @@ body::after {
 
 .app-header {
   text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--space-3);   /* E13: footprint vertical menor antes do conteúdo */
   border-bottom: 1px solid var(--brass);
-  padding-bottom: 1rem;
+  padding-bottom: var(--space-2);
   position: relative;
 }
 
 .app-title {
   font-family: var(--font-serif);
   font-weight: 600;
-  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  font-size: clamp(1.4rem, 2.4vw, 2rem);   /* E13: teto menor */
   letter-spacing: 0.08em;
   color: var(--brass-bright);
   text-shadow: 0 0 18px var(--brass-glow), 0 2px 0 rgba(0,0,0,0.8);
@@ -286,6 +366,24 @@ body.high-contrast .skill-row,
 body.high-contrast .weapon-card,
 body.high-contrast .chat-msg { border-color: var(--ink-faded) !important; }
 
+/* Estado vazio PADRÃO (ícone + instrução de próximo passo · resolve E17).
+   Unifica o padrão já bom de Encontro/Arsenal/Chat para todas as listas. */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  text-align: center;
+  min-height: 7rem;
+  padding: var(--space-6) var(--space-4);
+  color: var(--text-3);
+}
+.empty-state-ico { color: var(--text-3); opacity: 0.5; line-height: 1; }
+.empty-state-title { margin: 0; font-size: var(--text-base); color: var(--text-2); }
+.empty-state-hint { margin: 0; font-size: var(--text-sm); line-height: 1.55; max-width: 28rem; }
+.empty-state-hint b { color: var(--text-1); }
+
 /* Estado vazio do chat — evita o vazião quando não há mensagens (ambas as páginas) */
 .chat-empty {
   display: flex;
@@ -341,6 +439,64 @@ a {
 a:hover {
   color: var(--ink);
   border-bottom-color: var(--ink);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ÍCONES (sprite SVG local · resolve E1)
+   Uso: <svg class="icon"><use href="assets/icons/sprite.svg#ico-dado"/></svg>
+   Cor herdada via currentColor; tamanho via --icon-size.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.icon {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  flex: 0 0 auto;
+  display: inline-block;
+  vertical-align: -0.15em;
+  color: currentColor;
+  pointer-events: none;
+}
+.icon-sm { --icon-size: 0.9em; }
+.icon-lg { --icon-size: 1.4em; }
+.icon-xl { --icon-size: 2.2em; }
+/* Botão só-ícone: dá um respiro consistente ao alvo de toque */
+.btn-icon .icon { vertical-align: middle; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TOOLTIP (CSS-only · F-008)
+   Uso: data-tooltip="texto" + aria-label="texto" (sem depender de `title`,
+   que é invisível no touch e lento no desktop). Aparece no hover e no teclado.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+[data-tooltip] { position: relative; }
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 6px);
+  transform: translateX(-50%) translateY(4px);
+  background: var(--surface-3);
+  color: var(--text-1);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius-sm);
+  padding: 0.3rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: 1.3;
+  white-space: nowrap;
+  box-shadow: var(--shadow-2);
+  opacity: 0;
+  pointer-events: none;
+  z-index: var(--z-toast);
+  transition: opacity var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+[data-tooltip]:hover::after,
+[data-tooltip]:focus-visible::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-tooltip]::after { transition: none; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -412,23 +568,26 @@ button:disabled, .btn:disabled {
   font-size: 1rem;
 }
 
-/* Botão de Export JSON com destaque permanente */
-.btn-export {
-  background: linear-gradient(180deg, var(--brass-bright) 0%, var(--brass) 100%);
-  border-color: var(--brass-bright);
-  color: var(--on-accent, var(--bg-deep));
-  font-weight: 700;
-  position: relative;
+/* Acessibilidade AA: alvo de toque ≥44px em dispositivos de ponteiro grosso
+   (toque). No desktop (ponteiro fino) mantém o tamanho compacto. */
+@media (pointer: coarse) {
+  button, .btn, a.btn { min-height: 44px; }
+  .btn-icon { min-width: 44px; }
 }
-.btn-export::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: var(--radius);
-  background: var(--brass-glow);
-  filter: blur(8px);
-  z-index: -1;
-  opacity: 0.7;
+
+/* Botão de Export JSON — secundário (E2: não é a ação primária permanente).
+   Mantém leve ênfase de "backup recomendado" só na borda, sem preenchimento
+   verde nem glow que competia com a ação primária de cada contexto. */
+.btn-export {
+  background: var(--surface-2);
+  border-color: var(--accent);
+  color: var(--text-1);
+  font-weight: 600;
+}
+.btn-export:hover {
+  background: var(--surface-3);
+  border-color: var(--accent-hover);
+  color: var(--accent-hover);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -533,6 +692,56 @@ input[type="radio"] {
   vertical-align: middle;
   cursor: pointer;
 }
+
+/* ── Select tematizado (Fase 2 · finaliza E4) ──
+   Remove a seta nativa do SO e usa um chevron próprio. */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: var(--select-chevron);
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+  background-size: 1em;
+  padding-right: 2rem;
+  cursor: pointer;
+}
+select::-ms-expand { display: none; }
+
+/* ── Estados de input (matriz: foco/erro/desabilitado) ── */
+input:disabled, select:disabled, textarea:disabled,
+input[readonly] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: var(--surface-1);
+}
+input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="true"],
+input.invalid, textarea.invalid {
+  border-color: var(--danger);
+}
+input[aria-invalid="true"]:focus, textarea[aria-invalid="true"]:focus {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--danger) 35%, transparent);
+}
+textarea { min-height: 5rem; resize: vertical; }
+
+/* ── Botão: estado carregando (matriz: loading) ── */
+.btn[aria-busy="true"], button[aria-busy="true"] {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+}
+.btn[aria-busy="true"]::after, button[aria-busy="true"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 1em; height: 1em;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  color: var(--text-2);
+  animation: btn-spin 0.7s linear infinite;
+}
+@keyframes btn-spin { to { transform: rotate(360deg); } }
 
 label {
   font-family: var(--font-mono);
@@ -1224,7 +1433,7 @@ body[data-sanity="breaking"] .svital-san .svital-fill { background-color: var(--
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :focus-visible {
-  outline: 2px solid var(--brass-bright);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 

@@ -400,7 +400,8 @@ body[data-difficulty="extreme"] .skill-frac-sep {
 /* ── Theme picker (M3.5.3) ── */
 .theme-picker {
   display: flex;
-  gap: 0.3rem;
+  flex-wrap: wrap;            /* E8: evita scroll horizontal na linha de swatches */
+  gap: 0.4rem;
   align-items: center;
   padding: 0 0.5rem;
   border-left: 1px solid var(--ink-faded);
@@ -1362,6 +1363,9 @@ body[data-difficulty="extreme"] .skill-frac-sep {
    DASHBOARD EXECUTIVO (#20)
    ═══════════════════════════════════════════════════════════════════════════ */
 .dashboard-section { padding: 0.85rem; }
+/* E9: oculta a moldura do dashboard quando não há personagem (sobrepõe
+   a regra de visibilidade por aba .section.tab-active). */
+.dashboard-section.is-empty { display: none !important; }
 .ed-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.7rem; }
 .ed-name { font-family: var(--font-serif); font-size: 1.3rem; font-weight: 700; color: var(--brass-bright); }
 .ed-tag { font-family: var(--font-mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-faded); }
@@ -2909,13 +2913,22 @@ body:has(.wz-backdrop) .fab { display: none !important; }
 .wz-exit:hover { border-color: var(--brass); color: var(--brass-bright); }
 .wz-progress { height: 3px; background: var(--bg-deep); }
 .wz-progress-bar { height: 100%; background: var(--brass); transition: width 0.3s ease; }
-.wz-stepper { display: flex; flex-wrap: wrap; gap: 0.3rem; padding: 0.6rem 1.1rem; border-bottom: 1px solid var(--ink-faded); }
-.wz-step-dot { display: inline-flex; align-items: center; gap: 0.35rem; background: none; border: none; color: var(--ink-faded); font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; cursor: default; padding: 0.2rem 0.4rem; }
-.wz-step-dot i { width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--ink-faded); display: inline-block; }
-.wz-step-dot.done { color: var(--ink-dim); cursor: pointer; }
-.wz-step-dot.done i { background: var(--ok, #6a9a6a); }
-.wz-step-dot.on { color: var(--brass-bright); }
-.wz-step-dot.on i { background: var(--brass); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brass) 30%, transparent); }
+/* E14: stepper com dots numerados (maior affordance) + chip selecionado claro */
+.wz-stepper { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.7rem 1.1rem; border-bottom: 1px solid var(--border-1); }
+.wz-step-dot { display: inline-flex; align-items: center; gap: 0.4rem; background: none; border: none; color: var(--text-3); font-family: var(--font-mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; cursor: default; padding: 0.15rem 0.2rem; }
+.wz-step-dot i {
+  width: 1.55rem; height: 1.55rem; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--surface-3); color: var(--text-3);
+  border: 1px solid var(--border-2);
+  font-style: normal; font-size: 0.78rem; font-weight: 700; flex: 0 0 auto;
+}
+.wz-step-label { white-space: nowrap; }
+.wz-step-dot.done { color: var(--text-2); cursor: pointer; }
+.wz-step-dot.done i { background: var(--success); color: var(--on-accent, #fff); border-color: var(--success); }
+.wz-step-dot.on { color: var(--accent-hover); }
+.wz-step-dot.on i { background: var(--accent); color: var(--on-accent); border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent); }
+@media (max-width: 560px) { .wz-step-label { display: none; } }
 .wz-body { display: grid; grid-template-columns: 1fr 280px; gap: 0; flex: 1 1 auto; min-height: 0; }
 .wz-main { padding: 1.1rem 1.25rem; overflow-y: auto; }
 .wz-tip { background: var(--bg-card-hi); border-left: 1px solid var(--ink-faded); padding: 1.1rem; overflow-y: auto; }
@@ -2931,11 +2944,14 @@ body:has(.wz-backdrop) .fab { display: none !important; }
 .wz-chips { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
 .wz-card { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 0.15rem; text-align: left; background: var(--bg-card-hi); border: 1px solid var(--ink-faded); border-radius: var(--radius); color: var(--ink); padding: 0.6rem 0.7rem; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
 .wz-card:hover { border-color: var(--brass); }
-.wz-card.on { border-color: var(--brass); background: color-mix(in srgb, var(--brass) 12%, var(--bg-card-hi)); }
+.wz-card.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, var(--surface-3)); box-shadow: inset 0 0 0 1px var(--accent); }
+/* Marca de selecionado clara (E14) */
+.wz-card.on::after { content: "✓"; position: absolute; top: 0.3rem; right: 0.45rem; color: var(--accent-hover); font-weight: 700; font-size: 0.9rem; line-height: 1; }
+.wz-card.on .wz-diff { right: 1.4rem; }
 .wz-card-ico { font-size: 1.3rem; }
 .wz-card-t { font-weight: 600; }
-.wz-card-desc { font-size: 0.74rem; color: var(--ink-faded); line-height: 1.3; }
-.wz-diff { position: absolute; top: 0.4rem; right: 0.5rem; font-size: 0.62rem; letter-spacing: -1px; }
+.wz-card-desc { font-size: 0.74rem; color: var(--text-3); line-height: 1.3; }
+.wz-diff { position: absolute; top: 0.4rem; right: 0.5rem; font-size: 0.7rem; letter-spacing: 0; color: var(--candle-bright, #d8b36a); }
 
 .wz-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
 .wz-field { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.8rem; color: var(--ink-dim); }

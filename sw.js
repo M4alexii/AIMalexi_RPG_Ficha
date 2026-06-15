@@ -13,7 +13,7 @@
    Para forçar atualização imediata: incremente CACHE_VERSION abaixo.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const CACHE_VERSION = "v91";
+const CACHE_VERSION = "v100";
 const CACHE_NAME = "aimalexi-rpg-" + CACHE_VERSION;
 
 // Assets que devem estar disponíveis offline imediatamente após instalação.
@@ -33,6 +33,11 @@ const PRECACHE_URLS = [
   "./css/investigator.css",
   "./css/keeper.css",
   "./css/guia.css",
+  "./assets/icons/sprite.svg",
+  "./assets/icons/favicon.svg",
+  "./assets/icon-192.png",
+  "./assets/icon-512.png",
+  "./assets/screenshots/investigator.png",
   "./js/shared/ui-components.js",
   "./js/shared/guided-tour.js",
   "./js/shared/mini-md.js",

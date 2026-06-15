@@ -315,7 +315,7 @@ window.CoC.views = window.CoC.views || {};
             title="Total da perícia (Base ${base} + alocados)" />
           <div class="skill-frac"><span class="skill-frac-half" title="Difícil">${dice.half(value)}</span><span class="skill-frac-sep"> · </span><span class="skill-frac-fifth" title="Extremo">${dice.fifth(value)}</span></div>
           ${markBtn}
-          <button class="skill-roll btn-ghost" data-roll-skill="${escapeHtml(s.name)}" title="Rolar perícia">🎲</button>
+          <button class="skill-roll btn-ghost" data-roll-skill="${escapeHtml(s.name)}" title="Rolar perícia"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-dado"></use></svg></button>
           <div class="skill-enc-panel" data-enc-for="${escapeHtml(s.name)}" hidden></div>
         `;
         inner.appendChild(row);
@@ -368,7 +368,7 @@ window.CoC.views = window.CoC.views || {};
             <input class="skill-input" type="number" min="0" max="99" value="${value}" data-skill="${escapeHtml(name)}" />
             <div class="skill-frac"><span class="skill-frac-half" title="Difícil">${dice.half(value)}</span><span class="skill-frac-sep"> · </span><span class="skill-frac-fifth" title="Extremo">${dice.fifth(value)}</span></div>
             ${markBtnC}
-            <button class="skill-roll btn-ghost" data-roll-skill="${escapeHtml(name)}" title="Rolar perícia">🎲</button>
+            <button class="skill-roll btn-ghost" data-roll-skill="${escapeHtml(name)}" title="Rolar perícia"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-dado"></use></svg></button>
           `;
           inner.appendChild(row);
         }

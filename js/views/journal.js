@@ -57,9 +57,11 @@ window.CoC.views = window.CoC.views || {};
 
     if (entries.length === 0) {
       list.appendChild(
-        el("p", { class: "journal-empty" }, [
-          "Nenhuma entrada. Use ", el("strong", {}, ["+ Nova Entrada"]), " para registrar descobertas."
-        ])
+        window.CoC.ui.emptyState({
+          icon: "diario",
+          title: "Nenhuma entrada ainda",
+          hint: 'Use <b>+ Nova Entrada</b> para registrar descobertas da campanha.'
+        })
       );
       return;
     }

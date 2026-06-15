@@ -261,11 +261,13 @@ window.CoC = window.CoC || {};
       });
       const closeBtn = el("button", {
         class: "btn-ghost",
-        text: "✕",
+        html: '<svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-fechar"></use></svg>',
         title: "Fechar",
+        "aria-label": "Fechar",
         style: {
-          position: "absolute", top: "0.5rem", right: "0.5rem",
-          fontSize: "1.2rem", padding: "0.3rem 0.6rem"
+          position: "absolute", top: "0.4rem", right: "0.4rem",
+          minWidth: "44px", minHeight: "44px",
+          display: "inline-flex", alignItems: "center", justifyContent: "center"
         },
         on: { click: close }
       });
@@ -546,13 +548,48 @@ window.CoC = window.CoC || {};
     document.head.appendChild(style);
   })();
 
+  // ─── Ícones (sprite SVG local · resolve E1) ────────────────────────────
+  const ICON_SPRITE = "assets/icons/sprite.svg";
+  // String <svg> pronta para innerHTML/templates. `name` sem o prefixo "ico-".
+  function iconHTML(name, opts = {}) {
+    const cls = "icon"
+      + (opts.size ? " icon-" + opts.size : "")
+      + (opts.class ? " " + opts.class : "");
+    return '<svg class="' + cls + '" aria-hidden="true" focusable="false">'
+      + '<use href="' + ICON_SPRITE + '#ico-' + name + '"></use></svg>';
+  }
+  // Nó DOM equivalente, para uso com el()/appendChild.
+  function icon(name, opts = {}) {
+    const span = document.createElement("span");
+    span.style.display = "contents";
+    span.innerHTML = iconHTML(name, opts);
+    return span.firstElementChild || span;
+  }
+
+  // ─── Estado vazio padronizado (ícone + instrução · resolve E17) ─────────
+  function emptyStateHTML(opts = {}) {
+    const ico = opts.icon || "pergaminho";
+    const title = opts.title ? '<p class="empty-state-title">' + escapeHtml(opts.title) + "</p>" : "";
+    // hint aceita HTML (ex.: <b>+ Nova Entrada</b>) — responsabilidade do chamador.
+    const hint = opts.hint ? '<p class="empty-state-hint">' + opts.hint + "</p>" : "";
+    return '<div class="empty-state">'
+      + '<span class="empty-state-ico" aria-hidden="true">' + iconHTML(ico, { size: "xl" }) + "</span>"
+      + title + hint + "</div>";
+  }
+  function emptyState(opts = {}) {
+    const wrap = document.createElement("div");
+    wrap.innerHTML = emptyStateHTML(opts);
+    return wrap.firstElementChild;
+  }
+
   // ─── Expor ────────────────────────────────────────────────────────────
   window.CoC.ui = {
     $, $$, el, setText, setHTML,
     toast, toastRoll, modal, confirm, prompt,
     appendRoll, clearLog, exportLogAsMarkdown,
     escapeHtml, copyToClipboard,
-    bottomSheet
+    bottomSheet,
+    icon, iconHTML, emptyState, emptyStateHTML
   };
 
 })();

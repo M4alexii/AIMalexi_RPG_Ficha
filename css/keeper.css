@@ -6,9 +6,13 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  --keeper-accent: var(--blood);
-  --keeper-accent-bright: #d84a4a;
-  --keeper-accent-glow: var(--blood-glow);
+  /* Marca do Mestre = oxblood/borgonha de "arquivo" — distinta do vermelho de
+     PERIGO (--danger/--blood), que fica reservado a excluir/lixeira/HP crítico.
+     Resolve E7 (títulos e abas não devem parecer alertas) sem abandonar a
+     identidade sangue/horror: apenas sofistica o tom para um vinho mais escuro. */
+  --keeper-accent: var(--burgundy-hi);   /* #6b2a2a — marca (títulos, abas, bordas) */
+  --keeper-accent-bright: #b06a55;       /* terracota-vinho legível p/ texto/realces */
+  --keeper-accent-glow: rgba(107, 42, 42, 0.5);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -211,7 +215,7 @@
   padding: 0;
   font-size: 0.7rem;
   border-radius: 50%;
-  background: var(--keeper-accent-bright, #c92929);
+  background: var(--danger, #8b1a1a);
   color: #fff;
   border: 1px solid var(--bg-deep);
   cursor: pointer;
@@ -245,6 +249,8 @@
   border-left: 3px solid var(--keeper-accent, var(--brass));
   border-radius: var(--radius-lg);
 }
+/* E12: dashboard recolhido quando não há campanha/investigadores */
+.keeper-overview.ko-collapsed { display: none; }
 .ko-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.4rem; }
 .ko-title { font-family: var(--font-serif); font-size: 1.3rem; color: var(--keeper-accent-bright, var(--brass-bright)); letter-spacing: 0.03em; }
 .ko-status { font-family: var(--font-mono); font-size: 0.78rem; color: var(--ink-dim); }
@@ -318,10 +324,12 @@
   gap: 0.3rem;
   max-height: 60vh;
   overflow-y: auto;
+  overflow-x: hidden;        /* E8: sem scroll horizontal na lista do bestiário */
   padding-right: 0.2rem;
 }
 
 .library-item {
+  min-width: 0;              /* permite que nomes longos encolham/quebrem */
   background: var(--bg-card-hi);
   border: 1px solid var(--ink-faded);
   border-left: 3px solid transparent;
@@ -350,6 +358,8 @@
   font-size: 0.95rem;
   color: var(--ink);
   line-height: 1.2;
+  min-width: 0;
+  overflow-wrap: anywhere;   /* nomes longos quebram em vez de estourar */
 }
 
 .library-item .li-meta {
@@ -850,7 +860,7 @@
 }
 .ei-hpbar-fill.hp-good { background: var(--ok, #5a8a5a); }
 .ei-hpbar-fill.hp-warn { background: var(--brass, #c89b3c); }
-.ei-hpbar-fill.hp-crit { background: var(--keeper-accent-bright, #c92929); }
+.ei-hpbar-fill.hp-crit { background: var(--danger, #8b1a1a); }
 .ei-hpbar-fill.hp-dead { background: var(--ink-faded); }
 .ei-hp-label {
   position: relative;
