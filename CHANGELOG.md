@@ -5,6 +5,20 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-15 - Densidade adaptativa + auditoria de temas
+
+### Adicionado
+
+- **Modo Espaçoso (iniciante)**: nova opção `density-roomy` em Configurações → Densidade.
+  Aumenta `--gap-lg` para 1.6rem, padding de seção para 1.2rem 1.4rem, altura mínima de
+  inputs para 48px e padding de cards/skills/armas para 0.55rem — facilita uso em touch
+  e reduz densidade cognitiva para novos jogadores.
+- **Auditoria de cascade semântica**: verificado que os temas `arquivo` (claro),
+  `obsidian` (aço frio) e `cosmic` (verde eldritch) cascateiam corretamente todos os
+  tokens semânticos via `var()` sem necessidade de overrides adicionais.
+
+---
+
 ## 2026-06-15 - Polimento de design · conclusão Fases 2 e 3
 
 ### Adicionado

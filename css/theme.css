@@ -353,6 +353,15 @@ body.density-compact .section { padding: 0.6rem 0.75rem; }
 body.density-compact .derived-card,
 body.density-compact .skill-row,
 body.density-compact .weapon-card { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+/* Espaçoso (iniciante) — aumenta espaçamento e alvos de toque, reduz densidade */
+body.density-roomy  { --gap-lg: 1.6rem; }
+body.density-roomy .section { padding: 1.2rem 1.4rem; }
+body.density-roomy .derived-card,
+body.density-roomy .skill-row,
+body.density-roomy .weapon-card { padding-top: 0.55rem; padding-bottom: 0.55rem; }
+body.density-roomy input,
+body.density-roomy select { min-height: 48px; font-size: 1rem; }
+body.density-roomy .section-title { font-size: 1.15rem; }
 
 /* Alto contraste — reforça texto e bordas (acessibilidade) */
 body.high-contrast {

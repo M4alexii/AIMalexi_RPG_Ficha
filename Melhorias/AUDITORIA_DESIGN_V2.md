@@ -108,7 +108,7 @@ Critério de aceite: `node js/tests/runner.js` verde; CI verde.
   apple-touch-icon. (Splash deriva de ícone+background_color.)
 - ✅ Identidade: favicon/OG de marca; redesign do hero da home com screenshot (E3).
 - ✅ Motion design intencional (tokens de duração/easing; reduced-motion já global).
-- ⏳ Densidade adaptativa (modo iniciante/veterano).
+- ✅ Densidade adaptativa (modo iniciante/veterano) — `body.density-roomy` em `theme.css`; opção "Espaçoso (iniciante)" em `settings.js`.
 - ✅ Nomenclatura consistente (H-f) — shortcut manifest e feature card corrigidos.
 - ✅ Faixa de vitais compacta no mobile (`#mobile-vitals-strip`): PV/SAN/PM sticky no topo
   do conteúdo em ≤767px, com mini-barra de progresso e alerta de nível crítico.
