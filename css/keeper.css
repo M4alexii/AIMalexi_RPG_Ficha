@@ -6,9 +6,13 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  --keeper-accent: var(--blood);
-  --keeper-accent-bright: #d84a4a;
-  --keeper-accent-glow: var(--blood-glow);
+  /* Marca do Mestre = oxblood/borgonha de "arquivo" — distinta do vermelho de
+     PERIGO (--danger/--blood), que fica reservado a excluir/lixeira/HP crítico.
+     Resolve E7 (títulos e abas não devem parecer alertas) sem abandonar a
+     identidade sangue/horror: apenas sofistica o tom para um vinho mais escuro. */
+  --keeper-accent: var(--burgundy-hi);   /* #6b2a2a — marca (títulos, abas, bordas) */
+  --keeper-accent-bright: #b06a55;       /* terracota-vinho legível p/ texto/realces */
+  --keeper-accent-glow: rgba(107, 42, 42, 0.5);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -211,7 +215,7 @@
   padding: 0;
   font-size: 0.7rem;
   border-radius: 50%;
-  background: var(--keeper-accent-bright, #c92929);
+  background: var(--danger, #8b1a1a);
   color: #fff;
   border: 1px solid var(--bg-deep);
   cursor: pointer;
@@ -850,7 +854,7 @@
 }
 .ei-hpbar-fill.hp-good { background: var(--ok, #5a8a5a); }
 .ei-hpbar-fill.hp-warn { background: var(--brass, #c89b3c); }
-.ei-hpbar-fill.hp-crit { background: var(--keeper-accent-bright, #c92929); }
+.ei-hpbar-fill.hp-crit { background: var(--danger, #8b1a1a); }
 .ei-hpbar-fill.hp-dead { background: var(--ink-faded); }
 .ei-hp-label {
   position: relative;

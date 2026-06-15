@@ -102,6 +102,83 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   CAMADA SEMÂNTICA DE TOKENS (auditoria de design · 3 camadas)
+   ───────────────────────────────────────────────────────────────────────────
+   Primitivos (acima) → Semânticos (aqui) → Componente (nas specs).
+   Estes tokens são ALIASES dos primitivos: como referenciam via var(), eles
+   cascateiam automaticamente para os 13 temas (que sobrescrevem os primitivos).
+   NÃO renomeie os primitivos — só adicione aliases aqui.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* — Superfícies — */
+  --bg:           var(--bg-deep);
+  --surface-1:    var(--bg-mid);
+  --surface-2:    var(--bg-card);
+  --surface-3:    var(--bg-card-hi);
+
+  /* — Texto (cor) — (distinto de --text-xs..xl, que são TAMANHOS) */
+  --text-1:       var(--ink);       /* primário      */
+  --text-2:       var(--ink-dim);   /* secundário    */
+  --text-3:       var(--ink-faded); /* terciário ≥3:1 */
+
+  /* — Bordas — */
+  --border-1:     var(--line);      /* divisórias sutis */
+  --border-2:     var(--ink-faded); /* bordas de componente */
+
+  /* — Ação / estado semântico — */
+  --accent-hover: var(--brass-bright);
+  --danger:       var(--blood);     /* destrutivo (excluir/lixeira) */
+  --danger-hover: var(--burgundy);
+  --on-danger:    var(--ink);
+  --success:      var(--ok);
+  --warning:      var(--warn);
+  --focus-ring:   var(--brass-bright);
+
+  /* — Raios — (sm/md são aliases não-quebráveis dos existentes) */
+  --radius-sm:    var(--radius);    /* 3px */
+  --radius-md:    var(--radius-lg); /* 6px */
+  --radius-pill:  999px;
+
+  /* — Sombras (3 níveis) — */
+  --shadow-1: 0 1px 2px rgba(0,0,0,.35);
+  --shadow-2: 0 4px 12px rgba(0,0,0,.45);
+  --shadow-3: 0 12px 32px rgba(0,0,0,.55);
+
+  /* — Camadas (z-index) — */
+  --z-dropdown: 100;
+  --z-sheet:    200;
+  --z-modal:    300;
+  --z-toast:    400;
+
+  /* — Movimento — */
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 320ms;
+  --ease:     cubic-bezier(.2,0,.2,1);
+
+  /* — Espaçamento grid 8pt — */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-7:  32px;
+  --space-8:  40px;
+  --space-9:  48px;
+  --space-10: 64px;
+  --space-11: 80px;
+  --space-12: 96px;
+
+  /* — Ícones — */
+  --icon-size: 1.05em;
+
+  /* Controles nativos (checkbox/radio/range/progress) herdam o tema — resolve E4 */
+  accent-color: var(--accent);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    PARCHMENT WORLD — Two-world strategy
    ───────────────────────────────────────────────────────────────────────────
    Dark archive room (--abyss/--charcoal): Keeper view, system UI, settings.
@@ -412,23 +489,19 @@ button:disabled, .btn:disabled {
   font-size: 1rem;
 }
 
-/* Botão de Export JSON com destaque permanente */
+/* Botão de Export JSON — secundário (E2: não é a ação primária permanente).
+   Mantém leve ênfase de "backup recomendado" só na borda, sem preenchimento
+   verde nem glow que competia com a ação primária de cada contexto. */
 .btn-export {
-  background: linear-gradient(180deg, var(--brass-bright) 0%, var(--brass) 100%);
-  border-color: var(--brass-bright);
-  color: var(--on-accent, var(--bg-deep));
-  font-weight: 700;
-  position: relative;
+  background: var(--surface-2);
+  border-color: var(--accent);
+  color: var(--text-1);
+  font-weight: 600;
 }
-.btn-export::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: var(--radius);
-  background: var(--brass-glow);
-  filter: blur(8px);
-  z-index: -1;
-  opacity: 0.7;
+.btn-export:hover {
+  background: var(--surface-3);
+  border-color: var(--accent-hover);
+  color: var(--accent-hover);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1224,7 +1297,7 @@ body[data-sanity="breaking"] .svital-san .svital-fill { background-color: var(--
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :focus-visible {
-  outline: 2px solid var(--brass-bright);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
