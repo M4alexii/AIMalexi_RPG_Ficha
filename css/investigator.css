@@ -185,7 +185,7 @@
   border-radius: var(--radius);
   border-left: 3px solid transparent;
   background: rgba(43, 36, 26, 0.15);
-  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+  transition: background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
 }
 .sattr-row:hover {
   background: rgba(184, 146, 79, 0.15);
@@ -352,7 +352,7 @@
 .sattr-frac-fifth,
 .skill-frac-half,
 .skill-frac-fifth {
-  transition: color 0.15s, font-weight 0.15s;
+  transition: color var(--dur-fast) var(--ease), font-weight var(--dur-fast) var(--ease);
 }
 
 /* Difícil: ½ ativo */
@@ -413,7 +413,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   border-radius: 50%;
   border: 2px solid transparent;
   cursor: pointer;
-  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+  transition: transform var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
   padding: 0;
   flex-shrink: 0;
   outline: none;
@@ -602,7 +602,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   text-transform: uppercase;
   padding: 0.65rem 1rem;
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
+  transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
   white-space: nowrap;
 }
 .desktop-tab:hover  { color: var(--ink); }
@@ -766,7 +766,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   font-size: 0.78rem;
   letter-spacing: 0.04em;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background var(--dur-fast) var(--ease);
 }
 .sidebar-edit-btn:hover { background: rgba(184, 146, 79, 0.2); }
 
@@ -965,7 +965,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   border-radius: var(--radius-lg);
   cursor: pointer;
   overflow: hidden;
-  transition: border-color 0.15s;
+  transition: border-color var(--dur-fast) var(--ease);
   flex: 0 0 auto;
   width: 130px;
   aspect-ratio: 3 / 4;
@@ -1122,7 +1122,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   background: var(--bg-card);
   color: var(--ink-dim);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
 }
 .condition-chip:hover { border-color: var(--brass); }
 .condition-chip.active {
@@ -1346,7 +1346,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   border: 1px solid var(--ink-faded);
   border-left: 3px solid transparent;
   border-radius: var(--radius);
-  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  transition: border-color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 .skill-row:hover {
@@ -1427,7 +1427,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   cursor: pointer;
   font-size: 0.85rem;
   padding: 0 0.2rem;
-  transition: color 0.15s;
+  transition: color var(--dur-fast) var(--ease);
 }
 .skill-info-toggle:hover,
 .skill-info-toggle.open { color: var(--brass-bright); }
@@ -2200,7 +2200,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   border-radius: var(--radius);
   background: var(--bg-card-hi);
   border: 1px solid var(--ink-faded);
-  transition: background 0.15s, border-color 0.15s;
+  transition: background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
 }
 .inv-item:hover { border-color: var(--brass); }
 
@@ -2238,7 +2238,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   gap: 0.1rem;
   flex-shrink: 0;
   opacity: 0;
-  transition: opacity 0.15s;
+  transition: opacity var(--dur-fast) var(--ease);
 }
 .inv-item:hover .inv-item-actions { opacity: 1; }
 
@@ -2326,7 +2326,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   border-radius: var(--radius);
   background: var(--bg-card-hi);
   border: 1px solid var(--ink-faded);
-  transition: background 0.15s, border-color 0.15s;
+  transition: background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
 }
 .journal-entry:hover { border-color: var(--brass); }
 
@@ -2367,7 +2367,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   gap: 0.1rem;
   flex-shrink: 0;
   opacity: 0;
-  transition: opacity 0.15s;
+  transition: opacity var(--dur-fast) var(--ease);
 }
 .journal-entry:hover .journal-entry-actions { opacity: 1; }
 
@@ -2436,7 +2436,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   border: 1px solid var(--ink-faded);
   border-left: 3px solid transparent;
   border-radius: var(--radius);
-  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  transition: border-color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 2px 8px rgba(0,0,0,0.1);
 }
 .spell-card:hover {
@@ -2496,7 +2496,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   display: flex;
   gap: 0.1rem;
   opacity: 0;
-  transition: opacity 0.15s;
+  transition: opacity var(--dur-fast) var(--ease);
 }
 .spell-card:hover .spell-secondary { opacity: 1; }
 
@@ -2521,7 +2521,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   padding: 0.65rem 0.85rem;
   margin-bottom: 0.55rem;
   position: relative;
-  transition: border-color 0.15s;
+  transition: border-color var(--dur-fast) var(--ease);
 }
 .tome-card:hover { border-color: var(--brass); }
 
@@ -2579,7 +2579,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   height: 100%;
   background: var(--brass);
   border-radius: 3px;
-  transition: width 0.25s ease;
+  transition: width var(--dur-base) var(--ease);
 }
 .tome-progress-fill.done { background: #4a8a54; }
 
@@ -2604,7 +2604,7 @@ body[data-difficulty="extreme"] .skill-frac-sep {
   display: flex;
   gap: 0.2rem;
   opacity: 0;
-  transition: opacity 0.15s;
+  transition: opacity var(--dur-fast) var(--ease);
 }
 .tome-card:hover .tome-secondary { opacity: 1; }
 
@@ -3174,7 +3174,7 @@ body:has(.wz-backdrop) .fab { display: none !important; }
 .wz-cards { display: grid; gap: 0.5rem; margin-bottom: 1rem; }
 .wz-cards-arq { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
 .wz-chips { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
-.wz-card { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 0.15rem; text-align: left; background: var(--bg-card-hi); border: 1px solid var(--ink-faded); border-radius: var(--radius); color: var(--ink); padding: 0.6rem 0.7rem; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+.wz-card { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 0.15rem; text-align: left; background: var(--bg-card-hi); border: 1px solid var(--ink-faded); border-radius: var(--radius); color: var(--ink); padding: 0.6rem 0.7rem; cursor: pointer; transition: border-color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease); }
 .wz-card:hover { border-color: var(--brass); }
 .wz-card.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, var(--surface-3)); box-shadow: inset 0 0 0 1px var(--accent); }
 /* Marca de selecionado clara (E14) */
@@ -3239,7 +3239,7 @@ body:has(.wz-backdrop) .fab { display: none !important; }
 /* Wizard — passo Equipamento (kit) */
 .wz-kit-toggle { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--ink); cursor: pointer; margin: 0.2rem 0 0.7rem; }
 .wz-kit-toggle input { width: 1.05rem; height: 1.05rem; accent-color: var(--brass); }
-.wz-kit-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem 0.8rem; transition: opacity 0.15s; }
+.wz-kit-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem 0.8rem; transition: opacity var(--dur-fast) var(--ease); }
 .wz-kit-list li { font-size: 0.9rem; color: var(--ink-dim); background: var(--bg-card-hi); border: 1px solid var(--ink-faded); border-radius: var(--radius); padding: 0.4rem 0.6rem; }
 .wz-kit-list.off { opacity: 0.4; }
 @media (max-width: 720px) { .wz-kit-list { grid-template-columns: 1fr; } }

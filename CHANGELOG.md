@@ -5,6 +5,22 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-15 - Tooltips, density skills e motion tokens
+
+### Adicionado / corrigido
+
+- **Tooltip rollout completo (F-008)**: `data-tooltip` + `aria-label` nos últimos botões
+  só-ícone: 13 swatches de tema (substituem `title`), `#btn-overflow` e `#btn-copy-log`
+  em `investigator.html` e `keeper.html` — tooltips visíveis no teclado e touch.
+- **Motion tokens em investigator.css**: todas as 20+ ocorrências de `0.15s` e
+  `0.25s ease` hardcoded convertidas para `var(--dur-fast) var(--ease)` e
+  `var(--dur-base) var(--ease)`; `transition: all` em `.condition-chip` expandido
+  para propriedades explícitas.
+- **E15 concluído**: `density-compact` (0.25rem top/bottom) e `density-roomy` (0.55rem)
+  cobrem a grade de perícias; combinado com `word-break` e ícone SVG.
+
+---
+
 ## 2026-06-15 - Densidade adaptativa + auditoria de temas
 
 ### Adicionado
