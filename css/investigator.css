@@ -555,8 +555,9 @@ body[data-difficulty="extreme"] .skill-frac-sep {
     color: var(--text-3, var(--ink-faded));
     font-weight: 400;
   }
+  /* Semântica quente/frio: PV (corpo) = sangue · SAN (mente/Mythos) = frio · PM = musgo */
   .iab-stat.pv  .iab-stat-value { color: var(--danger, #c0392b); }
-  .iab-stat.san .iab-stat-value { color: var(--brass, #b89240); }
+  .iab-stat.san .iab-stat-value { color: var(--mist, #5a8fb5); }
   .iab-stat.pm  .iab-stat-value { color: var(--success, #6a9a6a); }
   .iab-stat.low .iab-stat-value { animation: mvs-pulse 1.2s ease-in-out infinite; }
 
@@ -3108,7 +3109,7 @@ body:has(.wz-backdrop) .fab { display: none !important; }
     transition: width var(--dur-base, 200ms) var(--ease, ease);
   }
   .mvs-pill.pv  .mvs-fill { background: var(--danger, #8b1a1a); }
-  .mvs-pill.san .mvs-fill { background: var(--brass, #b89240); }
+  .mvs-pill.san .mvs-fill { background: var(--mist, #5a8fb5); }
   .mvs-pill.pm  .mvs-fill { background: var(--success, #6a9a6a); }
   .mvs-pill.pv.low  .mvs-fill,
   .mvs-pill.san.low .mvs-fill { animation: mvs-pulse 1.2s ease-in-out infinite; }

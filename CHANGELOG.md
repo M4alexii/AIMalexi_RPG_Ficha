@@ -5,6 +5,28 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-15 - Direção "Arquivo de Arkham": preset tipográfico + split quente/frio
+
+### Adicionado
+
+- **Preset de tipografia** (Configurações → Tipografia): alterna entre
+  "Clássica (serif 1920s)" — padrão, preserva a identidade — e
+  "Moderna (Inter na UI · mono nos dados)", que aplica Inter em toda a interface
+  funcional, JetBrains Mono nos números e mantém serif só em títulos/lore.
+  Implementado via `body.type-modern` remapeando apenas as famílias de fonte por
+  token (nenhum componente muda); números ganham `tabular-nums` no modo moderno.
+  Ambas as fontes já vinham no `@import` do tema.
+
+### Corrigido
+
+- **Semântica quente/frio da Sanidade**: a app-bar (`#inv-app-bar`) e a faixa de
+  vitais mobile (`#mobile-vitals-strip`) coloriam SAN com latão (quente); agora
+  usam o tom frio (`--mist`), consistente com o dashboard. Novo token semântico
+  `--sanity: var(--mist)` cascateia para os 13 temas. PV segue sangue, PM musgo;
+  vermelho permanece reservado a dano/exclusão.
+
+---
+
 ## 2026-06-15 - Correções de regras CoC7e (#8, #12, #15)
 
 ### Corrigido

@@ -120,6 +120,28 @@ Critério de aceite: `node js/tests/runner.js` verde; CI verde.
 
 ---
 
+## Direção "Arquivo de Arkham" (consultoria Malleji · jun/2026)
+
+Refinamentos adotados da consultoria externa, **sem rewrite** e respeitando a
+identidade 1920s como ativo:
+
+- ✅ **Preset tipográfico opcional** (Configurações → Tipografia): "Clássica"
+  (serif 1920s — padrão, preserva a identidade) × "Moderna" (Inter na UI +
+  JetBrains Mono nos dados; serif só em títulos/lore). `body.type-modern`
+  remapeia só as famílias via token — nenhum componente muda. Resolve a tensão
+  de E16 por escolha do usuário em vez de imposição. Ambas as fontes já vinham
+  no `@import`.
+- ✅ **Reforço da semântica quente/frio** onde faltava: SAN (mente/Mythos) na
+  app-bar e na faixa de vitais mobile estava em latão (quente) — agora usa o
+  tom frio (`--mist`), consistente com o dashboard. Novo token semântico
+  `--sanity: var(--mist)` cascateia para os 13 temas. PV permanece sangue
+  (vermelho), PM musgo; vermelho segue reservado a dano/exclusão.
+
+> A paleta com hex novos do plano **não** foi adotada (decisão: reforçar o split
+> só onde faltava, mantendo a base atual e o contraste já auditado).
+
+---
+
 ## Ativos a proteger (não achatar no redesign)
 Identidade 1920s; estratégia "dois mundos" (investigador × Guardião); wizard com
 arquétipos + dificuldade em estrelas e dica contextual lateral; microcopy de tom

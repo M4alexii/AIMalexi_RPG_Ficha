@@ -134,6 +134,9 @@
   --success:      var(--ok);
   --warning:      var(--warn);
   --focus-ring:   var(--brass-bright);
+  /* Sanidade/Mythos = lado FRIO (mente) — distinto do quente (investigador/latão)
+     e do vermelho (perigo físico). Reforça a estratégia "dois mundos". */
+  --sanity:       var(--mist);
 
   /* — Raios — (sm/md são aliases não-quebráveis dos existentes) */
   --radius-sm:    var(--radius);    /* 3px */
@@ -362,6 +365,24 @@ body.density-roomy .weapon-card { padding-top: 0.55rem; padding-bottom: 0.55rem;
 body.density-roomy input,
 body.density-roomy select { min-height: 48px; font-size: 1rem; }
 body.density-roomy .section-title { font-size: 1.15rem; }
+
+/* ─── Preset tipográfico "Moderna" (direção Arquivo de Arkham · Mallexi) ───
+   Inter na UI funcional + JetBrains Mono nos dados; serif (Cormorant / IM Fell)
+   preservada só em títulos e lore. Toggle em Configurações → Tipografia.
+   Remapeia apenas as FAMÍLIAS via token — nenhum componente muda. Ambas as
+   fontes já vêm no @import do topo. "Clássica" (padrão) mantém a serif 1920s. */
+body.type-modern {
+  --font-body:       'Inter', system-ui, -apple-system, sans-serif;  /* corpo + UI */
+  --font-mono:       'JetBrains Mono', ui-monospace, monospace;       /* dados/números */
+  --font-typewriter: 'Inter', system-ui, sans-serif;                 /* micro-rótulos */
+  /* --font-display, --font-serif e --font-marginalia permanecem serif/manuscrito:
+     são a voz atmosférica (títulos, lore, anotações). */
+}
+/* Números tabulares na UI moderna — vitais/perícias não "dançam" ao mudar valor */
+body.type-modern .ed-vital-val,
+body.type-modern .iab-stat-value,
+body.type-modern .mvs-value,
+body.type-modern .sattr-value { font-variant-numeric: tabular-nums; }
 
 /* Alto contraste — reforça texto e bordas (acessibilidade) */
 body.high-contrast {
