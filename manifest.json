@@ -10,6 +10,18 @@
   "lang": "pt-BR",
   "icons": [
     {
+      "src": "./assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
       "src": "./assets/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
@@ -20,6 +32,26 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "./assets/screenshots/home.png",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Portal da plataforma"
+    },
+    {
+      "src": "./assets/screenshots/investigator.png",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Ficha do Investigador"
+    },
+    {
+      "src": "./assets/screenshots/keeper.png",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Centro de Campanha do Guardião"
     }
   ],
   "shortcuts": [
