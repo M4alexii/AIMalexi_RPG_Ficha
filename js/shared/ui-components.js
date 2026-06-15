@@ -261,11 +261,13 @@ window.CoC = window.CoC || {};
       });
       const closeBtn = el("button", {
         class: "btn-ghost",
-        text: "✕",
+        html: '<svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-fechar"></use></svg>',
         title: "Fechar",
+        "aria-label": "Fechar",
         style: {
-          position: "absolute", top: "0.5rem", right: "0.5rem",
-          fontSize: "1.2rem", padding: "0.3rem 0.6rem"
+          position: "absolute", top: "0.4rem", right: "0.4rem",
+          minWidth: "44px", minHeight: "44px",
+          display: "inline-flex", alignItems: "center", justifyContent: "center"
         },
         on: { click: close }
       });

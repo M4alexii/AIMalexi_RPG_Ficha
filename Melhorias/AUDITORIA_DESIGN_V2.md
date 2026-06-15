@@ -54,15 +54,17 @@ sólido de profissional · S3 separa profissional de referência.
 | E8 | S1 | Overflow horizontal (swatches, bestiário) | ✅ `flex-wrap` + `overflow-x:hidden` |
 | E9 | S1 | Container vazio na aba Personagem | ✅ Moldura do dashboard oculta sem personagem |
 | E10 | S1 | Preview de Markdown quebrado | ✅ Preview usa miniMD de verdade |
-| E11 | S1 | Painéis com ✕ dentro de abas | ⏳ Fase 2 (rotular como "Limpar") |
+| E11 | S1 | Painéis com ✕ dentro de abas | ✅ Botões viram "Limpar" com ícone |
 | E12 | S1 | Dashboard vazio no topo do Guardião | ✅ Recolhe sem campanha/investigadores |
-| E13 | S1 | Headers consumindo ~200px | ⏳ Fase 2 (compactar app-bar) |
-| E14 | S2 | Stepper do wizard com baixa affordance | ⏳ Fase 2 |
-| E15 | S1 | Densidade hostil na aba Perícias | ⏳ Fase 2 |
+| E13 | S1 | Headers consumindo espaço | ✅ `app-header` compacto (margem/teto reduzidos) |
+| E14 | S2 | Stepper do wizard com baixa affordance | ✅ Dots numerados + chips com seleção clara |
+| E15 | S1 | Densidade hostil na aba Perícias | 🟡 Quebra por palavra ok + ícone SVG; modo compacto reusa `density-*` |
 | E16 | S1 | Mistura tipográfica sem papéis | 🟡 Escala/tokens definidos; migração incremental |
 | E17 | S1 | Estados vazios desiguais | ✅ `.empty-state` padrão + Diário/Arsenal |
 | F-003 | S1 | Foco invisível | ✅ Já existia; tokenizado em `--focus-ring` |
-| F-008 | S2 | Tooltips só via `title` | ⏳ Fase 2 (componente `data-tooltip`) |
+| F-008 | S2 | Tooltips só via `title` | 🟡 Componente `[data-tooltip]` pronto; rollout incremental |
+| F-019 | S2 | Alvos de toque pequenos | ✅ ≥44px em ponteiro grosso; ✕ do bottom-sheet 44px |
+| H-d | S3 | PWA instalável "parece app" | ✅ Ícone de marca 192/512, maskable, screenshots, apple-touch |
 
 Legenda: ✅ feito · 🟡 parcial · ⏳ pendente.
 
@@ -90,20 +92,23 @@ Critério de aceite: `node js/tests/runner.js` verde; CI verde.
 
 ### Fase 2 — De sólido para profissional (refinamento) — 🟡 em andamento
 - ✅ Selects tematizados + matriz de estados de input/botão (loading/disabled/invalid).
-- ⏳ Componente de tooltip `data-tooltip` (F-008).
-- ⏳ Compactar headers de página (E13).
-- ⏳ Stepper do wizard + chips de traço (E14).
-- ⏳ Densidade da aba Perícias (E15); painéis ✕ → "Limpar" (E11).
-- ⏳ Onboarding/first-run; microcopy; acessibilidade AA; mobile polido
-  (F-026→F-030); consolidação de temas.
+- ✅ Componente de tooltip `[data-tooltip]` (F-008) — rollout incremental restante.
+- ✅ Headers de página compactos (E13).
+- ✅ Stepper do wizard + chips de traço (E14).
+- ✅ Painéis ✕ → "Limpar" (E11); ✅ alvos de toque ≥44px (F-019).
+- 🟡 Densidade da aba Perícias (E15) — ícone + quebra ok; modo compacto a explorar.
+- ⏳ Onboarding/first-run; microcopy; mobile polido (F-026→F-030);
+  consolidação de temas; rollout amplo de `data-tooltip`.
 
-### Fase 3 — De profissional para referência (acabamento) — ⏳ pendente
-- Motion design intencional (tokens de duração/easing; respeitar reduced-motion).
-- Densidade adaptativa (modo iniciante/veterano).
-- Identidade de marca completa (logo, favicon, OG — OG já feito).
-- PWA instalada impecável (ícones maskable 192/512, splash, standalone).
-- Redesigns estruturais: Home (hero com screenshot real — E3) e Ficha/aba
-  Personagem (app-bar com PV/SAN/PM compactos — E9/E13).
+### Fase 3 — De profissional para referência (acabamento) — 🟡 em andamento
+- ✅ PWA instalável: ícone de marca 192/512 (any+maskable), screenshots,
+  apple-touch-icon. (Splash deriva de ícone+background_color.)
+- ✅ Identidade: favicon/OG de marca; redesign do hero da home com screenshot (E3).
+- ⏳ Motion design intencional (tokens de duração/easing; reduced-motion já global).
+- ⏳ Densidade adaptativa (modo iniciante/veterano).
+- ⏳ Nomenclatura consistente (H-f); logo no header.
+- ⏳ Redesign estrutural da Ficha/aba Personagem (app-bar com PV/SAN/PM — E9/E13);
+  maior risco visual — isolável, por último.
 
 ---
 

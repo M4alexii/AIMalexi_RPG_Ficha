@@ -568,6 +568,13 @@ button:disabled, .btn:disabled {
   font-size: 1rem;
 }
 
+/* Acessibilidade AA: alvo de toque ≥44px em dispositivos de ponteiro grosso
+   (toque). No desktop (ponteiro fino) mantém o tamanho compacto. */
+@media (pointer: coarse) {
+  button, .btn, a.btn { min-height: 44px; }
+  .btn-icon { min-width: 44px; }
+}
+
 /* Botão de Export JSON — secundário (E2: não é a ação primária permanente).
    Mantém leve ênfase de "backup recomendado" só na borda, sem preenchimento
    verde nem glow que competia com a ação primária de cada contexto. */
