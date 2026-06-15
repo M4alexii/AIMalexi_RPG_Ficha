@@ -9,10 +9,7 @@
   <link rel="stylesheet" href="css/theme.css" />
   <link rel="stylesheet" href="css/investigator.css" />
 
-  <link
-    rel="icon"
-    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%B2%3C/text%3E%3C/svg%3E"
-  />
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg" />
 
   <link rel="manifest" href="manifest.json" />
 
@@ -81,18 +78,18 @@
       <div class="sheet-title">Ações</div>
 
       <div class="sheet-group">
-        <button id="btn-session-export" class="btn-ghost" title="Exportar sessão completa com trace de eventos (rolagens, dano, sanidade)">📊 Sessão</button>
-        <button id="btn-import" class="btn-ghost" title="Importar JSON">📁 Importar</button>
-        <button id="btn-export" class="btn-export" title="Exportar personagem como JSON (BACKUP!)">💾 Exportar JSON</button>
-        <button id="btn-print" class="btn-ghost" title="Imprimir / Salvar como PDF">🖨️ PDF</button>
+        <button id="btn-session-export" class="btn-ghost" title="Exportar sessão completa com trace de eventos (rolagens, dano, sanidade)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-grafico"></use></svg> Sessão</button>
+        <button id="btn-import" class="btn-ghost" title="Importar JSON"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-pasta"></use></svg> Importar</button>
+        <button id="btn-export" class="btn-export" title="Exportar personagem como JSON (BACKUP!)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-baixar"></use></svg> Exportar JSON</button>
+        <button id="btn-print" class="btn-ghost" title="Imprimir / Salvar como PDF"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-impressora"></use></svg> PDF</button>
       </div>
 
       <div class="sheet-group">
-        <button id="btn-global-search" class="btn-ghost" title="Busca global (Ctrl+K)">🔍 Buscar</button>
-        <button id="btn-session-mode" class="btn-ghost" title="Modo de sessão: prioriza as perícias da cena (neutro → investigação → combate)">🎬 Cena</button>
-        <button id="btn-immersion" class="btn-ghost" title="Modo Imersão: menos números, mais narrativa — ideal para interpretação">🕯️ Imersão</button>
-        <button id="btn-settings" class="btn-ghost" title="Central de Configurações (tema, idioma, acessibilidade)">⚙️ Configurações</button>
-        <button id="btn-sanity-fx" class="btn-ghost" title="Configurar efeitos visuais de insanidade">🧠 Efeitos</button>
+        <button id="btn-global-search" class="btn-ghost" title="Busca global (Ctrl+K)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-lupa"></use></svg> Buscar</button>
+        <button id="btn-session-mode" class="btn-ghost" title="Modo de sessão: prioriza as perícias da cena (neutro → investigação → combate)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-claquete"></use></svg> Cena</button>
+        <button id="btn-immersion" class="btn-ghost" title="Modo Imersão: menos números, mais narrativa — ideal para interpretação"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-vela"></use></svg> Imersão</button>
+        <button id="btn-settings" class="btn-ghost" title="Central de Configurações (tema, idioma, acessibilidade)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-engrenagem"></use></svg> Configurações</button>
+        <button id="btn-sanity-fx" class="btn-ghost" title="Configurar efeitos visuais de insanidade"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-cerebro"></use></svg> Efeitos</button>
         <div class="theme-picker no-print" id="theme-picker" title="Tema da campanha">
           <button class="theme-swatch active" data-theme="arkham"     title="Arkham — Arquivo de Investigador (padrão)"></button>
           <button class="theme-swatch"        data-theme="classico"   title="Clássico — Dourado original"></button>
@@ -111,7 +108,7 @@
       </div>
 
       <div class="sheet-group sheet-group-danger">
-        <button id="btn-delete" class="btn-danger" title="Deletar este personagem">🗑️ Excluir</button>
+        <button id="btn-delete" class="btn-danger" title="Deletar este personagem"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-lixeira"></use></svg> Excluir</button>
       </div>
     </div>
 
@@ -120,22 +117,22 @@
 
   <!-- ═══ MOBILE TABS (bottom navigation no mobile) ═══ -->
   <nav class="mobile-tabs no-print" aria-label="Navegação móvel">
-    <button class="mobile-tab active" data-tab="personagem"><span class="tab-icon" aria-hidden="true">👤</span><span class="tab-label">Personagem</span></button>
-    <button class="mobile-tab" data-tab="pericias"><span class="tab-icon" aria-hidden="true">📜</span><span class="tab-label">Perícias</span></button>
-    <button class="mobile-tab" data-tab="combate"><span class="tab-icon" aria-hidden="true">⚔️</span><span class="tab-label">Combate</span></button>
-    <button class="mobile-tab" data-tab="inventario"><span class="tab-icon" aria-hidden="true">🎒</span><span class="tab-label">Inventário</span></button>
-    <button class="mobile-tab tab-overflow" data-tab="diario"><span class="tab-icon" aria-hidden="true">📔</span><span class="tab-label">Diário</span></button>
-    <button class="mobile-tab tab-overflow" data-tab="log"><span class="tab-icon" aria-hidden="true">🎲</span><span class="tab-label">Log</span></button>
-    <button class="mobile-tab mobile-more" id="mobile-more" type="button" aria-haspopup="true" aria-expanded="false"><span class="tab-icon" aria-hidden="true">⋯</span><span class="tab-label">Mais</span></button>
+    <button class="mobile-tab active" data-tab="personagem"><span class="tab-icon" aria-hidden="true"><svg class="icon"><use href="assets/icons/sprite.svg#ico-usuario"></use></svg></span><span class="tab-label">Personagem</span></button>
+    <button class="mobile-tab" data-tab="pericias"><span class="tab-icon" aria-hidden="true"><svg class="icon"><use href="assets/icons/sprite.svg#ico-pergaminho"></use></svg></span><span class="tab-label">Perícias</span></button>
+    <button class="mobile-tab" data-tab="combate"><span class="tab-icon" aria-hidden="true"><svg class="icon"><use href="assets/icons/sprite.svg#ico-espadas"></use></svg></span><span class="tab-label">Combate</span></button>
+    <button class="mobile-tab" data-tab="inventario"><span class="tab-icon" aria-hidden="true"><svg class="icon"><use href="assets/icons/sprite.svg#ico-mochila"></use></svg></span><span class="tab-label">Inventário</span></button>
+    <button class="mobile-tab tab-overflow" data-tab="diario"><span class="tab-icon" aria-hidden="true"><svg class="icon"><use href="assets/icons/sprite.svg#ico-diario"></use></svg></span><span class="tab-label">Diário</span></button>
+    <button class="mobile-tab tab-overflow" data-tab="log"><span class="tab-icon" aria-hidden="true"><svg class="icon"><use href="assets/icons/sprite.svg#ico-dado"></use></svg></span><span class="tab-label">Log</span></button>
+    <button class="mobile-tab mobile-more" id="mobile-more" type="button" aria-haspopup="true" aria-expanded="false"><span class="tab-icon" aria-hidden="true"><svg class="icon"><use href="assets/icons/sprite.svg#ico-mais-horizontal"></use></svg></span><span class="tab-label">Mais</span></button>
   </nav>
 
   <!-- Sheet "Mais" (bottom nav overflow) -->
   <div class="more-sheet no-print" id="more-sheet" hidden role="menu" aria-label="Mais opções">
     <div class="sheet-handle" aria-hidden="true"></div>
     <div class="sheet-title">Mais</div>
-    <button class="more-item" data-more-tab="diario" role="menuitem">📔 Diário de Campanha</button>
-    <button class="more-item" data-more-tab="log" role="menuitem">🎲 Log de Rolagens</button>
-    <button class="more-item" data-more-action="settings" role="menuitem">⚙️ Configurações</button>
+    <button class="more-item" data-more-tab="diario" role="menuitem"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-diario"></use></svg> Diário de Campanha</button>
+    <button class="more-item" data-more-tab="log" role="menuitem"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-dado"></use></svg> Log de Rolagens</button>
+    <button class="more-item" data-more-action="settings" role="menuitem"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-engrenagem"></use></svg> Configurações</button>
   </div>
   <div class="sheet-backdrop no-print" id="more-backdrop" hidden></div>
 
@@ -149,7 +146,7 @@
         class="character-portrait portrait-main"
         title="Retrato · clique para alterar"
       ></div>
-      <button id="btn-avatar-frame" class="btn-ghost btn-sm no-print" title="Moldura e forma do retrato">🖼️ Moldura</button>
+      <button id="btn-avatar-frame" class="btn-ghost btn-sm no-print" title="Moldura e forma do retrato"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-imagem"></use></svg> Moldura</button>
       <div class="sidebar-identity">
         <div id="sidebar-name" class="sidebar-name">—</div>
         <div id="sidebar-occupation" class="sidebar-occupation">—</div>
@@ -157,24 +154,24 @@
       </div>
       <div id="sidebar-vitals" class="sidebar-vitals"></div>
       <div class="sidebar-attr-header">
-        <button id="btn-roll-all" class="btn-primary btn-sm" title="Gera todos os atributos do zero (rolagem 3d6×5 / 2d6+6×5)">🎲 Rolar Tudo</button>
+        <button id="btn-roll-all" class="btn-primary btn-sm" title="Gera todos os atributos do zero (rolagem 3d6×5 / 2d6+6×5)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-dado"></use></svg> Rolar Tudo</button>
         <span id="attr-budget" class="attr-budget" hidden title="Soma das 8 características (point-buy CoC 7e ≈ 460)"></span>
       </div>
       <div id="sidebar-attributes" class="sidebar-attributes"></div>
-      <button id="btn-edit-mode" class="sidebar-edit-btn" title="Alternar Modo Editar (permite valores fora dos limites com aprovação)">✎ Editar Investigador</button>
-      <button id="btn-deps" class="sidebar-edit-btn" title="Ver o grafo de dependências de regras (o que cada atributo afeta)">🔗 Ver Dependências</button>
+      <button id="btn-edit-mode" class="sidebar-edit-btn" title="Alternar Modo Editar (permite valores fora dos limites com aprovação)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-lapis"></use></svg> Editar Investigador</button>
+      <button id="btn-deps" class="sidebar-edit-btn" title="Ver o grafo de dependências de regras (o que cada atributo afeta)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-link"></use></svg> Ver Dependências</button>
     </aside>
 
     <!-- ═══ PAINEL PRINCIPAL ═══ -->
     <div class="main-panel">
 
       <nav class="desktop-tabs no-print" id="desktop-tabs" aria-label="Navegação da ficha">
-        <button class="desktop-tab active" data-tab="personagem">👤 Personagem</button>
-        <button class="desktop-tab" data-tab="pericias">📜 Perícias</button>
-        <button class="desktop-tab" data-tab="combate">⚔️ Combate</button>
-        <button class="desktop-tab" data-tab="inventario">🎒 Inventário</button>
-        <button class="desktop-tab" data-tab="diario">📔 Diário</button>
-        <button class="desktop-tab" data-tab="log">🎲 Log</button>
+        <button class="desktop-tab active" data-tab="personagem"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-usuario"></use></svg> Personagem</button>
+        <button class="desktop-tab" data-tab="pericias"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-pergaminho"></use></svg> Perícias</button>
+        <button class="desktop-tab" data-tab="combate"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-espadas"></use></svg> Combate</button>
+        <button class="desktop-tab" data-tab="inventario"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-mochila"></use></svg> Inventário</button>
+        <button class="desktop-tab" data-tab="diario"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-diario"></use></svg> Diário</button>
+        <button class="desktop-tab" data-tab="log"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-dado"></use></svg> Log</button>
       </nav>
 
     <!-- ═══ CONTEÚDO ═══ -->

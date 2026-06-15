@@ -363,6 +363,24 @@ body.high-contrast .skill-row,
 body.high-contrast .weapon-card,
 body.high-contrast .chat-msg { border-color: var(--ink-faded) !important; }
 
+/* Estado vazio PADRÃO (ícone + instrução de próximo passo · resolve E17).
+   Unifica o padrão já bom de Encontro/Arsenal/Chat para todas as listas. */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  text-align: center;
+  min-height: 7rem;
+  padding: var(--space-6) var(--space-4);
+  color: var(--text-3);
+}
+.empty-state-ico { color: var(--text-3); opacity: 0.5; line-height: 1; }
+.empty-state-title { margin: 0; font-size: var(--text-base); color: var(--text-2); }
+.empty-state-hint { margin: 0; font-size: var(--text-sm); line-height: 1.55; max-width: 28rem; }
+.empty-state-hint b { color: var(--text-1); }
+
 /* Estado vazio do chat — evita o vazião quando não há mensagens (ambas as páginas) */
 .chat-empty {
   display: flex;
@@ -419,6 +437,27 @@ a:hover {
   color: var(--ink);
   border-bottom-color: var(--ink);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ÍCONES (sprite SVG local · resolve E1)
+   Uso: <svg class="icon"><use href="assets/icons/sprite.svg#ico-dado"/></svg>
+   Cor herdada via currentColor; tamanho via --icon-size.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.icon {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  flex: 0 0 auto;
+  display: inline-block;
+  vertical-align: -0.15em;
+  color: currentColor;
+  pointer-events: none;
+}
+.icon-sm { --icon-size: 0.9em; }
+.icon-lg { --icon-size: 1.4em; }
+.icon-xl { --icon-size: 2.2em; }
+/* Botão só-ícone: dá um respiro consistente ao alvo de toque */
+.btn-icon .icon { vertical-align: middle; }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    BOTÕES

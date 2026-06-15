@@ -62,7 +62,13 @@ window.CoC.views  = window.CoC.views  || {};
     var weapons = Array.isArray(c.weapons) ? c.weapons : [];
 
     if (weapons.length === 0) {
-      list.innerHTML = '<p class="dim center" style="grid-column: 1/-1;">Sem armas. Clique em <b>+ Arma</b> para adicionar.</p>';
+      list.innerHTML = '<div style="grid-column: 1/-1;">'
+        + window.CoC.ui.emptyState({
+            icon: "espadas",
+            title: "Nenhuma arma no arsenal",
+            hint: 'Clique em <b>+ Arma</b> para adicionar uma arma à ficha.'
+          }).outerHTML
+        + '</div>';
       return;
     }
 

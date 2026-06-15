@@ -1,0 +1,202 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+<!--
+  AIMalexi RPG · sprite de icones (self-hosted, CSP-safe).
+  Uso: svg.icon + use href ao id ico-NOME. Cor via currentColor; tamanho
+  pela classe .icon. Icones geometricos originais (traco 24x24).
+-->
+<defs>
+  <style>
+    symbol { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  </style>
+</defs>
+
+<symbol id="ico-dado" viewBox="0 0 24 24">
+  <rect x="3" y="3" width="18" height="18" rx="3"/>
+  <circle cx="8" cy="8" r="1.1" fill="currentColor" stroke="none"/>
+  <circle cx="16" cy="8" r="1.1" fill="currentColor" stroke="none"/>
+  <circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none"/>
+  <circle cx="8" cy="16" r="1.1" fill="currentColor" stroke="none"/>
+  <circle cx="16" cy="16" r="1.1" fill="currentColor" stroke="none"/>
+</symbol>
+
+<symbol id="ico-pasta" viewBox="0 0 24 24">
+  <path d="M3 6a2 2 0 0 1 2-2h4l2 2.5h6a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>
+</symbol>
+
+<symbol id="ico-pasta-abrir" viewBox="0 0 24 24">
+  <path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h6a2 2 0 0 1 2 2"/>
+  <path d="m3 9 1.6 8.4A2 2 0 0 0 6.6 19h10.2a2 2 0 0 0 2-1.6L20.5 9Z"/>
+</symbol>
+
+<symbol id="ico-baixar" viewBox="0 0 24 24">
+  <path d="M12 4v10"/>
+  <path d="m8 11 4 4 4-4"/>
+  <path d="M5 19h14"/>
+</symbol>
+
+<symbol id="ico-impressora" viewBox="0 0 24 24">
+  <path d="M7 8V4h10v4"/>
+  <path d="M5 8h14a2 2 0 0 1 2 2v6h-4"/>
+  <path d="M5 16H3a0 0 0 0 1 0 0v-6a2 2 0 0 1 2-2"/>
+  <rect x="7" y="14" width="10" height="6" rx="1"/>
+</symbol>
+
+<symbol id="ico-lupa" viewBox="0 0 24 24">
+  <circle cx="10.5" cy="10.5" r="6.5"/>
+  <path d="m20 20-4.8-4.8"/>
+</symbol>
+
+<symbol id="ico-engrenagem" viewBox="0 0 24 24">
+  <circle cx="12" cy="12" r="3"/>
+  <path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>
+</symbol>
+
+<symbol id="ico-cerebro" viewBox="0 0 24 24">
+  <path d="M12 5a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 2.5 4.5A2.5 2.5 0 0 0 12 19Z"/>
+  <path d="M12 5a3 3 0 0 1 3 3 3 3 0 0 1 2 5 3 3 0 0 1-2.5 4.5A2.5 2.5 0 0 1 12 19Z"/>
+</symbol>
+
+<symbol id="ico-usuario" viewBox="0 0 24 24">
+  <circle cx="12" cy="8" r="4"/>
+  <path d="M5 20a7 7 0 0 1 14 0"/>
+</symbol>
+
+<symbol id="ico-usuarios" viewBox="0 0 24 24">
+  <circle cx="9" cy="8" r="3.5"/>
+  <path d="M3 19a6 6 0 0 1 12 0"/>
+  <path d="M16 5.2a3.5 3.5 0 0 1 0 6.6"/>
+  <path d="M17 13.5a6 6 0 0 1 4 5.5"/>
+</symbol>
+
+<symbol id="ico-mascaras" viewBox="0 0 24 24">
+  <path d="M4 5h8v6a4 4 0 0 1-8 0Z"/>
+  <path d="M12 8h8v3a4 4 0 0 1-7.6 1.7"/>
+  <path d="M6.5 8.5h.01M9.5 8.5h.01"/>
+</symbol>
+
+<symbol id="ico-pergaminho" viewBox="0 0 24 24">
+  <path d="M6 4h11a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"/>
+  <path d="M9 8h7M9 12h7M9 16h4"/>
+</symbol>
+
+<symbol id="ico-espadas" viewBox="0 0 24 24">
+  <path d="M14.5 3.5 20 9l-2 2-5.5-5.5Z"/>
+  <path d="m12.5 7.5-9 9V20h3.5l9-9"/>
+  <path d="M3.5 14.5 9 20"/>
+  <path d="M19 14.5 14.5 19"/>
+</symbol>
+
+<symbol id="ico-mochila" viewBox="0 0 24 24">
+  <path d="M6 9a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v9a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"/>
+  <path d="M9 5V4a3 3 0 0 1 6 0v1"/>
+  <path d="M9 13h6"/>
+</symbol>
+
+<symbol id="ico-diario" viewBox="0 0 24 24">
+  <path d="M6 4h12a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/>
+  <path d="M4 16h15"/>
+  <path d="M9 8h6"/>
+</symbol>
+
+<symbol id="ico-chat" viewBox="0 0 24 24">
+  <path d="M4 5h16a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9l-4 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z"/>
+</symbol>
+
+<symbol id="ico-lixeira" viewBox="0 0 24 24">
+  <path d="M4 7h16"/>
+  <path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+  <path d="M6 7v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7"/>
+  <path d="M10 11v6M14 11v6"/>
+</symbol>
+
+<symbol id="ico-lapis" viewBox="0 0 24 24">
+  <path d="M14.5 5.5 18.5 9.5"/>
+  <path d="M4 20l1-4L16 5a1.5 1.5 0 0 1 2 0l1 1a1.5 1.5 0 0 1 0 2L8 19Z"/>
+</symbol>
+
+<symbol id="ico-mais" viewBox="0 0 24 24">
+  <path d="M12 5v14M5 12h14"/>
+</symbol>
+
+<symbol id="ico-fechar" viewBox="0 0 24 24">
+  <path d="M6 6l12 12M18 6 6 18"/>
+</symbol>
+
+<symbol id="ico-raio" viewBox="0 0 24 24">
+  <path d="M13 3 5 13h6l-2 8 8-10h-6Z"/>
+</symbol>
+
+<symbol id="ico-globo" viewBox="0 0 24 24">
+  <circle cx="12" cy="12" r="9"/>
+  <path d="M3 12h18"/>
+  <path d="M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18Z"/>
+</symbol>
+
+<symbol id="ico-livros" viewBox="0 0 24 24">
+  <path d="M5 4h5a1 1 0 0 1 1 1v15a2 2 0 0 0-2-2H5Z"/>
+  <path d="M19 4h-5a1 1 0 0 0-1 1v15a2 2 0 0 1 2-2h4Z"/>
+</symbol>
+
+<symbol id="ico-ajuda" viewBox="0 0 24 24">
+  <circle cx="12" cy="12" r="9"/>
+  <path d="M9.5 9.5a2.5 2.5 0 0 1 4.5 1.5c0 1.5-2 2-2 3"/>
+  <path d="M12 17h.01"/>
+</symbol>
+
+<symbol id="ico-mapa" viewBox="0 0 24 24">
+  <path d="m3 6 6-2 6 2 6-2v14l-6 2-6-2-6 2Z"/>
+  <path d="M9 4v14M15 6v14"/>
+</symbol>
+
+<symbol id="ico-grafico" viewBox="0 0 24 24">
+  <path d="M4 4v16h16"/>
+  <path d="M8 16v-4M12 16V8M16 16v-6"/>
+</symbol>
+
+<symbol id="ico-link" viewBox="0 0 24 24">
+  <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.5 1.5"/>
+  <path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.5-1.5"/>
+</symbol>
+
+<symbol id="ico-imagem" viewBox="0 0 24 24">
+  <rect x="3" y="4" width="18" height="16" rx="2"/>
+  <circle cx="8.5" cy="9" r="1.5"/>
+  <path d="m4 18 5-5 4 4 3-3 4 4"/>
+</symbol>
+
+<symbol id="ico-claquete" viewBox="0 0 24 24">
+  <path d="M3 8h18v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z"/>
+  <path d="m3 8 2-4 16 0-2 4"/>
+  <path d="m7 4 2 4M12 4l2 4"/>
+</symbol>
+
+<symbol id="ico-vela" viewBox="0 0 24 24">
+  <path d="M12 3c1.5 1.5 1.5 3 0 4.5C10.5 6 10.5 4.5 12 3Z" fill="currentColor" stroke="none"/>
+  <rect x="9" y="9" width="6" height="11" rx="1"/>
+  <path d="M12 7.5V9"/>
+</symbol>
+
+<symbol id="ico-recarregar" viewBox="0 0 24 24">
+  <path d="M20 12a8 8 0 1 1-2.3-5.6"/>
+  <path d="M20 4v4h-4"/>
+</symbol>
+
+<symbol id="ico-mais-horizontal" viewBox="0 0 24 24">
+  <circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/>
+  <circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/>
+  <circle cx="19" cy="12" r="1.4" fill="currentColor" stroke="none"/>
+</symbol>
+
+<symbol id="ico-seta-esq" viewBox="0 0 24 24"><path d="m14 6-6 6 6 6"/></symbol>
+<symbol id="ico-seta-dir" viewBox="0 0 24 24"><path d="m10 6 6 6-6 6"/></symbol>
+<symbol id="ico-chevron-baixo" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+
+<symbol id="ico-marca" viewBox="0 0 24 24">
+  <path d="M12 3c4 0 6 3 6 6 0 2-1 3-1 5l2 5"/>
+  <path d="M12 3c-4 0-6 3-6 6 0 2 1 3 1 5l-2 5"/>
+  <path d="M12 9c1.5 0 2.5 1 2.5 3l1 6"/>
+  <path d="M12 9c-1.5 0-2.5 1-2.5 3l-1 6"/>
+  <circle cx="10" cy="8" r="0.8" fill="currentColor" stroke="none"/>
+  <circle cx="14" cy="8" r="0.8" fill="currentColor" stroke="none"/>
+</symbol>
+</svg>

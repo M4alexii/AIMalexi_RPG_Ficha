@@ -8,13 +8,23 @@
   <meta name="description" content="Plataforma completa e gratuita para Chamado de Cthulhu 7ª Edição: crie investigadores, gerencie campanhas, controle sanidade e role testes automaticamente. PWA offline-first." />
   <link rel="stylesheet" href="css/theme.css" />
   <link rel="stylesheet" href="css/home.css" />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%90%99%3C/text%3E%3C/svg%3E" />
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#1a1510" />
   <meta name="color-scheme" content="dark" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <!-- Open Graph / compartilhamento -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="AIMalexi RPG" />
+  <meta property="og:title" content="AIMalexi RPG · Plataforma de Chamado de Cthulhu 7E" />
+  <meta property="og:description" content="Crie investigadores, gerencie campanhas, controle a sanidade e role testes automaticamente. PWA gratuita e offline-first." />
+  <meta property="og:image" content="assets/icons/favicon.svg" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="AIMalexi RPG · Chamado de Cthulhu 7E" />
+  <meta name="twitter:description" content="Ficha do investigador, centro de campanha do Mestre e compêndio — grátis, offline e open source." />
 </head>
 <body>
 <script>
@@ -40,17 +50,17 @@
       automaticamente. Tudo no navegador, online ou offline — sem instalar nada.
     </p>
     <div class="hero-cta">
-      <a href="investigator.html" class="cta-primary">🎲 Criar Investigador</a>
+      <a href="investigator.html" class="cta-primary"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-dado"></use></svg> Criar Investigador</a>
       <a href="#recursos" class="cta-secondary">Explorar Recursos</a>
     </div>
   </header>
 
   <!-- ═══ QUICK ACTIONS ═══ -->
   <nav class="quick-actions" aria-label="Ações rápidas">
-    <a href="investigator.html" class="qa"><span class="qa-icon" aria-hidden="true">➕</span>Novo Investigador</a>
-    <a href="investigator.html" class="qa"><span class="qa-icon" aria-hidden="true">📂</span>Importar JSON</a>
-    <button type="button" class="qa" id="qa-roll" title="Rolar 1d100"><span class="qa-icon" aria-hidden="true">🎲</span><span class="qa-roll-result" id="qa-roll-result">Rolar d100</span></button>
-    <a href="keeper.html" class="qa"><span class="qa-icon" aria-hidden="true">🌎</span>Campanhas</a>
+    <a href="investigator.html" class="qa"><span class="qa-icon" aria-hidden="true"><svg class="icon icon-lg"><use href="assets/icons/sprite.svg#ico-mais"></use></svg></span>Novo Investigador</a>
+    <a href="investigator.html" class="qa"><span class="qa-icon" aria-hidden="true"><svg class="icon icon-lg"><use href="assets/icons/sprite.svg#ico-pasta-abrir"></use></svg></span>Importar JSON</a>
+    <button type="button" class="qa" id="qa-roll" title="Rolar 1d100"><span class="qa-icon" aria-hidden="true"><svg class="icon icon-lg"><use href="assets/icons/sprite.svg#ico-dado"></use></svg></span><span class="qa-roll-result" id="qa-roll-result">Rolar d100</span></button>
+    <a href="keeper.html" class="qa"><span class="qa-icon" aria-hidden="true"><svg class="icon icon-lg"><use href="assets/icons/sprite.svg#ico-globo"></use></svg></span>Campanhas</a>
   </nav>
 
   <!-- ═══ STATS ═══ -->
@@ -67,7 +77,7 @@
     <div class="feature-grid">
 
       <article class="feature-card investigator">
-        <div class="fc-icon" aria-hidden="true">🎲</div>
+        <div class="fc-icon" aria-hidden="true"><svg class="icon icon-xl"><use href="assets/icons/sprite.svg#ico-usuario"></use></svg></div>
         <h3>Ficha do Investigador</h3>
         <ul>
           <li>Atributos e derivados automáticos</li>
@@ -80,7 +90,7 @@
       </article>
 
       <article class="feature-card keeper">
-        <div class="fc-icon" aria-hidden="true">📜</div>
+        <div class="fc-icon" aria-hidden="true"><svg class="icon icon-xl"><use href="assets/icons/sprite.svg#ico-mascaras"></use></svg></div>
         <h3>Ferramenta do Mestre</h3>
         <ul>
           <li>NPCs aleatórios em 1 clique</li>
@@ -93,7 +103,7 @@
       </article>
 
       <article class="feature-card guide">
-        <div class="fc-icon" aria-hidden="true">❓</div>
+        <div class="fc-icon" aria-hidden="true"><svg class="icon icon-xl"><use href="assets/icons/sprite.svg#ico-ajuda"></use></svg></div>
         <h3>Guia do Iniciante</h3>
         <ul>
           <li>Aprenda CoC do zero em ~20 min</li>
@@ -106,7 +116,7 @@
       </article>
 
       <article class="feature-card compendium">
-        <div class="fc-icon" aria-hidden="true">📚</div>
+        <div class="fc-icon" aria-hidden="true"><svg class="icon icon-xl"><use href="assets/icons/sprite.svg#ico-livros"></use></svg></div>
         <h3>Compêndio de Regras</h3>
         <ul>
           <li>Atributos e perícias de referência</li>
