@@ -5,6 +5,18 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-15 - Polimento de design · Fase 3 (mobile vitals strip)
+
+### Adicionado
+
+- **Faixa de vitais no mobile** (`#mobile-vitals-strip`): barra sticky compacta com PV,
+  SAN e PM (valor atual/máximo + mini-barra de progresso colorida) visível somente em
+  ≤767px no topo do painel de conteúdo. Pulsa em vermelho/âmbar quando o nível ≤ 25%.
+  Atualiza em tempo real junto com o dashboard executivo. Resolve a falta de vitais
+  visíveis ao rolar o conteúdo de Perícias/Combate/Inventário no mobile.
+
+---
+
 ## 2026-06-15 - Polimento de design · Fase 1 (fundação) + início da Fase 2
 
 Implementa o roadmap da auditoria de produto/UX/UI/Design System

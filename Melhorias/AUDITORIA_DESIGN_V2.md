@@ -107,8 +107,9 @@ Critério de aceite: `node js/tests/runner.js` verde; CI verde.
 - ⏳ Motion design intencional (tokens de duração/easing; reduced-motion já global).
 - ⏳ Densidade adaptativa (modo iniciante/veterano).
 - ⏳ Nomenclatura consistente (H-f); logo no header.
-- ⏳ Redesign estrutural da Ficha/aba Personagem (app-bar com PV/SAN/PM — E9/E13);
-  maior risco visual — isolável, por último.
+- ✅ Faixa de vitais compacta no mobile (`#mobile-vitals-strip`): PV/SAN/PM sticky no topo
+  do conteúdo em ≤767px, com mini-barra de progresso e alerta de nível crítico — resolve
+  a lacuna de E9/E13 no mobile sem restructurar o layout desktop.
 
 ---
 

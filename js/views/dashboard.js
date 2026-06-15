@@ -40,6 +40,29 @@ window.CoC.views = window.CoC.views || {};
     '</div>';
   }
 
+  function _renderMobileStrip(c) {
+    var strip = document.getElementById('mobile-vitals-strip');
+    if (!strip) return;
+    if (!c) { strip.hidden = true; strip.innerHTML = ''; return; }
+    var d = c.derived || {};
+    var pills = ['PV', 'SAN', 'PM'].map(function (key) {
+      var entry = d[key] || {};
+      var cur  = entry.current != null ? entry.current : (entry.value || 0);
+      var max  = key === 'SAN' ? (entry.max || 0) : (entry.value || 0);
+      var pct  = max > 0 ? Math.max(0, Math.min(100, (cur / max) * 100)) : 0;
+      var low  = (pct <= 25 && max > 0) ? ' low' : '';
+      var abbr = key === 'PV' ? 'PV' : key === 'SAN' ? 'SAN' : 'PM';
+      var cls  = key.toLowerCase();
+      return '<div class="mvs-pill ' + cls + low + '">' +
+        '<span class="mvs-label">' + abbr + '</span>' +
+        '<span class="mvs-value">' + cur + '<span class="mvs-max">/' + max + '</span></span>' +
+        '<div class="mvs-track"><div class="mvs-fill" style="width:' + pct + '%"></div></div>' +
+      '</div>';
+    });
+    strip.innerHTML = pills.join('');
+    strip.hidden = false;
+  }
+
   function render() {
     var root = document.getElementById('exec-dashboard');
     if (!root) return;
@@ -50,9 +73,11 @@ window.CoC.views = window.CoC.views || {};
     if (!c) {
       root.innerHTML = '';
       if (section) section.classList.add('is-empty');
+      _renderMobileStrip(null);
       return;
     }
     if (section) section.classList.remove('is-empty');
+    _renderMobileStrip(c);
 
     var d = c.derived || {};
     var pv = d.PV || {}, pm = d.PM || {}, san = d.SAN || {};
