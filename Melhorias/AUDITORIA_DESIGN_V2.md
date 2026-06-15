@@ -108,8 +108,11 @@ Critério de aceite: `node js/tests/runner.js` verde; CI verde.
 - ⏳ Densidade adaptativa (modo iniciante/veterano).
 - ⏳ Nomenclatura consistente (H-f); logo no header.
 - ✅ Faixa de vitais compacta no mobile (`#mobile-vitals-strip`): PV/SAN/PM sticky no topo
-  do conteúdo em ≤767px, com mini-barra de progresso e alerta de nível crítico — resolve
-  a lacuna de E9/E13 no mobile sem restructurar o layout desktop.
+  do conteúdo em ≤767px, com mini-barra de progresso e alerta de nível crítico.
+- ✅ **App-bar compacta** (`#inv-app-bar`, ≥768px): substitui o header estático quando um
+  personagem está carregado — exibe nome (serif), ocupação+residência (mono, uppercase) e
+  PV/SAN/PM em colunas bordadas + botão "Rolar teste" que abre a busca global. Resolve
+  E9/E13 no desktop: 200px de header estático → 54px de HUD dinâmico.
 
 ---
 

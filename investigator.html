@@ -115,6 +115,24 @@
   </div>
   <div class="sheet-backdrop no-print" id="sheet-backdrop" hidden></div>
 
+  <!-- ═══ APP BAR — identidade + vitais compactos (visível ≥768px) ═══ -->
+  <div id="inv-app-bar" class="inv-app-bar no-print" hidden aria-label="Investigador ativo">
+    <a href="index.html" class="iab-back" aria-label="Voltar ao portal">
+      <svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-seta-esq"></use></svg>
+    </a>
+    <div class="iab-identity">
+      <span class="iab-name" id="iab-name"></span>
+      <span class="iab-meta" id="iab-meta"></span>
+    </div>
+    <div class="iab-vitals" id="iab-vitals" aria-live="polite" aria-label="Vitais"></div>
+    <div class="iab-actions">
+      <button class="btn-primary iab-btn-roll" id="iab-roll" title="Rolar um teste de perícia">
+        <svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-dado"></use></svg>
+        Rolar teste
+      </button>
+    </div>
+  </div>
+
   <!-- ═══ MOBILE TABS (bottom navigation no mobile) ═══ -->
   <nav class="mobile-tabs no-print" aria-label="Navegação móvel">
     <button class="mobile-tab active" data-tab="personagem"><span class="tab-icon" aria-hidden="true"><svg class="icon"><use href="assets/icons/sprite.svg#ico-usuario"></use></svg></span><span class="tab-label">Personagem</span></button>
