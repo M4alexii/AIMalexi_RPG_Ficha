@@ -116,6 +116,12 @@ window.CoC = window.CoC || {};
     var k = computeInvestigatorKpis(st.investigators);
     var connected = st.status === 'active';
 
+    // E12: sem campanha ativa e sem investigadores, o dashboard fica vazio e
+    // empurra o conteúdo útil. Colapsa a seção inteira até haver algo a mostrar.
+    var empty = !connected && k.total === 0;
+    root.classList.toggle('ko-collapsed', empty);
+    if (empty) return;
+
     var statusEl = document.getElementById('ko-status');
     if (statusEl) statusEl.textContent = connected ? (k.online + '/' + k.total + ' online') : 'Sem campanha ativa';
 

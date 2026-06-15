@@ -43,9 +43,16 @@ window.CoC.views = window.CoC.views || {};
   function render() {
     var root = document.getElementById('exec-dashboard');
     if (!root) return;
+    // E9: a moldura .section não deve aparecer vazia quando não há personagem.
+    var section = root.closest ? root.closest('.dashboard-section') : null;
     var store = window.CoC.store;
     var c = store ? store.getState().character : null;
-    if (!c) { root.innerHTML = ''; return; }
+    if (!c) {
+      root.innerHTML = '';
+      if (section) section.classList.add('is-empty');
+      return;
+    }
+    if (section) section.classList.remove('is-empty');
 
     var d = c.derived || {};
     var pv = d.PV || {}, pm = d.PM || {}, san = d.SAN || {};

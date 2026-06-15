@@ -249,6 +249,8 @@
   border-left: 3px solid var(--keeper-accent, var(--brass));
   border-radius: var(--radius-lg);
 }
+/* E12: dashboard recolhido quando não há campanha/investigadores */
+.keeper-overview.ko-collapsed { display: none; }
 .ko-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.4rem; }
 .ko-title { font-family: var(--font-serif); font-size: 1.3rem; color: var(--keeper-accent-bright, var(--brass-bright)); letter-spacing: 0.03em; }
 .ko-status { font-family: var(--font-mono); font-size: 0.78rem; color: var(--ink-dim); }
@@ -322,10 +324,12 @@
   gap: 0.3rem;
   max-height: 60vh;
   overflow-y: auto;
+  overflow-x: hidden;        /* E8: sem scroll horizontal na lista do bestiário */
   padding-right: 0.2rem;
 }
 
 .library-item {
+  min-width: 0;              /* permite que nomes longos encolham/quebrem */
   background: var(--bg-card-hi);
   border: 1px solid var(--ink-faded);
   border-left: 3px solid transparent;
@@ -354,6 +358,8 @@
   font-size: 0.95rem;
   color: var(--ink);
   line-height: 1.2;
+  min-width: 0;
+  overflow-wrap: anywhere;   /* nomes longos quebram em vez de estourar */
 }
 
 .library-item .li-meta {
