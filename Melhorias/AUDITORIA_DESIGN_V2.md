@@ -46,7 +46,7 @@ sólido de profissional · S3 separa profissional de referência.
 |----|-----|--------|--------|
 | E1/F-001 | S1 | Emojis como ícones funcionais | ✅ Sprite SVG + favicon de marca; toolbars/abas/feature cards migrados |
 | E2 | S1 | Toolbar sem hierarquia; EXPORTAR primário fixo | ✅ `.btn-export` rebaixado a secundário |
-| E3/F-005 | S0 | Home sem screenshot + grid órfão | 🟡 Grid 2×2 (órfão resolvido); hero com screenshot → Fase 3 |
+| E3/F-005 | S0 | Home sem screenshot + grid órfão | ✅ Grid 2×2; hero redesenhado com copy forte, CTA duplo e trust line |
 | E4/F-002 | S1 | Controles nativos sem tema | ✅ `accent-color` global + `<select>` com chevron próprio |
 | E5/F-009 | S1 | Vazamento de i18n no editor de NPC | ✅ Verificado: rótulos já pt-BR; só o tipo de ataque vazava → corrigido |
 | E6/F-010 | S1 | Bordas tracejadas vermelhas = erro | ✅ Verificado: tracejado é cinza/estrutural — não era defeito |
@@ -58,11 +58,11 @@ sólido de profissional · S3 separa profissional de referência.
 | E12 | S1 | Dashboard vazio no topo do Guardião | ✅ Recolhe sem campanha/investigadores |
 | E13 | S1 | Headers consumindo espaço | ✅ `app-header` compacto (margem/teto reduzidos) |
 | E14 | S2 | Stepper do wizard com baixa affordance | ✅ Dots numerados + chips com seleção clara |
-| E15 | S1 | Densidade hostil na aba Perícias | 🟡 Quebra por palavra ok + ícone SVG; modo compacto reusa `density-*` |
+| E15 | S1 | Densidade hostil na aba Perícias | ✅ `density-compact`/`density-roomy` cobrem skills; transições tokenizadas |
 | E16 | S1 | Mistura tipográfica sem papéis | 🟡 Escala/tokens definidos; migração incremental |
 | E17 | S1 | Estados vazios desiguais | ✅ `.empty-state` padrão + Diário/Arsenal |
 | F-003 | S1 | Foco invisível | ✅ Já existia; tokenizado em `--focus-ring` |
-| F-008 | S2 | Tooltips só via `title` | 🟡 Componente `[data-tooltip]` pronto; rollout incremental |
+| F-008 | S2 | Tooltips só via `title` | ✅ Rollout completo: swatches de tema (13), `#btn-overflow`, `#btn-copy-log` em ambas as páginas |
 | F-019 | S2 | Alvos de toque pequenos | ✅ ≥44px em ponteiro grosso; ✕ do bottom-sheet 44px |
 | H-d | S3 | PWA instalável "parece app" | ✅ Ícone de marca 192/512, maskable, screenshots, apple-touch |
 
@@ -90,25 +90,33 @@ Tokens, ícones SVG, hierarquia de ação, estados vazios padronizados, separaç
 marca×perigo, e correção dos bugs visuais E8/E9/E10/E12/E3.
 Critério de aceite: `node js/tests/runner.js` verde; CI verde.
 
-### Fase 2 — De sólido para profissional (refinamento) — 🟡 em andamento
+### Fase 2 — De sólido para profissional (refinamento) — ✅ concluída (PR #50)
 - ✅ Selects tematizados + matriz de estados de input/botão (loading/disabled/invalid).
 - ✅ Componente de tooltip `[data-tooltip]` (F-008) — rollout incremental restante.
 - ✅ Headers de página compactos (E13).
 - ✅ Stepper do wizard + chips de traço (E14).
 - ✅ Painéis ✕ → "Limpar" (E11); ✅ alvos de toque ≥44px (F-019).
 - 🟡 Densidade da aba Perícias (E15) — ícone + quebra ok; modo compacto a explorar.
-- ⏳ Onboarding/first-run; microcopy; mobile polido (F-026→F-030);
-  consolidação de temas; rollout amplo de `data-tooltip`.
+- ✅ Onboarding/first-run: `#welcome-state` na aba Personagem quando banco vazio —
+  "Criar investigador" e "Importar JSON" delegam para os botões do toolbar.
+- ✅ Tokens de motion (`--dur-*`/`--ease`) em `home.css`, `investigator.css`,
+  `keeper.css`, `theme.css` — sem valores literais de `0.2s`/`all X`.
+- ✅ Rollout de `data-tooltip` concluído: swatches de tema, `#btn-overflow`, `#btn-copy-log`.
+- ✅ Todas as transições `0.15s`/`0.25s ease` em `investigator.css` e `theme.css` migradas para `var(--dur-fast/base) var(--ease)`.
 
-### Fase 3 — De profissional para referência (acabamento) — 🟡 em andamento
+### Fase 3 — De profissional para referência (acabamento) — ✅ concluída (PR #50)
 - ✅ PWA instalável: ícone de marca 192/512 (any+maskable), screenshots,
   apple-touch-icon. (Splash deriva de ícone+background_color.)
 - ✅ Identidade: favicon/OG de marca; redesign do hero da home com screenshot (E3).
-- ⏳ Motion design intencional (tokens de duração/easing; reduced-motion já global).
-- ⏳ Densidade adaptativa (modo iniciante/veterano).
-- ⏳ Nomenclatura consistente (H-f); logo no header.
-- ⏳ Redesign estrutural da Ficha/aba Personagem (app-bar com PV/SAN/PM — E9/E13);
-  maior risco visual — isolável, por último.
+- ✅ Motion design intencional (tokens de duração/easing; reduced-motion já global).
+- ✅ Densidade adaptativa (modo iniciante/veterano) — `body.density-roomy` em `theme.css`; opção "Espaçoso (iniciante)" em `settings.js`.
+- ✅ Nomenclatura consistente (H-f) — shortcut manifest e feature card corrigidos.
+- ✅ Faixa de vitais compacta no mobile (`#mobile-vitals-strip`): PV/SAN/PM sticky no topo
+  do conteúdo em ≤767px, com mini-barra de progresso e alerta de nível crítico.
+- ✅ **App-bar compacta** (`#inv-app-bar`, ≥768px): substitui o header estático quando um
+  personagem está carregado — exibe nome (serif), ocupação+residência (mono, uppercase) e
+  PV/SAN/PM em colunas bordadas + botão "Rolar teste" que abre a busca global. Resolve
+  E9/E13 no desktop: 200px de header estático → 54px de HUD dinâmico.
 
 ---
 

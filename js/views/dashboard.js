@@ -40,6 +40,77 @@ window.CoC.views = window.CoC.views || {};
     '</div>';
   }
 
+  function _renderAppBar(c) {
+    var bar = document.getElementById('inv-app-bar');
+    if (!bar) return;
+    if (!c) {
+      bar.hidden = true;
+      document.body.classList.remove('has-char');
+      return;
+    }
+    document.body.classList.add('has-char');
+
+    // Identity
+    var nameEl = document.getElementById('iab-name');
+    var metaEl = document.getElementById('iab-meta');
+    if (nameEl) nameEl.textContent = (c.investigator && c.investigator.name) || 'Investigador';
+    if (metaEl) {
+      var parts = [];
+      if (c.investigator && c.investigator.occupation) parts.push(c.investigator.occupation);
+      if (c.investigator && c.investigator.residence)  parts.push(c.investigator.residence);
+      metaEl.textContent = parts.join(' · ');
+    }
+
+    // Vitals
+    var vitalsEl = document.getElementById('iab-vitals');
+    if (vitalsEl) {
+      var d = c.derived || {};
+      var defs = [
+        { key: 'pv',  label: 'PV',  entry: d.PV  || {},  isSAN: false },
+        { key: 'san', label: 'SAN', entry: d.SAN || {},  isSAN: true  },
+        { key: 'pm',  label: 'PM',  entry: d.PM  || {},  isSAN: false },
+      ];
+      vitalsEl.innerHTML = defs.map(function (s) {
+        var e   = s.entry;
+        var cur = e.current != null ? e.current : (e.value || 0);
+        var max = s.isSAN ? (e.max || 0) : (e.value || 0);
+        var pct = max > 0 ? (cur / max) * 100 : 0;
+        var low = (pct <= 25 && max > 0) ? ' low' : '';
+        return '<div class="iab-stat ' + s.key + low + '">' +
+          '<span class="iab-stat-label">' + s.label + '</span>' +
+          '<span class="iab-stat-value">' + cur +
+            '<span class="iab-stat-max">/' + max + '</span>' +
+          '</span>' +
+        '</div>';
+      }).join('');
+    }
+
+    bar.hidden = false;
+  }
+
+  function _renderMobileStrip(c) {
+    var strip = document.getElementById('mobile-vitals-strip');
+    if (!strip) return;
+    if (!c) { strip.hidden = true; strip.innerHTML = ''; return; }
+    var d = c.derived || {};
+    var pills = ['PV', 'SAN', 'PM'].map(function (key) {
+      var entry = d[key] || {};
+      var cur  = entry.current != null ? entry.current : (entry.value || 0);
+      var max  = key === 'SAN' ? (entry.max || 0) : (entry.value || 0);
+      var pct  = max > 0 ? Math.max(0, Math.min(100, (cur / max) * 100)) : 0;
+      var low  = (pct <= 25 && max > 0) ? ' low' : '';
+      var abbr = key === 'PV' ? 'PV' : key === 'SAN' ? 'SAN' : 'PM';
+      var cls  = key.toLowerCase();
+      return '<div class="mvs-pill ' + cls + low + '">' +
+        '<span class="mvs-label">' + abbr + '</span>' +
+        '<span class="mvs-value">' + cur + '<span class="mvs-max">/' + max + '</span></span>' +
+        '<div class="mvs-track"><div class="mvs-fill" style="width:' + pct + '%"></div></div>' +
+      '</div>';
+    });
+    strip.innerHTML = pills.join('');
+    strip.hidden = false;
+  }
+
   function render() {
     var root = document.getElementById('exec-dashboard');
     if (!root) return;
@@ -47,12 +118,19 @@ window.CoC.views = window.CoC.views || {};
     var section = root.closest ? root.closest('.dashboard-section') : null;
     var store = window.CoC.store;
     var c = store ? store.getState().character : null;
+    var welcome = document.getElementById('welcome-state');
     if (!c) {
       root.innerHTML = '';
       if (section) section.classList.add('is-empty');
+      if (welcome) welcome.hidden = false;
+      _renderMobileStrip(null);
+      _renderAppBar(null);
       return;
     }
     if (section) section.classList.remove('is-empty');
+    if (welcome) welcome.hidden = true;
+    _renderMobileStrip(c);
+    _renderAppBar(c);
 
     var d = c.derived || {};
     var pv = d.PV || {}, pm = d.PM || {}, san = d.SAN || {};
@@ -115,7 +193,7 @@ window.CoC.views = window.CoC.views || {};
       '<div class="ed-grid">' + rolls + conds + equipBlock + '</div>';
   }
 
-  // Ações que afetam o dashboard (vitais, condições, equipamento, atributos)
+  // Ações que afetam o dashboard completo (vitais, condições, equipamento, atributos)
   var WATCH = {
     APPLY_DAMAGE: 1, HEAL_DAMAGE: 1, LOSE_SANITY: 1, RECOVER_SANITY: 1,
     SPEND_MAGIC: 1, RESTORE_MAGIC: 1, ADD_MYTHOS: 1, RECALC_DERIVED: 1,
@@ -123,15 +201,43 @@ window.CoC.views = window.CoC.views || {};
     ADD_WEAPON: 1, UPDATE_WEAPON: 1, REMOVE_WEAPON: 1, RELOAD_WEAPON: 1,
     SET_ATTRIBUTE: 1
   };
+  // Ações que afetam apenas a app-bar (identidade do investigador)
+  var WATCH_ID = { SET_IDENTITY: 1, LOAD_CHARACTER: 1 };
 
   function init() {
     var bus = window.CoC.bus;
     if (!bus || !bus.subscribe) return;
     // Re-renderiza quando uma rolagem é registrada (log no DOM mudou)
     bus.subscribe('roll:badge-inc', function () { render(); });
-    // Re-renderiza em mudanças de estado relevantes
+    // Re-renderiza em mudanças de estado relevantes (dashboard completo)
     bus.subscribe('store:dispatch', function (event) {
-      if (event && event.changed && event.action && WATCH[event.action.type]) render();
+      if (!event || !event.action) return;
+      if (WATCH[event.action.type] && event.changed) { render(); return; }
+      // Atualiza só a app-bar em mudanças de identidade (nome, ocupação)
+      if (WATCH_ID[event.action.type]) {
+        var store = window.CoC.store;
+        var c = store ? store.getState().character : null;
+        _renderAppBar(c);
+      }
+    });
+    // Botão "Rolar teste" na app-bar abre a busca global (permite rolar perícias)
+    var rollBtn = document.getElementById('iab-roll');
+    if (rollBtn) {
+      rollBtn.addEventListener('click', function () {
+        var gsBtn = document.getElementById('btn-global-search');
+        if (gsBtn) gsBtn.click();
+      });
+    }
+    // Botões do welcome state delegam para os controles do toolbar
+    var wsCreate = document.getElementById('ws-create');
+    var wsImport = document.getElementById('ws-import');
+    if (wsCreate) wsCreate.addEventListener('click', function () {
+      var btn = document.getElementById('btn-new');
+      if (btn) btn.click();
+    });
+    if (wsImport) wsImport.addEventListener('click', function () {
+      var btn = document.getElementById('btn-import');
+      if (btn) btn.click();
     });
   }
 

@@ -70,7 +70,8 @@
     <span class="toolbar-spacer"></span>
 
     <!-- ⋮ Menu overflow (só aparece no mobile) -->
-    <button id="btn-overflow" class="btn-ghost no-print" title="Menu · utilitários (Importar/Exportar/Config/Excluir)"
+    <button id="btn-overflow" class="btn-ghost no-print"
+            data-tooltip="Menu de utilitários"
             aria-expanded="false" aria-controls="toolbar-actions" aria-label="Abrir menu de utilitários">☰</button>
 
     <div class="toolbar-actions" id="toolbar-actions" role="menu">
@@ -90,20 +91,20 @@
         <button id="btn-immersion" class="btn-ghost" title="Modo Imersão: menos números, mais narrativa — ideal para interpretação"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-vela"></use></svg> Imersão</button>
         <button id="btn-settings" class="btn-ghost" title="Central de Configurações (tema, idioma, acessibilidade)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-engrenagem"></use></svg> Configurações</button>
         <button id="btn-sanity-fx" class="btn-ghost" title="Configurar efeitos visuais de insanidade"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-cerebro"></use></svg> Efeitos</button>
-        <div class="theme-picker no-print" id="theme-picker" title="Tema da campanha">
-          <button class="theme-swatch active" data-theme="arkham"     title="Arkham — Arquivo de Investigador (padrão)"></button>
-          <button class="theme-swatch"        data-theme="classico"   title="Clássico — Dourado original"></button>
-          <button class="theme-swatch"        data-theme="lovecraft"  title="Lovecraft — Biblioteca Antiga"></button>
-          <button class="theme-swatch"        data-theme="cosmic"     title="Cosmic — Horror Cósmico"></button>
-          <button class="theme-swatch"        data-theme="arquivo"    title="Arquivo — Documento Investigativo (claro)"></button>
-          <button class="theme-swatch"        data-theme="miskatonic" title="Miskatonic — Acadêmico"></button>
-          <button class="theme-swatch"        data-theme="sepia"      title="Sépia — Documento Histórico"></button>
-          <button class="theme-swatch"        data-theme="obsidian"   title="Obsidian — Moderno"></button>
-          <button class="theme-swatch"        data-theme="eldritch"   title="Eldritch — Vazio Púrpura"></button>
-          <button class="theme-swatch"        data-theme="noir"       title="Noir — Preto e Branco"></button>
-          <button class="theme-swatch"        data-theme="hospital"   title="Hospital Psiquiátrico — Claro"></button>
-          <button class="theme-swatch"        data-theme="agencia"    title="Agência Federal — Cinza/Azul"></button>
-          <button class="theme-swatch"        data-theme="custom"     title="🎨 Personalizada — monte sua ficha"></button>
+        <div class="theme-picker no-print" id="theme-picker" aria-label="Tema da campanha">
+          <button class="theme-swatch active" data-theme="arkham"     data-tooltip="Arkham — padrão"              aria-label="Tema Arkham (padrão)"></button>
+          <button class="theme-swatch"        data-theme="classico"   data-tooltip="Clássico — Dourado"           aria-label="Tema Clássico"></button>
+          <button class="theme-swatch"        data-theme="lovecraft"  data-tooltip="Lovecraft — Biblioteca"       aria-label="Tema Lovecraft"></button>
+          <button class="theme-swatch"        data-theme="cosmic"     data-tooltip="Cosmic — Horror Cósmico"      aria-label="Tema Cosmic"></button>
+          <button class="theme-swatch"        data-theme="arquivo"    data-tooltip="Arquivo — Claro"              aria-label="Tema Arquivo (claro)"></button>
+          <button class="theme-swatch"        data-theme="miskatonic" data-tooltip="Miskatonic — Acadêmico"       aria-label="Tema Miskatonic"></button>
+          <button class="theme-swatch"        data-theme="sepia"      data-tooltip="Sépia — Histórico"            aria-label="Tema Sépia"></button>
+          <button class="theme-swatch"        data-theme="obsidian"   data-tooltip="Obsidian — Moderno"           aria-label="Tema Obsidian"></button>
+          <button class="theme-swatch"        data-theme="eldritch"   data-tooltip="Eldritch — Púrpura"          aria-label="Tema Eldritch"></button>
+          <button class="theme-swatch"        data-theme="noir"       data-tooltip="Noir — P&amp;B"              aria-label="Tema Noir"></button>
+          <button class="theme-swatch"        data-theme="hospital"   data-tooltip="Hospital — Claro"             aria-label="Tema Hospital Psiquiátrico"></button>
+          <button class="theme-swatch"        data-theme="agencia"    data-tooltip="Agência — Cinza/Azul"         aria-label="Tema Agência Federal"></button>
+          <button class="theme-swatch"        data-theme="custom"     data-tooltip="Personalizada"                aria-label="Tema personalizado"></button>
         </div>
       </div>
 
@@ -114,6 +115,24 @@
 
   </div>
   <div class="sheet-backdrop no-print" id="sheet-backdrop" hidden></div>
+
+  <!-- ═══ APP BAR — identidade + vitais compactos (visível ≥768px) ═══ -->
+  <div id="inv-app-bar" class="inv-app-bar no-print" hidden aria-label="Investigador ativo">
+    <a href="index.html" class="iab-back" aria-label="Voltar ao portal">
+      <svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-seta-esq"></use></svg>
+    </a>
+    <div class="iab-identity">
+      <span class="iab-name" id="iab-name"></span>
+      <span class="iab-meta" id="iab-meta"></span>
+    </div>
+    <div class="iab-vitals" id="iab-vitals" aria-live="polite" aria-label="Vitais"></div>
+    <div class="iab-actions">
+      <button class="btn-primary iab-btn-roll" id="iab-roll" title="Rolar um teste de perícia">
+        <svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-dado"></use></svg>
+        Rolar teste
+      </button>
+    </div>
+  </div>
 
   <!-- ═══ MOBILE TABS (bottom navigation no mobile) ═══ -->
   <nav class="mobile-tabs no-print" aria-label="Navegação móvel">
@@ -174,11 +193,32 @@
         <button class="desktop-tab" data-tab="log"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-dado"></use></svg> Log</button>
       </nav>
 
+      <!-- Faixa de vitais compacta (PV/SAN/PM) — visível só no mobile ≤767px -->
+      <div id="mobile-vitals-strip" class="mobile-vitals-strip no-print" hidden aria-live="polite" aria-label="Vitais do investigador"></div>
+
     <!-- ═══ CONTEÚDO ═══ -->
     <div class="content-col">
 
       <!-- DASHBOARD EXECUTIVO (#20) -->
       <section class="section dashboard-section" data-tab="personagem">
+        <!-- Estado de boas-vindas: mostrado quando nenhum personagem está carregado -->
+        <div id="welcome-state" class="welcome-state" hidden>
+          <div class="ws-icon" aria-hidden="true">
+            <svg class="icon icon-xl" style="width:3rem;height:3rem;opacity:.55"><use href="assets/icons/sprite.svg#ico-dado"></use></svg>
+          </div>
+          <h2 class="ws-title">Bem-vindo ao AIMalexi RPG</h2>
+          <p class="ws-lead">Crie seu primeiro investigador para começar uma sessão de Chamado de Cthulhu 7ª Edição.</p>
+          <div class="ws-actions">
+            <button class="btn-primary ws-create" id="ws-create">
+              <svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-mais"></use></svg>
+              Criar investigador
+            </button>
+            <button class="btn-ghost ws-import" id="ws-import">
+              <svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-pasta-abrir"></use></svg>
+              Importar JSON
+            </button>
+          </div>
+        </div>
         <div id="exec-dashboard"></div>
       </section>
 
@@ -500,7 +540,8 @@
             <button
               class="btn-ghost btn-icon"
               id="btn-copy-log"
-              title="Copiar log como markdown"
+              data-tooltip="Copiar log (markdown)"
+              aria-label="Copiar log de rolagens como markdown"
             >
               ↗
             </button>

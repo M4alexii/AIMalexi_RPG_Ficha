@@ -5,6 +5,68 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-15 - Tooltips, density skills e motion tokens
+
+### Adicionado / corrigido
+
+- **Tooltip rollout completo (F-008)**: `data-tooltip` + `aria-label` nos últimos botões
+  só-ícone: 13 swatches de tema (substituem `title`), `#btn-overflow` e `#btn-copy-log`
+  em `investigator.html` e `keeper.html` — tooltips visíveis no teclado e touch.
+- **Motion tokens em investigator.css**: todas as 20+ ocorrências de `0.15s` e
+  `0.25s ease` hardcoded convertidas para `var(--dur-fast) var(--ease)` e
+  `var(--dur-base) var(--ease)`; `transition: all` em `.condition-chip` expandido
+  para propriedades explícitas.
+- **E15 concluído**: `density-compact` (0.25rem top/bottom) e `density-roomy` (0.55rem)
+  cobrem a grade de perícias; combinado com `word-break` e ícone SVG.
+
+---
+
+## 2026-06-15 - Densidade adaptativa + auditoria de temas
+
+### Adicionado
+
+- **Modo Espaçoso (iniciante)**: nova opção `density-roomy` em Configurações → Densidade.
+  Aumenta `--gap-lg` para 1.6rem, padding de seção para 1.2rem 1.4rem, altura mínima de
+  inputs para 48px e padding de cards/skills/armas para 0.55rem — facilita uso em touch
+  e reduz densidade cognitiva para novos jogadores.
+- **Auditoria de cascade semântica**: verificado que os temas `arquivo` (claro),
+  `obsidian` (aço frio) e `cosmic` (verde eldritch) cascateiam corretamente todos os
+  tokens semânticos via `var()` sem necessidade de overrides adicionais.
+
+---
+
+## 2026-06-15 - Polimento de design · conclusão Fases 2 e 3
+
+### Adicionado
+
+- **Welcome state (first-run)**: quando nenhum personagem está carregado na Ficha do
+  Investigador, a aba Personagem exibe um painel central com "Criar investigador" e
+  "Importar JSON", eliminando a tela vazia confusa.
+- **Home: hero com copy forte** — headline "Sua mesa de Chamado de Cthulhu, completa e
+  offline." com ênfase dourada/itálica; CTA secundário "Sou o Guardião" (→ keeper.html);
+  trust line "100% offline · Exporta PDF · $0 · Open source"; legenda da screenshot.
+- **App-bar (`#inv-app-bar`, desktop ≥768px)**: sticky 54px mostrando nome, ocupação+local
+  e PV/SAN/PM com alerta de nível crítico; "Rolar teste" abre busca global. Header estático
+  oculta quando personagem está carregado.
+- **Faixa de vitais mobile** (`#mobile-vitals-strip`, ≤767px): PV/SAN/PM sticky no topo do
+  conteúdo com mini-barra e pulso de alerta ≤25%.
+- **Motion design**: todas as transições em `home.css`, `investigator.css`, `keeper.css` e
+  `theme.css` migradas para `--dur-fast/base/slow` + `--ease` (sem valores literais).
+
+---
+
+## 2026-06-15 - Polimento de design · Fase 3 (mobile vitals strip)
+
+### Adicionado
+
+- **Faixa de vitais no mobile** (`#mobile-vitals-strip`): barra sticky compacta com PV,
+  SAN e PM (valor atual/máximo + mini-barra de progresso colorida) visível somente em
+  ≤767px no topo do painel de conteúdo. Pulsa em vermelho/âmbar quando o nível ≤ 25%.
+  Atualiza em tempo real junto com o dashboard executivo. Resolve a falta de vitais
+  visíveis ao rolar o conteúdo de Perícias/Combate/Inventário no mobile.
+
+---
+
 ## 2026-06-15 - Polimento de design · Fase 1 (fundação) + início da Fase 2
 
 Implementa o roadmap da auditoria de produto/UX/UI/Design System

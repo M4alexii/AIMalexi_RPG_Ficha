@@ -198,7 +198,7 @@
   background: var(--bg-deep) center / cover no-repeat;
   cursor: zoom-in;
   padding: 0;
-  transition: border-color 0.15s, transform 0.1s;
+  transition: border-color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
 }
 .journal-thumb:hover { border-color: var(--keeper-accent); transform: scale(1.04); }
 .journal-thumb:not(.has-image)::after { content: '🖼'; font-size: 1.2rem; opacity: 0.4; }
@@ -495,7 +495,9 @@
   border-radius: var(--radius);
   border: 1px solid;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background var(--dur-base) var(--ease),
+              color var(--dur-base) var(--ease),
+              border-color var(--dur-base) var(--ease);
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -856,7 +858,7 @@
   inset: 0 auto 0 0;
   height: 100%;
   border-radius: 999px;
-  transition: width 0.2s ease;
+  transition: width var(--dur-base) var(--ease);
 }
 .ei-hpbar-fill.hp-good { background: var(--ok, #5a8a5a); }
 .ei-hpbar-fill.hp-warn { background: var(--brass, #c89b3c); }
@@ -1173,7 +1175,7 @@
   min-width: 160px;
   max-width: 220px;
   flex: 1;
-  transition: border-color 0.2s;
+  transition: border-color var(--dur-base) var(--ease);
   position: relative;
 }
 
@@ -1354,7 +1356,7 @@
 .inv-bar-fill {
   height: 100%;
   border-radius: 2px;
-  transition: width 0.4s ease;
+  transition: width var(--dur-slow) var(--ease);
 }
 
 .inv-bar.hp   .inv-bar-fill { background: var(--blood); }
@@ -1435,7 +1437,7 @@
   align-items: baseline;
   padding: 0.3rem 0.4rem;
   border-radius: var(--radius);
-  transition: background 0.1s;
+  transition: background var(--dur-fast) var(--ease);
   font-size: 0.82rem;
 }
 
@@ -1914,7 +1916,9 @@
   border-radius: var(--radius) var(--radius) 0 0;
   position: relative;
   top: 1px;
-  transition: color 0.15s, background 0.2s, border-color 0.2s;
+  transition: color var(--dur-fast) var(--ease),
+              background var(--dur-base) var(--ease),
+              border-color var(--dur-base) var(--ease);
 }
 .keeper-tab:hover {
   color: var(--ink);

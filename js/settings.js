@@ -134,6 +134,7 @@ window.CoC = window.CoC || {};
     // Densidade / contraste / movimento / efeitos de rolagem → classes no body
     body.classList.toggle('density-compact', s.density === 'compact');
     body.classList.toggle('density-normal',  s.density === 'normal');
+    body.classList.toggle('density-roomy',   s.density === 'roomy');
 
     // Modo da ficha (Jogador = progressive disclosure; CSS em investigator.css)
     body.dataset.uiMode = s.uiMode === 'player' ? 'player' : 'investigator';
@@ -215,6 +216,7 @@ window.CoC = window.CoC || {};
       // Densidade
       '<div class="settings-row"><label>' + T('settings.density') + '</label>' +
         '<select id="set-density">' +
+          '<option value="roomy"' + (s.density === 'roomy' ? ' selected' : '') + '>Espaçoso (iniciante)</option>' +
           '<option value="comfortable"' + (s.density === 'comfortable' ? ' selected' : '') + '>' + T('settings.density.comfortable') + '</option>' +
           '<option value="normal"' + (s.density === 'normal' ? ' selected' : '') + '>Normal (desktop)</option>' +
           '<option value="compact"' + (s.density === 'compact' ? ' selected' : '') + '>' + T('settings.density.compact') + '</option>' +
