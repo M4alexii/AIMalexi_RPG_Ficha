@@ -118,14 +118,17 @@ window.CoC.views = window.CoC.views || {};
     var section = root.closest ? root.closest('.dashboard-section') : null;
     var store = window.CoC.store;
     var c = store ? store.getState().character : null;
+    var welcome = document.getElementById('welcome-state');
     if (!c) {
       root.innerHTML = '';
       if (section) section.classList.add('is-empty');
+      if (welcome) welcome.hidden = false;
       _renderMobileStrip(null);
       _renderAppBar(null);
       return;
     }
     if (section) section.classList.remove('is-empty');
+    if (welcome) welcome.hidden = true;
     _renderMobileStrip(c);
     _renderAppBar(c);
 
@@ -225,6 +228,17 @@ window.CoC.views = window.CoC.views || {};
         if (gsBtn) gsBtn.click();
       });
     }
+    // Botões do welcome state delegam para os controles do toolbar
+    var wsCreate = document.getElementById('ws-create');
+    var wsImport = document.getElementById('ws-import');
+    if (wsCreate) wsCreate.addEventListener('click', function () {
+      var btn = document.getElementById('btn-new');
+      if (btn) btn.click();
+    });
+    if (wsImport) wsImport.addEventListener('click', function () {
+      var btn = document.getElementById('btn-import');
+      if (btn) btn.click();
+    });
   }
 
   window.CoC.views.dashboard = Object.freeze({ init: init, render: render });

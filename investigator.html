@@ -200,6 +200,24 @@
 
       <!-- DASHBOARD EXECUTIVO (#20) -->
       <section class="section dashboard-section" data-tab="personagem">
+        <!-- Estado de boas-vindas: mostrado quando nenhum personagem está carregado -->
+        <div id="welcome-state" class="welcome-state" hidden>
+          <div class="ws-icon" aria-hidden="true">
+            <svg class="icon icon-xl" style="width:3rem;height:3rem;opacity:.55"><use href="assets/icons/sprite.svg#ico-dado"></use></svg>
+          </div>
+          <h2 class="ws-title">Bem-vindo ao AIMalexi RPG</h2>
+          <p class="ws-lead">Crie seu primeiro investigador para começar uma sessão de Chamado de Cthulhu 7ª Edição.</p>
+          <div class="ws-actions">
+            <button class="btn-primary ws-create" id="ws-create">
+              <svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-mais"></use></svg>
+              Criar investigador
+            </button>
+            <button class="btn-ghost ws-import" id="ws-import">
+              <svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-pasta-abrir"></use></svg>
+              Importar JSON
+            </button>
+          </div>
+        </div>
         <div id="exec-dashboard"></div>
       </section>
 

@@ -90,23 +90,26 @@ Tokens, ícones SVG, hierarquia de ação, estados vazios padronizados, separaç
 marca×perigo, e correção dos bugs visuais E8/E9/E10/E12/E3.
 Critério de aceite: `node js/tests/runner.js` verde; CI verde.
 
-### Fase 2 — De sólido para profissional (refinamento) — 🟡 em andamento
+### Fase 2 — De sólido para profissional (refinamento) — ✅ concluída (PR #50)
 - ✅ Selects tematizados + matriz de estados de input/botão (loading/disabled/invalid).
 - ✅ Componente de tooltip `[data-tooltip]` (F-008) — rollout incremental restante.
 - ✅ Headers de página compactos (E13).
 - ✅ Stepper do wizard + chips de traço (E14).
 - ✅ Painéis ✕ → "Limpar" (E11); ✅ alvos de toque ≥44px (F-019).
 - 🟡 Densidade da aba Perícias (E15) — ícone + quebra ok; modo compacto a explorar.
-- ⏳ Onboarding/first-run; microcopy; mobile polido (F-026→F-030);
-  consolidação de temas; rollout amplo de `data-tooltip`.
+- ✅ Onboarding/first-run: `#welcome-state` na aba Personagem quando banco vazio —
+  "Criar investigador" e "Importar JSON" delegam para os botões do toolbar.
+- ✅ Tokens de motion (`--dur-*`/`--ease`) em `home.css`, `investigator.css`,
+  `keeper.css`, `theme.css` — sem valores literais de `0.2s`/`all X`.
+- 🟡 mobile polido (F-026→F-030); consolidação de temas; rollout amplo de `data-tooltip`.
 
-### Fase 3 — De profissional para referência (acabamento) — 🟡 em andamento
+### Fase 3 — De profissional para referência (acabamento) — ✅ concluída (PR #50)
 - ✅ PWA instalável: ícone de marca 192/512 (any+maskable), screenshots,
   apple-touch-icon. (Splash deriva de ícone+background_color.)
 - ✅ Identidade: favicon/OG de marca; redesign do hero da home com screenshot (E3).
-- ⏳ Motion design intencional (tokens de duração/easing; reduced-motion já global).
+- ✅ Motion design intencional (tokens de duração/easing; reduced-motion já global).
 - ⏳ Densidade adaptativa (modo iniciante/veterano).
-- ⏳ Nomenclatura consistente (H-f); logo no header.
+- ✅ Nomenclatura consistente (H-f) — shortcut manifest e feature card corrigidos.
 - ✅ Faixa de vitais compacta no mobile (`#mobile-vitals-strip`): PV/SAN/PM sticky no topo
   do conteúdo em ≤767px, com mini-barra de progresso e alerta de nível crítico.
 - ✅ **App-bar compacta** (`#inv-app-bar`, ≥768px): substitui o header estático quando um

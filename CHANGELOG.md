@@ -5,6 +5,26 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-15 - Polimento de design · conclusão Fases 2 e 3
+
+### Adicionado
+
+- **Welcome state (first-run)**: quando nenhum personagem está carregado na Ficha do
+  Investigador, a aba Personagem exibe um painel central com "Criar investigador" e
+  "Importar JSON", eliminando a tela vazia confusa.
+- **Home: hero com copy forte** — headline "Sua mesa de Chamado de Cthulhu, completa e
+  offline." com ênfase dourada/itálica; CTA secundário "Sou o Guardião" (→ keeper.html);
+  trust line "100% offline · Exporta PDF · $0 · Open source"; legenda da screenshot.
+- **App-bar (`#inv-app-bar`, desktop ≥768px)**: sticky 54px mostrando nome, ocupação+local
+  e PV/SAN/PM com alerta de nível crítico; "Rolar teste" abre busca global. Header estático
+  oculta quando personagem está carregado.
+- **Faixa de vitais mobile** (`#mobile-vitals-strip`, ≤767px): PV/SAN/PM sticky no topo do
+  conteúdo com mini-barra e pulso de alerta ≤25%.
+- **Motion design**: todas as transições em `home.css`, `investigator.css`, `keeper.css` e
+  `theme.css` migradas para `--dur-fast/base/slow` + `--ease` (sem valores literais).
+
+---
+
 ## 2026-06-15 - Polimento de design · Fase 3 (mobile vitals strip)
 
 ### Adicionado
