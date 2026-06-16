@@ -83,6 +83,27 @@ window.CoC = window.CoC || {};
     if (!rgb) return "rgba(184, 146, 79, 0.45)";
     return "rgba(" + rgb[0] + ", " + rgb[1] + ", " + rgb[2] + ", " + alpha + ")";
   }
+  function contrast(hex1, hex2) {
+    var l1 = luminance(hex1), l2 = luminance(hex2);
+    var lighter = Math.max(l1, l2), darker = Math.min(l1, l2);
+    return (lighter + 0.05) / (darker + 0.05);
+  }
+  // Garante contraste WCAG mínimo ajustando lightness (em RGB ≈ luminance).
+  // Itera clarear/escurecer o candidato até atingir o alvo ou saturar.
+  function corSegura(bgHex, candidateHex, target) {
+    target = target || 4.5;
+    if (contrast(bgHex, candidateHex) >= target) return candidateHex;
+    var dark = luminance(bgHex) < 0.5;   // fundo escuro → candidato deve clarear
+    var step = 0.03;
+    var cur = candidateHex;
+    for (var i = 0; i < 40; i++) {
+      var next = shade(cur, dark ? step : -step);
+      if (next === cur) break;   // saturou (branco puro ou preto puro)
+      cur = next;
+      if (contrast(bgHex, cur) >= target) break;
+    }
+    return cur;
+  }
 
   function normalize(palette) {
     var p = Object.assign({}, DEFAULTS, palette || {});
@@ -116,8 +137,11 @@ window.CoC = window.CoC || {};
     s.setProperty("--bg-card-hi", shade(p.bgCard, isLight ? -0.07 : 0.07));
     s.setProperty("--bg-overlay", glow(p.bgDeep, 0.92));
     s.setProperty("--ink", p.ink);
-    s.setProperty("--ink-dim", p.inkDim);
-    s.setProperty("--ink-faded", shade(p.inkDim, isLight ? 0.35 : -0.45));
+    // Texto secundário: garante AA (4.5:1) sobre o card
+    s.setProperty("--ink-dim", corSegura(p.bgCard, p.inkDim, 4.5));
+    // Texto terciário/bordas: garante pelo menos 3:1 (UI/large)
+    var rawFaded = shade(p.inkDim, isLight ? 0.35 : -0.45);
+    s.setProperty("--ink-faded", corSegura(p.bgCard, rawFaded, 3.0));
     s.setProperty("--brass", p.accent);
     s.setProperty("--brass-bright", shade(p.accent, isLight ? -0.18 : 0.25));
     s.setProperty("--brass-glow", glow(p.accent, isLight ? 0.30 : 0.45));
@@ -254,7 +278,9 @@ window.CoC = window.CoC || {};
     save: save,
     DEFAULTS: DEFAULTS,
     FONTS: FONTS,
-    TITLE_FONTS: TITLE_FONTS
+    TITLE_FONTS: TITLE_FONTS,
+    contrast: contrast,
+    corSegura: corSegura
   };
 
 })();
