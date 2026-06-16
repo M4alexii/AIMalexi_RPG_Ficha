@@ -20,7 +20,7 @@
     // character é exposto via getter/setter abaixo — cocStore é a fonte de verdade
     rollMods: {
       difficulty: "regular",   // regular | hard | extreme
-      bp: ""                   // "" | "bonus" | "penalty"
+      bp: null                  // null | "bonus" | "penalty"
     },
     editMode: false,
     mobileTab: "personagem",

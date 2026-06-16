@@ -40,6 +40,7 @@ window.CoC = window.CoC || {};
     accent:       '',          // vazio = usa o accent do tema
     language:     'pt',
     fontScale:    1.0,         // 0.85 – 1.3
+    fontPreset:   'classica',  // classica (serif 1920s) | moderna (Inter UI + mono dados)
     density:      'comfortable',
     uiMode:       'investigator', // 'player' = tela limpa p/ iniciantes
     reduceMotion: false,
@@ -136,6 +137,10 @@ window.CoC = window.CoC || {};
     body.classList.toggle('density-normal',  s.density === 'normal');
     body.classList.toggle('density-roomy',   s.density === 'roomy');
 
+    // Preset tipográfico: 'moderna' = Inter na UI + JetBrains Mono nos dados
+    // (serif preservada só em títulos/lore); 'classica' = identidade serif 1920s.
+    body.classList.toggle('type-modern', s.fontPreset === 'moderna');
+
     // Modo da ficha (Jogador = progressive disclosure; CSS em investigator.css)
     body.dataset.uiMode = s.uiMode === 'player' ? 'player' : 'investigator';
     // Se a aba ativa ficou oculta no Modo Jogador, volta para Personagem
@@ -207,6 +212,12 @@ window.CoC = window.CoC || {};
       // Escala de fonte
       '<div class="settings-row"><label>' + T('settings.fontScale') + ' (<span id="set-scale-val">' + Math.round(s.fontScale * 100) + '%</span>)</label>' +
         '<input type="range" id="set-scale" min="0.85" max="1.3" step="0.05" value="' + s.fontScale + '" /></div>' +
+      // Preset tipográfico
+      '<div class="settings-row"><label>Tipografia</label>' +
+        '<select id="set-fontpreset">' +
+          '<option value="classica"' + (s.fontPreset !== 'moderna' ? ' selected' : '') + '>Clássica (serif 1920s)</option>' +
+          '<option value="moderna"' + (s.fontPreset === 'moderna' ? ' selected' : '') + '>Moderna (Inter na UI · mono nos dados)</option>' +
+        '</select></div>' +
       // Modo da ficha (Jogador/Investigador)
       '<div class="settings-row"><label>Modo da ficha</label>' +
         '<select id="set-uimode">' +
@@ -265,6 +276,7 @@ window.CoC = window.CoC || {};
       var lbl = $('set-scale-val'); if (lbl) lbl.textContent = Math.round(parseFloat(this.value) * 100) + '%';
     };
     $('set-density').onchange  = function () { set('density', this.value); };
+    $('set-fontpreset').onchange = function () { set('fontPreset', this.value); };
     $('set-uimode').onchange   = function () { set('uiMode', this.value); };
     $('set-bgtex').onchange    = function () { set('bgTexture', this.value); };
     $('set-bgint').oninput     = function () {

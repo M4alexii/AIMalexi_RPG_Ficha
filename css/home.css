@@ -93,7 +93,7 @@
 }
 .hero-trust {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: var(--text-xs);
   color: var(--ink-faded);
   letter-spacing: 0.05em;
   margin: 0.75rem 0 0;
@@ -141,13 +141,13 @@
   background: var(--bg-card-hi); border: 1px solid var(--ink-faded);
   border-radius: var(--radius-lg); color: var(--ink);
   text-decoration: none; cursor: pointer;
-  font-family: var(--font-mono); font-size: 0.72rem; text-align: center;
+  font-family: var(--font-mono); font-size: var(--text-xs); text-align: center;
   transition: transform var(--dur-fast) var(--ease),
               border-color var(--dur-fast) var(--ease),
               background var(--dur-fast) var(--ease);
 }
 .qa:hover { transform: translateY(-2px); border-color: var(--brass); background: var(--bg-card); }
-.qa .qa-icon { font-size: 1.5rem; }
+.qa .qa-icon { font-size: var(--text-xl); }
 .qa-roll-result {
   font-family: var(--font-serif); font-weight: 700; color: var(--brass-bright);
   min-height: 1.2em;
@@ -216,7 +216,7 @@
   min-height: 42px; padding: 0.5rem 1.1rem;
   background: transparent; border: 1px solid var(--accent, var(--brass));
   border-radius: var(--radius); color: var(--brass-bright);
-  font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.05em;
+  font-family: var(--font-mono); font-size: var(--text-sm); letter-spacing: 0.05em;
   text-transform: uppercase; text-decoration: none;
   transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
 }

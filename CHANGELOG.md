@@ -5,6 +5,59 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-15 - Direção "Arquivo de Arkham": preset tipográfico + split quente/frio
+
+### Adicionado
+
+- **Preset de tipografia** (Configurações → Tipografia): alterna entre
+  "Clássica (serif 1920s)" — padrão, preserva a identidade — e
+  "Moderna (Inter na UI · mono nos dados)", que aplica Inter em toda a interface
+  funcional, JetBrains Mono nos números e mantém serif só em títulos/lore.
+  Implementado via `body.type-modern` remapeando apenas as famílias de fonte por
+  token (nenhum componente muda); números ganham `tabular-nums` no modo moderno.
+  Ambas as fontes já vinham no `@import` do tema.
+
+### Corrigido
+
+- **Semântica quente/frio da Sanidade**: a app-bar (`#inv-app-bar`) e a faixa de
+  vitais mobile (`#mobile-vitals-strip`) coloriam SAN com latão (quente); agora
+  usam o tom frio (`--mist`), consistente com o dashboard. Novo token semântico
+  `--sanity: var(--mist)` cascateia para os 13 temas. PV segue sangue, PM musgo;
+  vermelho permanece reservado a dano/exclusão.
+
+---
+
+## 2026-06-15 - Correções de regras CoC7e (#8, #12, #15)
+
+### Corrigido
+
+- **#8 — Armadura em `rollDamage`**: parâmetro `armor` opcional em
+  `dice.rollDamage(weaponStr, db, impale, armor)`. Quando passado, `total`
+  retorna `max(0, dano - armor)` e `totalBeforeArmor` preserva o dano bruto
+  (útil para detecção de Ferimento Grave, que usa o dano bruto per CoC7e p.111).
+  7 asserções de regressão adicionadas em `test-dice.js`.
+- **#12 — `validateCharacter` por atributo**: bounds agora são per-atributo:
+  TAM/INT/EDU usam mín 30 (2D6+6×5 com ajuste de idade conservador);
+  EDU aceita até 99 (via verificações de melhoria); demais atributos usam mín 5
+  (age adj. pode reduzir FOR/CON/DES/APA significativamente).
+- **#15 — `rollMods.bp` null**: inicializado como `null` em vez de `""`,
+  alinhando com o contrato documentado em `dice.rollD100` (`null | "bonus" | "penalty"`).
+
+---
+
+## 2026-06-15 - Migração tipográfica (E16)
+
+### Corrigido
+
+- **E16 — Mistura tipográfica**: 56 ocorrências de `font-size` com valores literais que
+  tinham correspondência exata nos tokens (`0.72rem`→`var(--text-xs)`, `0.78rem`→
+  `var(--text-sm)`, `1.1rem`→`var(--text-md)`, `1.25rem`→`var(--text-lg)`,
+  `1.5rem`→`var(--text-xl)`) convertidas em `investigator.css`, `keeper.css` e `home.css`.
+- `14px`/`16px` em `.sheet-card label`/inputs convertidos para `0.875rem`/`var(--text-base)`
+  — agora escalam com a configuração de escala de fonte do usuário.
+
+---
+
 ## 2026-06-15 - Tooltips, density skills e motion tokens
 
 ### Adicionado / corrigido

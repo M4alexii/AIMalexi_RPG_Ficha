@@ -59,7 +59,7 @@ sólido de profissional · S3 separa profissional de referência.
 | E13 | S1 | Headers consumindo espaço | ✅ `app-header` compacto (margem/teto reduzidos) |
 | E14 | S2 | Stepper do wizard com baixa affordance | ✅ Dots numerados + chips com seleção clara |
 | E15 | S1 | Densidade hostil na aba Perícias | ✅ `density-compact`/`density-roomy` cobrem skills; transições tokenizadas |
-| E16 | S1 | Mistura tipográfica sem papéis | 🟡 Escala/tokens definidos; migração incremental |
+| E16 | S1 | Mistura tipográfica sem papéis | ✅ 56 ocorrências convertidas para tokens; `14px`/`16px` → rem; pixels removidos |
 | E17 | S1 | Estados vazios desiguais | ✅ `.empty-state` padrão + Diário/Arsenal |
 | F-003 | S1 | Foco invisível | ✅ Já existia; tokenizado em `--focus-ring` |
 | F-008 | S2 | Tooltips só via `title` | ✅ Rollout completo: swatches de tema (13), `#btn-overflow`, `#btn-copy-log` em ambas as páginas |
@@ -96,7 +96,7 @@ Critério de aceite: `node js/tests/runner.js` verde; CI verde.
 - ✅ Headers de página compactos (E13).
 - ✅ Stepper do wizard + chips de traço (E14).
 - ✅ Painéis ✕ → "Limpar" (E11); ✅ alvos de toque ≥44px (F-019).
-- 🟡 Densidade da aba Perícias (E15) — ícone + quebra ok; modo compacto a explorar.
+- ✅ Densidade da aba Perícias (E15) — `density-compact`/`density-roomy` + transições tokenizadas.
 - ✅ Onboarding/first-run: `#welcome-state` na aba Personagem quando banco vazio —
   "Criar investigador" e "Importar JSON" delegam para os botões do toolbar.
 - ✅ Tokens de motion (`--dur-*`/`--ease`) em `home.css`, `investigator.css`,
@@ -117,6 +117,28 @@ Critério de aceite: `node js/tests/runner.js` verde; CI verde.
   personagem está carregado — exibe nome (serif), ocupação+residência (mono, uppercase) e
   PV/SAN/PM em colunas bordadas + botão "Rolar teste" que abre a busca global. Resolve
   E9/E13 no desktop: 200px de header estático → 54px de HUD dinâmico.
+
+---
+
+## Direção "Arquivo de Arkham" (consultoria Malleji · jun/2026)
+
+Refinamentos adotados da consultoria externa, **sem rewrite** e respeitando a
+identidade 1920s como ativo:
+
+- ✅ **Preset tipográfico opcional** (Configurações → Tipografia): "Clássica"
+  (serif 1920s — padrão, preserva a identidade) × "Moderna" (Inter na UI +
+  JetBrains Mono nos dados; serif só em títulos/lore). `body.type-modern`
+  remapeia só as famílias via token — nenhum componente muda. Resolve a tensão
+  de E16 por escolha do usuário em vez de imposição. Ambas as fontes já vinham
+  no `@import`.
+- ✅ **Reforço da semântica quente/frio** onde faltava: SAN (mente/Mythos) na
+  app-bar e na faixa de vitais mobile estava em latão (quente) — agora usa o
+  tom frio (`--mist`), consistente com o dashboard. Novo token semântico
+  `--sanity: var(--mist)` cascateia para os 13 temas. PV permanece sangue
+  (vermelho), PM musgo; vermelho segue reservado a dano/exclusão.
+
+> A paleta com hex novos do plano **não** foi adotada (decisão: reforçar o split
+> só onde faltava, mantendo a base atual e o contraste já auditado).
 
 ---
 
