@@ -79,6 +79,7 @@
       <div class="sheet-title">Ações</div>
 
       <div class="sheet-group">
+        <div class="sheet-group-label" aria-hidden="true">Dados</div>
         <button id="btn-session-export" class="btn-ghost" title="Exportar sessão completa com trace de eventos (rolagens, dano, sanidade)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-grafico"></use></svg> Sessão</button>
         <button id="btn-import" class="btn-ghost" title="Importar JSON"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-pasta"></use></svg> Importar</button>
         <button id="btn-export" class="btn-export" title="Exportar personagem como JSON (BACKUP!)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-baixar"></use></svg> Exportar JSON</button>
@@ -86,11 +87,15 @@
       </div>
 
       <div class="sheet-group">
+        <div class="sheet-group-label" aria-hidden="true">Mesa</div>
         <button id="btn-global-search" class="btn-ghost" title="Busca global (Ctrl+K)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-lupa"></use></svg> Buscar</button>
         <button id="btn-session-mode" class="btn-ghost" title="Modo de sessão: prioriza as perícias da cena (neutro → investigação → combate)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-claquete"></use></svg> Cena</button>
         <button id="btn-immersion" class="btn-ghost" title="Modo Imersão: menos números, mais narrativa — ideal para interpretação"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-vela"></use></svg> Imersão</button>
+      </div>
+
+      <div class="sheet-group">
+        <div class="sheet-group-label" aria-hidden="true">Aparência</div>
         <button id="btn-settings" class="btn-ghost" title="Central de Configurações (tema, idioma, acessibilidade)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-engrenagem"></use></svg> Configurações</button>
-        <button id="btn-sanity-fx" class="btn-ghost" title="Configurar efeitos visuais de insanidade"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-cerebro"></use></svg> Efeitos</button>
         <div class="theme-picker no-print" id="theme-picker" aria-label="Tema da campanha">
           <button class="theme-swatch active" data-theme="arkham"     data-tooltip="Arkham — padrão"              aria-label="Tema Arkham (padrão)"></button>
           <button class="theme-swatch"        data-theme="classico"   data-tooltip="Clássico — Dourado"           aria-label="Tema Clássico"></button>
@@ -106,6 +111,11 @@
           <button class="theme-swatch"        data-theme="agencia"    data-tooltip="Agência — Cinza/Azul"         aria-label="Tema Agência Federal"></button>
           <button class="theme-swatch"        data-theme="custom"     data-tooltip="Personalizada"                aria-label="Tema personalizado"></button>
         </div>
+      </div>
+
+      <div class="sheet-group">
+        <div class="sheet-group-label" aria-hidden="true">Efeitos</div>
+        <button id="btn-sanity-fx" class="btn-ghost" title="Configurar efeitos visuais de insanidade"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-cerebro"></use></svg> Efeitos de Insanidade</button>
       </div>
 
       <div class="sheet-group sheet-group-danger">

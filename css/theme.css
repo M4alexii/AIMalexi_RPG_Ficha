@@ -80,12 +80,16 @@
   --text-md:   1.1rem;    /* ~17.6px — destaque */
   --text-lg:   1.25rem;   /* 20px    — subtítulos */
   --text-xl:   1.5rem;    /* 24px    — títulos de seção */
+  /* Navegação/tabs — fluida: sobe com a viewport sem tocar cada componente */
+  --fs-nav:    clamp(0.82rem, 0.78rem + 0.2vw, 0.95rem);
 
   /* === Layout === */
   --radius:         3px;
   --radius-lg:      6px;
   --gap:            1rem;
   --gap-lg:         1.5rem;
+  /* Largura máxima do conteúdo principal (tabs) — centraliza em telas largas */
+  --content-max:    1180px;
 
   /* === Cor de acento ativa (atualizada via JS) === */
   --accent:         var(--brass);
@@ -210,7 +214,7 @@ html, body {
   background: var(--bg-deep);
   color: var(--ink);
   font-family: var(--font-body);
-  font-size: 16px;
+  font-size: clamp(15px, 0.45vw + 13px, 18px);   /* fluido: 15px@768px → 18px@1400px */
   line-height: 1.6;                 /* §21 — respiro maior p/ leitura prolongada */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
