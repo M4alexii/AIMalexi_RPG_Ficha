@@ -343,6 +343,7 @@ window.CoC.views = window.CoC.views || {};
         group.appendChild(inner);
 
         for (const name of customFiltered) {
+          renderedNames.add(name);
           const sk        = c.skills[name];
           const value     = Number(sk.value) || 0;
           const isOcc     = occSkills.has(name);
@@ -369,6 +370,67 @@ window.CoC.views = window.CoC.views || {};
             <div class="skill-frac"><span class="skill-frac-half" title="Difícil">${dice.half(value)}</span><span class="skill-frac-sep"> · </span><span class="skill-frac-fifth" title="Extremo">${dice.fifth(value)}</span></div>
             ${markBtnC}
             <button class="skill-roll btn-ghost" data-roll-skill="${escapeHtml(name)}" title="Rolar perícia"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-dado"></use></svg></button>
+          `;
+          inner.appendChild(row);
+        }
+        container.appendChild(group);
+      }
+    }
+
+    // ── Perícias da ocupação ausentes do catálogo e de c.skills ───────────────
+    // Especializações obrigatórias/livres como "Ciência (Biologia)" ou
+    // "Outra Língua (Latim)" não existem como linha do catálogo (que só tem a
+    // genérica "Ciência") nem (ainda) em c.skills ao escolher/trocar a ocupação.
+    // Sem isto, as perícias obrigatórias especializadas simplesmente não apareciam.
+    // Renderizamos linhas virtuais para que TODA perícia da ocupação apareça com
+    // ◆ e possa receber pontos (digitar valor dispara SET_SKILL e a torna real).
+    if (filter === "all" || filter === "occupation") {
+      const occMissing = [...occSkills].filter(name => {
+        if (renderedNames.has(name)) return false;
+        if (search && !name.toLowerCase().includes(search)) return false;
+        return true;
+      });
+      occMissing.sort((a, b) => a.localeCompare(b, "pt-BR"));
+
+      if (occMissing.length > 0) {
+        const group = el("div", { class: "skill-group" });
+        group.innerHTML = `<h3 class="skill-group-title">Perícias da Ocupação</h3>`;
+        const inner = el("div", { class: "skills-list" });
+        group.appendChild(inner);
+
+        for (const name of occMissing) {
+          renderedNames.add(name);
+          const sk     = c.skills?.[name];
+          const parent = window.CoCData.findSkill(name.replace(/\s*\(.+\)$/, ""));
+          const base   = parent
+            ? _computeBaseValue(parent, attrs)
+            : ((window.CoC.rules && window.CoC.rules.calcSkillBase
+                ? window.CoC.rules.calcSkillBase(name, c.attributes) : 0) || 0);
+          const value  = sk?.value != null ? Number(sk.value) : base;
+          const capStatus = validators.skillCapStatus(value, document.getElementById("btn-edit-mode")?.classList.contains("active") ?? false);
+          const isMarked  = !!(sk?.marked);
+
+          const row = el("div", {
+            class: "skill-row occupation" +
+              (capStatus.level === "err" ? " over-cap" : "") +
+              (capStatus.level === "warn" && !capStatus.ok ? " over-cap-warn" : "") +
+              (isMarked ? " skill-marked" : "")
+          });
+          const parentTag = parent ? `<span class="skill-tag" title="Base herdada de ${escapeHtml(parent.name)}">base ${base}</span>` : "";
+          const occMark   = _occToggleHTML(name, ctx.mandatory.has(name), ctx.chosen.has(name));
+          const markBtn   = `<button class="skill-mark btn-ghost${isMarked ? " marked" : ""}" data-mark-skill="${escapeHtml(name)}" title="${isMarked ? "Marcada para evolução (clique para desmarcar)" : "Marcar para evolução ao fim da sessão"}" aria-pressed="${isMarked}">${isMarked ? "✓" : "○"}</button>`;
+          const isFav     = !!(sk?.fav);
+          const favBtn    = `<button class="skill-fav btn-ghost${isFav ? " fav" : ""}" data-fav-skill="${escapeHtml(name)}" title="${isFav ? "Favorita (clique para remover)" : "Favoritar — sobe para o topo"}" aria-pressed="${isFav}">${isFav ? "★" : "☆"}</button>`;
+          const infoBtn   = `<button class="skill-info-toggle" data-info-skill="${escapeHtml(name)}" title="Ver descrição da perícia" aria-expanded="false">ⓘ</button>`;
+          row.innerHTML = `
+            <div class="skill-name">${favBtn}${occMark}${escapeHtml(name)}${parentTag} ${infoBtn}</div>
+            <input class="skill-input" type="number" min="0" max="99" value="${value}"
+              data-skill="${escapeHtml(name)}"
+              title="Total da perícia (Base ${base} + alocados)" />
+            <div class="skill-frac"><span class="skill-frac-half" title="Difícil">${dice.half(value)}</span><span class="skill-frac-sep"> · </span><span class="skill-frac-fifth" title="Extremo">${dice.fifth(value)}</span></div>
+            ${markBtn}
+            <button class="skill-roll btn-ghost" data-roll-skill="${escapeHtml(name)}" title="Rolar perícia"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-dado"></use></svg></button>
+            <div class="skill-enc-panel" data-enc-for="${escapeHtml(name)}" hidden></div>
           `;
           inner.appendChild(row);
         }

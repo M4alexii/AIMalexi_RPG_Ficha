@@ -235,13 +235,28 @@ window.CoC.campaign = window.CoC.campaign || {};
     if (st.temporaryInsanity)  conditions.push('Loucura Temporária');
     if (st.indefiniteInsanity) conditions.push('Loucura Indefinida');
 
-    // Atributos (compactos) e TODAS as perícias com valor → painel de visão geral.
+    // Atributos (compactos) → painel de visão geral.
     var attrsOut = {};
     _ATTR_ORDER.forEach(function (code) { if (attrs[code]) attrsOut[code] = Number(attrs[code].value) || 0; });
+
+    // TODAS as perícias do catálogo com o valor EFETIVO (alocado, senão a base),
+    // para o Guardião ver a ficha completa em "Abrir Ficha" — não só as com pontos.
     var skillsOut = {};
+    var rules   = window.CoC && window.CoC.rules;
+    var catalog = (window.CoCData && window.CoCData.skills) || [];
+    catalog.forEach(function (def) {
+      var sk = skills[def.name];
+      var v  = (sk && sk.value != null)
+        ? Number(sk.value)
+        : (rules && rules.calcSkillBase ? rules.calcSkillBase(def.name, attrs) : (Number(def.base) || 0));
+      skillsOut[def.name] = Number(v) || 0;
+    });
+    // Perícias customizadas / especializações fora do catálogo (ex.: "Ciência (Biologia)").
     Object.keys(skills).forEach(function (name) {
-      var v = skills[name] && skills[name].value;
-      if (v != null) skillsOut[name] = Number(v) || 0;
+      if (skillsOut[name] == null) {
+        var v = skills[name] && skills[name].value;
+        if (v != null) skillsOut[name] = Number(v) || 0;
+      }
     });
 
     // Retrato: envia o miniatura cacheada quando disponível; dispara fetch se portraitId mudou.
@@ -304,6 +319,16 @@ window.CoC.campaign = window.CoC.campaign || {};
 
   function _onTransportEvent(event) {
     if (!event) return;
+    // Mensagem do Guardião → log do jogador. O receptor interno do chat
+    // (chat.mount → transport.onEvent) é apagado por todo transport.init()
+    // (que reseta _handlers); só _onTransportEvent é re-registrado. Encaminhamos
+    // aqui — espelha keeper-dashboard.js. O chat deduplica por msgId.
+    if (event.type === 'CHAT_MESSAGE') {
+      if (window.CoC.views && window.CoC.views.chat && window.CoC.views.chat.receive) {
+        window.CoC.views.chat.receive(event);
+      }
+      return;
+    }
     if (event.type === 'REQUEST_STATUS') {
       _broadcastStatus();
     }
