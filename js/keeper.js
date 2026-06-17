@@ -1008,6 +1008,11 @@
                   : "ec-hp-crit";
       const kind      = e.type === "mythos" ? "mythos" : (e.type === "investigador" ? "investigador" : "humano");
       const kindLabel = kind === "mythos" ? "Mythos" : (kind === "investigador" ? "Investigador" : "Humano");
+      const subLabel  = e.type === "investigador" ? (e.occupation ? e.occupation : "Investigador")
+                      : e.type === "human"        ? "Humano"
+                      : e.type === "mythos"       ? "Mythos"
+                      : e.type === "animal"       ? "Animal"
+                      : e.type ? String(e.type) : null;
       const isActive  = e.id === state.encounterActiveId && !e.dead;
       const conds     = e.conditions || {};
       const ferido    = !!conds.feridoGrave || !!e.majorWound;
@@ -1040,7 +1045,7 @@
         <div class="ec-head">
           <div class="ec-head-main">
             <div class="ec-name">${escapeHtml(e.name)}</div>
-            ${e.type ? `<div class="ec-sub">${escapeHtml(String(e.type))}</div>` : ""}
+            ${subLabel ? `<div class="ec-sub">${escapeHtml(subLabel)}</div>` : ""}
           </div>
           <span class="ec-tag kind-${kind}">${kindLabel}</span>
           <div class="ec-init" title="Destreza — ordem de iniciativa"><span class="ec-init-v">${Number(e.dex) || 0}</span><span class="ec-init-l">Inic</span></div>
@@ -1066,7 +1071,7 @@
           <button class="ec-hpbtn ico" data-enc="${idx}" data-op="remove" title="Remover do encontro">✕</button>
         </div>
         <div class="ec-dmg-field">
-          <input type="number" min="1" placeholder="dano (nº ou 1d6)" class="ec-dmg-input" aria-label="Quantidade de dano" />
+          <input type="text" inputmode="decimal" placeholder="nº ou 1d6" class="ec-dmg-input" aria-label="Quantidade de dano" />
           <button class="ec-dmg-apply" data-enc="${idx}" data-op="dmg-apply">Aplicar</button>
         </div>
         <div class="ec-conds">${condsHTML}</div>
@@ -1084,8 +1089,12 @@
       .map((e, i) => ({ e, i }))                       // índice preserva estabilidade
       .sort((a, b) => ((a.e.dead ? 1 : 0) - (b.e.dead ? 1 : 0)) || ((b.e.dex || 0) - (a.e.dex || 0)) || (a.i - b.i))
       .map(x => x.e);
+    // Auto-ativa o primeiro combatente vivo (maior DES).
+    const first = state.encounter.find(e => !e.dead);
+    if (first) state.encounterActiveId = first.id;
     renderEncounter();
-    toast("⚡ Ordem de iniciativa: DES decrescente (mortos no fim).", { type: "info", duration: 3000 });
+    const nameMsg = first ? ` "${first.name}" abre o round.` : "";
+    toast(`⚡ Ordem de iniciativa: DES decrescente.${nameMsg}`, { type: "info", duration: 4000 });
   }
 
   // Avança/retrocede/zera o contador de rounds do encontro.
@@ -1400,6 +1409,7 @@
         },
         ammo:        null,
         majorWound:  false,
+        occupation:  s.occupation || '',
         type:        'investigador',
         sourceId:    null,
         dead:        (Number(s.hp) || 0) <= 0
