@@ -133,9 +133,13 @@ window.CoC.ui = window.CoC.ui || {};
         spot.style.width = (r.width + pad * 2) + "px";
         spot.style.height = (r.height + pad * 2) + "px";
       } else {
+        // T-15: resetar sincronamente sem animação — evita spotlight fantasma do passo anterior.
+        spot.style.transition = "none";
+        void spot.offsetWidth; // força reflow
         spot.classList.add("gt-center");
         spot.style.top = "50%"; spot.style.left = "50%";
         spot.style.width = "0px"; spot.style.height = "0px";
+        setTimeout(function () { if (spot) spot.style.transition = ""; }, 20);
       }
       positionPop(el);
     }
@@ -144,13 +148,17 @@ window.CoC.ui = window.CoC.ui || {};
       var vw = window.innerWidth, vh = window.innerHeight;
       var pw = pop.offsetWidth, ph = pop.offsetHeight;
       var top, left;
+      // T-17: só ancora se o elemento tem geometria real (visível, não em aba oculta).
       if (el) {
         var r = el.getBoundingClientRect();
-        // Preferência: abaixo do alvo; senão acima; senão centro vertical.
-        if (r.bottom + ph + 24 < vh) top = r.bottom + 16;
-        else if (r.top - ph - 24 > 0) top = r.top - ph - 16;
-        else top = Math.max(16, (vh - ph) / 2);
-        left = Math.min(Math.max(16, r.left), vw - pw - 16);
+        if (r.width > 0 || r.height > 0) {
+          if (r.bottom + ph + 24 < vh) top = r.bottom + 16;
+          else if (r.top - ph - 24 > 0) top = r.top - ph - 16;
+          else top = Math.max(16, (vh - ph) / 2);
+          left = Math.min(Math.max(16, r.left), vw - pw - 16);
+        } else {
+          top = (vh - ph) / 2; left = (vw - pw) / 2;
+        }
       } else {
         top = (vh - ph) / 2; left = (vw - pw) / 2;
       }

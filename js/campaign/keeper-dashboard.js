@@ -18,6 +18,86 @@ window.CoC.campaign = window.CoC.campaign || {};
   var _tp      = null;
   var _pinSys  = null;
   var _ontology = null;
+  var _invSort = 'perigo';   // 'perigo' | 'nome' | 'online'
+
+  // ── i18n (PT-BR diegético + EN) — registrado já no parse, antes do
+  //    settings.apply()/applyTranslations() do boot ───────────────────────────
+  (function registerDict() {
+    var i18n = window.CoC && window.CoC.i18n;
+    if (!i18n || !i18n.addDict) return;
+    i18n.addDict('pt', {
+      'keeper.inv.title': 'Investigadores',
+      'keeper.inv.waiting': 'Aguardando investigadores...',
+      'keeper.inv.sort': 'Ordenar',
+      'keeper.inv.sortDanger': 'Por perigo',
+      'keeper.inv.sortName': 'Por nome',
+      'keeper.inv.sortOnline': 'Online primeiro',
+      'keeper.inv.vitLife': 'Vida',
+      'keeper.inv.vitSanity': 'Sanidade',
+      'keeper.inv.vitMagic': 'Magia',
+      'keeper.inv.vitLuck': 'Sorte',
+      'keeper.inv.statusAlive': 'Vivo',
+      'keeper.inv.statusHurt': 'Ferido',
+      'keeper.inv.statusInsane': 'Em surto',
+      'keeper.inv.statusUnconscious': 'Inconsciente',
+      'keeper.inv.statusDead': 'Morto',
+      'keeper.inv.seal': '☠ Morto',
+      'keeper.inv.online': 'online',
+      'keeper.inv.offline': 'offline',
+      'keeper.inv.kpiTotal': 'Investigadores',
+      'keeper.inv.kpiAlive': 'Vivos',
+      'keeper.inv.kpiInsane': 'Em surto',
+      'keeper.inv.kpiDead': 'Mortos',
+      'keeper.inv.kpiSanAvg': 'Sanidade média',
+      'keeper.inv.highlights': 'Destaques',
+      'keeper.inv.detail': 'Atributos & Perícias',
+      'keeper.inv.attrs': 'Atributos',
+      'keeper.inv.skills': 'Perícias',
+      'keeper.inv.actOpen': 'Abrir ficha',
+      'keeper.inv.actDamage': 'Dano',
+      'keeper.inv.actSan': 'Perda SAN',
+      'keeper.inv.noteTitle': 'Abrir/criar nota do Guardião sobre este investigador'
+    });
+    i18n.addDict('en', {
+      'keeper.inv.title': 'Investigators',
+      'keeper.inv.waiting': 'Awaiting investigators...',
+      'keeper.inv.sort': 'Sort',
+      'keeper.inv.sortDanger': 'By danger',
+      'keeper.inv.sortName': 'By name',
+      'keeper.inv.sortOnline': 'Online first',
+      'keeper.inv.vitLife': 'Health',
+      'keeper.inv.vitSanity': 'Sanity',
+      'keeper.inv.vitMagic': 'Magic',
+      'keeper.inv.vitLuck': 'Luck',
+      'keeper.inv.statusAlive': 'Alive',
+      'keeper.inv.statusHurt': 'Hurt',
+      'keeper.inv.statusInsane': 'Insane',
+      'keeper.inv.statusUnconscious': 'Unconscious',
+      'keeper.inv.statusDead': 'Dead',
+      'keeper.inv.seal': '☠ Dead',
+      'keeper.inv.online': 'online',
+      'keeper.inv.offline': 'offline',
+      'keeper.inv.kpiTotal': 'Investigators',
+      'keeper.inv.kpiAlive': 'Alive',
+      'keeper.inv.kpiInsane': 'Insane',
+      'keeper.inv.kpiDead': 'Dead',
+      'keeper.inv.kpiSanAvg': 'Avg. sanity',
+      'keeper.inv.highlights': 'Highlights',
+      'keeper.inv.detail': 'Attributes & Skills',
+      'keeper.inv.attrs': 'Attributes',
+      'keeper.inv.skills': 'Skills',
+      'keeper.inv.actOpen': 'Open sheet',
+      'keeper.inv.actDamage': 'Damage',
+      'keeper.inv.actSan': 'SAN loss',
+      'keeper.inv.noteTitle': "Open/create the Keeper's note about this investigator"
+    });
+  })();
+
+  function _t(key, fallback) {
+    var i18n = window.CoC && window.CoC.i18n;
+    var v = i18n && i18n.t ? i18n.t(key) : null;
+    return (v && v !== key) ? v : (fallback || key);
+  }
 
   function $s(sel) { return document.querySelector(sel); }
   function $all(sel) { return Array.from(document.querySelectorAll(sel)); }
@@ -143,23 +223,31 @@ window.CoC.campaign = window.CoC.campaign || {};
 
   // ── Create Campaign ───────────────────────────────────────────────────────
   function _createCampaign() {
-    var pin  = _pinSys.generate();
-    var name = window.prompt('Nome da Campanha:', 'Horror em Arkham') || 'Horror em Arkham';
+    var ui = window.CoC && window.CoC.ui;
+    var pin = _pinSys.generate();
 
-    _tp.init(pin, 'host');
-    _tp.onEvent(_onTransportEvent);
-    var peerId = _tp.getPeerId();
-    _cs.createCampaign(name, pin, peerId);
-    _connectDurable(pin, 'host', name);
+    function _launch(name) {
+      name = (name || '').trim() || 'Horror em Arkham';
+      _tp.init(pin, 'host');
+      _tp.onEvent(_onTransportEvent);
+      var peerId = _tp.getPeerId();
+      _cs.createCampaign(name, pin, peerId);
+      _connectDurable(pin, 'host', name);
+      var hostEvent = _ontology
+        ? _ontology.make('HOST_ONLINE', { campaignId: pin, pin: pin, campaignName: name })
+        : { type: 'HOST_ONLINE', campaignId: pin, pin: pin, campaignName: name };
+      _tp.broadcast(hostEvent);
+      _renderDashboard(_cs.getState());
+      _openCampaignModal();
+    }
 
-    // Broadcast presença do host
-    var hostEvent = _ontology
-      ? _ontology.make('HOST_ONLINE', { campaignId: pin, pin: pin, campaignName: name })
-      : { type: 'HOST_ONLINE', campaignId: pin, pin: pin, campaignName: name };
-    _tp.broadcast(hostEvent);
-
-    _renderDashboard(_cs.getState());
-    _openCampaignModal();
+    if (ui && ui.prompt) {
+      ui.prompt('Nome da Campanha:', { title: 'Nova Campanha', defaultValue: 'Horror em Arkham' })
+        .then(function (name) { if (name !== null) _launch(name); });
+    } else {
+      // fallback seguro se ui-components ainda não carregou
+      _launch(window.prompt('Nome da Campanha:', 'Horror em Arkham') || '');
+    }
   }
 
   // ── Join Campaign ─────────────────────────────────────────────────────────
@@ -212,13 +300,21 @@ window.CoC.campaign = window.CoC.campaign || {};
 
     switch (event.type) {
 
-      case 'INVESTIGATOR_STATUS':
+      case 'INVESTIGATOR_STATUS': {
+        // Retrato/ocupação são aditivos e podem não vir em todo tick — carrega
+        // adiante o último valor conhecido (retrocompat com clientes antigos).
+        var prev = (_cs.getState().investigators || {})[event.peerId] || {};
+        var st   = event.status || {};
+        var prevSt = prev.status || {};
+        if (st.portrait == null && prevSt.portrait != null) st.portrait = prevSt.portrait;
+        if (!st.occupation && prevSt.occupation)            st.occupation = prevSt.occupation;
         _cs.upsertInvestigator(event.peerId, {
           playerName:    event.playerName    || '?',
           characterName: event.characterName || '?',
-          status:        event.status        || {}
+          status:        st
         });
         break;
+      }
 
       case 'PLAYER_CONNECTED':
         _cs.upsertInvestigator(event.peerId, { online: true });
@@ -339,6 +435,8 @@ window.CoC.campaign = window.CoC.campaign || {};
     var onlineN   = invs.filter(function (i) { return i.online; }).length;
     if (cbPlayers) cbPlayers.textContent = onlineN + ' conectado' + (onlineN !== 1 ? 's' : '');
 
+    _bindSort();
+    _renderKpis(invs);
     _renderInvestigatorCards(invs);
   }
 
@@ -354,77 +452,306 @@ window.CoC.campaign = window.CoC.campaign || {};
     }).join('') + '</div>';
   }
 
+  // ── Helpers do painel de comando (porte do protótipo, dados reais) ──────────
+  // Cor de preenchimento por faixa (eixo de vitais — tokens fixos de tokens.css).
+  function _axisFill(pct, kind) {
+    var p = Math.max(0, Math.min(1, pct));
+    if (kind === 'san') {
+      if (p <= 0.15) return 'var(--san-crit)';
+      if (p <= 0.35) return 'var(--san-bad)';
+      if (p <= 0.60) return 'var(--san-hurt)';
+      return 'var(--san-full)';
+    }
+    if (kind === 'mp') return 'var(--mp-axis)';
+    if (p <= 0.15) return 'var(--hp-crit)';
+    if (p <= 0.40) return 'var(--hp-bad)';
+    if (p <= 0.75) return 'var(--hp-hurt)';
+    return 'var(--hp-full)';
+  }
+
+  // Status derivado dos valores reais (prioridade conforme o protótipo).
+  function _statusOf(inv) {
+    var s = inv.status || {};
+    var hp = Number(s.hp) || 0, hpMax = Number(s.hpMax) || 1;
+    var san = Number(s.san) || 0, sanMax = Number(s.sanMax) || 1;
+    var conds = (Array.isArray(s.conditions) ? s.conditions : []).map(function (c) { return String(c).toLowerCase(); });
+    var incons = conds.some(function (c) { return c.indexOf('inconsc') >= 0; });
+    var ferido = conds.some(function (c) { return c.indexOf('ferid') >= 0; });
+    if (hp <= 0) return { k: 'morto', label: _t('keeper.inv.statusDead'), color: 'var(--dead)' };
+    if (incons || hp / hpMax <= 0.12) return { k: 'incons', label: _t('keeper.inv.statusUnconscious'), color: 'var(--san-full)' };
+    if (san / sanMax <= 0.18) return { k: 'surto', label: _t('keeper.inv.statusInsane'), color: 'var(--myth-bright)' };
+    if (hp / hpMax <= 0.40 || ferido) return { k: 'ferido', label: _t('keeper.inv.statusHurt'), color: 'var(--hp-bad)' };
+    return { k: 'vivo', label: _t('keeper.inv.statusAlive'), color: 'var(--ok)' };
+  }
+
+  // Quanto maior, pior (ordenação "Por perigo").
+  function _danger(inv) {
+    var s = inv.status || {};
+    var hp = Number(s.hp) || 0, hpMax = Number(s.hpMax) || 1;
+    var san = Number(s.san) || 0, sanMax = Number(s.sanMax) || 1;
+    if (hp <= 0) return 1000;
+    return (1 - hp / hpMax) * 100 + (1 - san / sanMax) * 120;
+  }
+
+  // Classe de cor do chip de condição (heurística sobre o texto livre da ficha).
+  function _condClass(label) {
+    var l = String(label).toLowerCase();
+    if (l.indexOf('sangr') >= 0) return 'sangrando';
+    if (l.indexOf('inconsc') >= 0) return 'incons';
+    if (l.indexOf('loucura') >= 0 || l.indexOf('insan') >= 0) return 'loucura';
+    if (l.indexOf('fobia') >= 0 || l.indexOf('medo') >= 0) return 'fobia';
+    if (l.indexOf('ferid') >= 0) return 'ferido';
+    return '';
+  }
+
+  // Só aceita data-URL de imagem (hardening: o retrato chega pelo sync).
+  function _safePortrait(p) {
+    return (typeof p === 'string' &&
+            /^data:image\/(png|jpe?g|webp);base64,[A-Za-z0-9+/=\s]+$/.test(p)) ? p : null;
+  }
+
+  function _vit(label, val, max, kind, warn) {
+    var v = Math.max(0, Number(val) || 0);
+    var mx = Number(max) || 0;
+    var pct = mx ? v / mx : 0;
+    return '<div class="inv-vit">' +
+      '<div class="inv-vit-top">' +
+        '<span class="inv-vit-l">' + _esc(label) + (warn ? ' <span class="inv-warn">⚠</span>' : '') + '</span>' +
+        '<span class="inv-vit-v">' + v + (mx ? '<span class="mx"> / ' + mx + '</span>' : '') + '</span>' +
+      '</div>' +
+      '<div class="inv-track"><div class="inv-fill" style="width:' + Math.round(pct * 100) + '%;background:' + _axisFill(pct, kind) + '"></div></div>' +
+    '</div>';
+  }
+
+  // ── KPIs reativos ───────────────────────────────────────────────────────────
+  function _renderKpis(invs) {
+    var el = $s('#investigators-kpis');
+    if (!el) return;
+    var alive = invs.filter(function (i) { return (Number((i.status || {}).hp) || 0) > 0; });
+    var total = invs.length;
+    var dead  = total - alive.length;
+    var insane = alive.filter(function (i) {
+      var s = i.status || {}; return (Number(s.san) || 0) / (Number(s.sanMax) || 1) <= 0.18;
+    }).length;
+    var sanAvg = alive.length
+      ? Math.round(alive.reduce(function (a, i) {
+          var s = i.status || {}; return a + (Number(s.san) || 0) / (Number(s.sanMax) || 1);
+        }, 0) / alive.length * 100)
+      : 0;
+    function kpi(v, key, cls) {
+      return '<div class="inv-kpi' + (cls ? ' ' + cls : '') + '">' +
+        '<span class="inv-kpi-v">' + _esc(v) + '</span>' +
+        '<span class="inv-kpi-l">' + _esc(_t('keeper.inv.' + key)) + '</span></div>';
+    }
+    el.innerHTML =
+      kpi(total, 'kpiTotal', '') +
+      kpi(alive.length + '/' + total, 'kpiAlive', '') +
+      kpi(insane, 'kpiInsane', insane ? 'danger' : '') +
+      kpi(dead, 'kpiDead', dead ? 'dead' : '') +
+      kpi(sanAvg + '%', 'kpiSanAvg', '');
+  }
+
+  // ── Ordenação ────────────────────────────────────────────────────────────────
+  function _bindSort() {
+    var bar = $s('#investigators-sort');
+    if (!bar || bar._invSortBound) return;
+    bar._invSortBound = true;
+    bar.addEventListener('click', function (e) {
+      var chip = e.target.closest('[data-sort]');
+      if (!chip) return;
+      _invSort = chip.getAttribute('data-sort');
+      $all('#investigators-sort .inv-sort-chip').forEach(function (c) {
+        c.classList.toggle('on', c.getAttribute('data-sort') === _invSort);
+      });
+      _renderInvestigatorCards(Object.values(_cs.getState().investigators || {}));
+    });
+  }
+
+  // ── Ações de mesa (delegação única) ──────────────────────────────────────────
+  function _bindRoster(container) {
+    if (container._invDelegated) return;
+    container._invDelegated = true;
+    container.addEventListener('click', function (e) {
+      var note = e.target.closest('[data-inv-note]');
+      if (note) {
+        e.preventDefault();
+        var ui = window.CoC && window.CoC.keeperNotesUI;
+        if (ui && ui.openOrCreateByTitle) ui.openOrCreateByTitle(note.getAttribute('data-inv-note'));
+        return;
+      }
+      var act = e.target.closest('[data-inv-action]');
+      if (!act) return;
+      e.preventDefault();
+      var peerId = act.getAttribute('data-peer');
+      var action = act.getAttribute('data-inv-action');
+      if (action === 'ficha') {
+        var inv = (_cs.getState().investigators || {})[peerId];
+        if (inv) _openFichaModal(inv);
+      } else if (action === 'dano' || action === 'san') {
+        _localAdjust(peerId, action);
+      }
+    });
+  }
+
+  // Dano / Perda SAN: AJUSTE LOCAL/VISUAL no painel do Guardião. Não há canal
+  // Guardião→jogador; rolagem por crypto (CoC.dice), nunca Math.random.
+  // TODO: propagar ao jogador quando existir um canal de escrita Guardião→jogador.
+  function _localAdjust(peerId, kind) {
+    var inv = (_cs.getState().investigators || {})[peerId];
+    if (!inv) return;
+    var s = Object.assign({}, inv.status || {});
+    if ((Number(s.hp) || 0) <= 0) return;   // morto não recebe ajuste
+    var dice = window.CoC && window.CoC.dice;
+    var amt = (dice && dice.rollDie) ? dice.rollDie(kind === 'dano' ? 6 : 8) : 1;
+    if (kind === 'dano') s.hp  = Math.max(0, (Number(s.hp)  || 0) - amt);
+    else                 s.san = Math.max(0, (Number(s.san) || 0) - amt);
+    _cs.upsertInvestigator(peerId, { status: s });   // re-render síncrono via subscribe
+    _floatNumber(peerId, kind, '-' + amt);
+  }
+
+  function _floatNumber(peerId, kind, txt) {
+    var fl = document.getElementById('float-' + peerId);
+    if (!fl) return;
+    var card = fl.closest('.inv-card');
+    fl.textContent = txt;
+    fl.className = 'inv-float ' + (kind === 'dano' ? 'dmg' : 'san');
+    void fl.offsetWidth;            // reinicia a animação
+    fl.classList.add('go');
+    if (card) {
+      var fc = kind === 'dano' ? 'flash-dmg' : 'flash-san';
+      card.classList.add(fc);
+      setTimeout(function () { card.classList.remove(fc); }, 500);
+    }
+    setTimeout(function () { fl.classList.remove('go'); }, 1000);
+  }
+
+  // Abrir ficha — visualização READ-ONLY (segura) num modal temático.
+  function _openFichaModal(inv) {
+    var ui = window.CoC && window.CoC.ui;
+    if (!ui || !ui.modal) return;
+    var s = inv.status || {};
+    var conds = (Array.isArray(s.conditions) ? s.conditions : []);
+    var condHtml = conds.length
+      ? '<div class="inv-conds" style="margin:0.5rem 0">' + conds.map(function (co) {
+          return '<span class="inv-cond ' + _condClass(co) + '">' + _esc(co) + '</span>';
+        }).join('') + '</div>'
+      : '';
+    var html =
+      '<div class="inv-occ" style="margin-bottom:0.6rem">' +
+        (s.occupation ? _esc(s.occupation) + ' · ' : '') +
+        '<span class="player">' + _esc(inv.playerName || '') + '</span>' +
+      '</div>' +
+      '<div class="inv-vitals" style="margin-bottom:0.6rem">' +
+        _vit(_t('keeper.inv.vitLife'),   s.hp,  s.hpMax,  'hp') +
+        _vit(_t('keeper.inv.vitSanity'), s.san, s.sanMax, 'san') +
+        _vit(_t('keeper.inv.vitMagic'),  s.mp,  s.mpMax,  'mp') +
+        _vit(_t('keeper.inv.vitLuck'),   s.luck, 99,      'hp') +
+      '</div>' +
+      condHtml +
+      (s.attrs  ? '<div class="inv-detail-sec"><h5>' + _esc(_t('keeper.inv.attrs'))  + '</h5>' + _kvGrid(s.attrs,  'inv-attrs') + '</div>' : '') +
+      (s.skills ? '<div class="inv-detail-sec"><h5>' + _esc(_t('keeper.inv.skills')) + '</h5>' + _kvGrid(s.skills, 'inv-skills', true) + '</div>' : '');
+    ui.modal({ title: _esc(inv.characterName || '?'), body: html, dismissible: true });
+  }
+
   function _renderInvestigatorCards(investigators) {
     var container = $s('#investigators-cards');
     var countEl   = $s('#is-count');
     if (!container) return;
 
-    // Delegação (uma vez): botão 📝 abre/cria a nota do investigador
-    if (!container._invNoteDelegated) {
-      container._invNoteDelegated = true;
-      container.addEventListener('click', function (e) {
-        var btn = e.target.closest('[data-inv-note]');
-        if (!btn) return;
-        e.preventDefault();
-        var ui = window.CoC && window.CoC.keeperNotesUI;
-        if (ui && ui.openOrCreateByTitle) ui.openOrCreateByTitle(btn.getAttribute('data-inv-note'));
-      });
-    }
+    _bindRoster(container);
 
     var online = investigators.filter(function (i) { return i.online; }).length;
     if (countEl) countEl.textContent = online + ' conectado' + (online !== 1 ? 's' : '');
 
     if (!investigators.length) {
-      container.innerHTML = '<div class="inv-card-empty">Aguardando investigadores...</div>';
+      container.innerHTML = '<div class="inv-card-empty">' + _esc(_t('keeper.inv.waiting')) + '</div>';
       return;
     }
 
-    container.innerHTML = investigators.map(function (inv) {
-      var s       = inv.status || {};
-      var hpMax   = s.hpMax  || 1;
-      var sanMax  = s.sanMax || 1;
-      var mpMax   = s.mpMax  || 1;
-      var hpPct   = Math.max(0, Math.min(100, Math.round((s.hp  || 0) / hpMax  * 100)));
-      var sanPct  = Math.max(0, Math.min(100, Math.round((s.san || 0) / sanMax * 100)));
-      var mpPct   = Math.max(0, Math.min(100, Math.round((s.mp  || 0) / mpMax  * 100)));
+    // Ordenação selecionada
+    var list = investigators.slice();
+    if (_invSort === 'nome') {
+      list.sort(function (a, b) { return String(a.characterName || '').localeCompare(String(b.characterName || '')); });
+    } else if (_invSort === 'online') {
+      list.sort(function (a, b) { return ((b.online ? 1 : 0) - (a.online ? 1 : 0)) || (_danger(b) - _danger(a)); });
+    } else { // perigo (padrão)
+      list.sort(function (a, b) { return _danger(b) - _danger(a); });
+    }
 
-      var armor      = Number(s.armor) || 0;
+    container.innerHTML = list.map(function (inv) {
+      var s    = inv.status || {};
+      var pid  = inv.peerId || '';
+      var st   = _statusOf(inv);
+      var dead = (Number(s.hp) || 0) <= 0;
+      var sanMax = Number(s.sanMax) || 1;
+      var sanWarn = !dead && (Number(s.san) || 0) / sanMax <= 0.35;
+
+      var portrait   = _safePortrait(s.portrait);
+      var occupation = s.occupation || '';
       var conditions = Array.isArray(s.conditions) ? s.conditions : [];
       var attrsHtml  = _kvGrid(s.attrs,  'inv-attrs');
       var skillsHtml = _kvGrid(s.skills, 'inv-skills', true);
 
-      return '<div class="inv-card ' + (inv.online ? 'online' : 'offline') + '">' +
-        '<div class="inv-card-header">' +
-          '<span class="inv-avatar" aria-hidden="true">' + _esc(_initials(inv.characterName)) + '</span>' +
-          '<span class="inv-card-online-dot"></span>' +
-          '<span class="inv-card-name">' + _esc(inv.characterName || '?') + '</span>' +
-          '<span class="inv-card-player">' + _esc(inv.playerName || '') + '</span>' +
-          '<button type="button" class="inv-note-btn" data-inv-note="' + _esc(inv.characterName || '') + '" title="Abrir/criar nota do Guardião sobre este investigador">📝</button>' +
+      var top3 = (s.skills && typeof s.skills === 'object')
+        ? Object.keys(s.skills).map(function (k) { return { n: k, v: Number(s.skills[k]) || 0 }; })
+            .sort(function (a, b) { return b.v - a.v; }).slice(0, 3)
+        : [];
+
+      var portraitInner = portrait
+        ? '<div class="inv-photo" style="background-image:url(\'' + portrait + '\')"></div>'
+        : '<div class="inv-initial">' + _esc(_initials(inv.characterName)) + '</div>';
+
+      return '<div class="inv-card ' + (inv.online ? 'online' : 'offline') + (dead ? ' dead' : '') +
+               '" id="inv-' + _esc(pid) + '" style="--status-color:' + st.color + '">' +
+        '<div class="inv-float" id="float-' + _esc(pid) + '"></div>' +
+        (dead ? '<div class="inv-dead-seal">' + _esc(_t('keeper.inv.seal')) + '</div>' : '') +
+        '<div class="inv-portrait">' +
+          '<div class="inv-frame">' + portraitInner +
+            '<span class="inv-corner tl"></span><span class="inv-corner tr"></span>' +
+            '<span class="inv-corner bl"></span><span class="inv-corner br"></span>' +
+          '</div>' +
+          '<span class="inv-online ' + (inv.online ? 'live' : '') + '"><span class="inv-dot"></span>' +
+            (inv.online ? _esc(_t('keeper.inv.online')) : _esc(_t('keeper.inv.offline'))) + '</span>' +
         '</div>' +
-        '<div class="inv-card-stats">' +
-          '<div class="inv-stat hp"><span class="inv-stat-label">PV</span><span class="inv-stat-value">' + (s.hp != null ? s.hp : '?') + '</span></div>' +
-          '<div class="inv-stat san"><span class="inv-stat-label">SAN</span><span class="inv-stat-value">' + (s.san != null ? s.san : '?') + '</span></div>' +
-          '<div class="inv-stat mp"><span class="inv-stat-label">PM</span><span class="inv-stat-value">' + (s.mp != null ? s.mp : '?') + '</span></div>' +
-          '<div class="inv-stat luck"><span class="inv-stat-label">SOR</span><span class="inv-stat-value">' + (s.luck != null ? s.luck : '?') + '</span></div>' +
-          (armor > 0 ? '<div class="inv-stat armor"><span class="inv-stat-label">ARM</span><span class="inv-stat-value">' + armor + '</span></div>' : '') +
+        '<div class="inv-main">' +
+          '<div class="inv-top">' +
+            '<div>' +
+              '<div class="inv-name">' + _esc(inv.characterName || '?') + '</div>' +
+              '<div class="inv-occ">' + (occupation ? _esc(occupation) + ' · ' : '') +
+                '<span class="player">' + _esc(inv.playerName || '') + '</span></div>' +
+            '</div>' +
+            '<span class="inv-status">' + _esc(st.label) + '</span>' +
+          '</div>' +
+          '<div class="inv-vitals">' +
+            _vit(_t('keeper.inv.vitLife'),   s.hp,   s.hpMax,  'hp') +
+            _vit(_t('keeper.inv.vitSanity'), s.san,  s.sanMax, 'san', sanWarn) +
+            _vit(_t('keeper.inv.vitMagic'),  s.mp,   s.mpMax,  'mp') +
+            _vit(_t('keeper.inv.vitLuck'),   s.luck, 99,       'hp') +
+          '</div>' +
+          (conditions.length
+            ? '<div class="inv-conds">' + conditions.map(function (co) {
+                return '<span class="inv-cond ' + _condClass(co) + '">' + _esc(co) + '</span>';
+              }).join('') + '</div>'
+            : '') +
+          (top3.length
+            ? '<div class="inv-skills-line">' + _esc(_t('keeper.inv.highlights')) + ': ' +
+                top3.map(function (sk) { return '<span class="sk">' + _esc(sk.n) + '</span> <b>' + sk.v + '%</b>'; }).join(' · ') +
+              '</div>'
+            : '') +
+          ((attrsHtml || skillsHtml)
+            ? '<details class="inv-card-detail">' +
+                '<summary>' + _esc(_t('keeper.inv.detail')) + '</summary>' +
+                (attrsHtml  ? '<div class="inv-detail-sec"><h5>' + _esc(_t('keeper.inv.attrs'))  + '</h5>' + attrsHtml  + '</div>' : '') +
+                (skillsHtml ? '<div class="inv-detail-sec"><h5>' + _esc(_t('keeper.inv.skills')) + '</h5>' + skillsHtml + '</div>' : '') +
+              '</details>'
+            : '') +
+          '<div class="inv-acts">' +
+            '<button type="button" class="inv-act ficha" data-inv-action="ficha" data-peer="' + _esc(pid) + '">⛶ ' + _esc(_t('keeper.inv.actOpen')) + '</button>' +
+            '<button type="button" class="inv-act dano" data-inv-action="dano" data-peer="' + _esc(pid) + '"' + (dead ? ' disabled' : '') + '>🩸 ' + _esc(_t('keeper.inv.actDamage')) + '</button>' +
+            '<button type="button" class="inv-act san" data-inv-action="san" data-peer="' + _esc(pid) + '"' + (dead ? ' disabled' : '') + '>🧠 ' + _esc(_t('keeper.inv.actSan')) + '</button>' +
+            '<button type="button" class="inv-note-btn" data-inv-note="' + _esc(inv.characterName || '') + '" title="' + _esc(_t('keeper.inv.noteTitle')) + '">📝</button>' +
+          '</div>' +
         '</div>' +
-        '<div class="inv-card-bars">' +
-          '<div class="inv-bar hp"><div class="inv-bar-fill" style="width:' + hpPct + '%"></div></div>' +
-          '<div class="inv-bar san"><div class="inv-bar-fill" style="width:' + sanPct + '%"></div></div>' +
-          '<div class="inv-bar mp"><div class="inv-bar-fill" style="width:' + mpPct + '%"></div></div>' +
-        '</div>' +
-        (conditions.length
-          ? '<div class="inv-card-conditions">' + conditions.map(function (co) {
-              return '<span class="inv-cond-chip">' + _esc(co) + '</span>';
-            }).join('') + '</div>'
-          : '') +
-        ((attrsHtml || skillsHtml)
-          ? '<details class="inv-card-detail">' +
-              '<summary>Atributos &amp; Perícias</summary>' +
-              (attrsHtml  ? '<div class="inv-detail-sec"><h5>Atributos</h5>' + attrsHtml  + '</div>' : '') +
-              (skillsHtml ? '<div class="inv-detail-sec"><h5>Perícias</h5>'  + skillsHtml + '</div>' : '') +
-            '</details>'
-          : '') +
       '</div>';
     }).join('');
   }

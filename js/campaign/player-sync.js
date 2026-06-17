@@ -19,6 +19,52 @@ window.CoC.campaign = window.CoC.campaign || {};
   var _snapTimer  = null;
 
   var _ATTR_ORDER = ['FOR', 'CON', 'TAM', 'DES', 'APA', 'INT', 'POD', 'EDU', 'Sorte'];
+
+  // Retrato miniaturizado para o painel do Mestre (aditivo, retrocompat).
+  // Computado uma vez e cacheado; refeito apenas quando portraitId mudar.
+  var _portraitCache   = { id: null, data: null };
+  var _portraitFetching = false;
+
+  function _downscaleDataURI(dataURI, maxDim, cb) {
+    var img = new Image();
+    img.onload = function () {
+      var w = img.naturalWidth, h = img.naturalHeight;
+      if (!w || !h || (w <= maxDim && h <= maxDim)) { cb(dataURI); return; }
+      var ratio = Math.min(maxDim / w, maxDim / h);
+      var nw = Math.round(w * ratio), nh = Math.round(h * ratio);
+      var canvas = document.createElement('canvas');
+      canvas.width = nw; canvas.height = nh;
+      var ctx = canvas.getContext('2d');
+      if (!ctx) { cb(dataURI); return; }
+      ctx.drawImage(img, 0, 0, nw, nh);
+      try { cb(canvas.toDataURL('image/jpeg', 0.75)); } catch (e) { cb(dataURI); }
+    };
+    img.onerror = function () { cb(null); };
+    img.src = dataURI;
+  }
+
+  function _schedulePortraitFetch(portraitId) {
+    if (_portraitFetching) return;
+    _portraitFetching = true;
+    var mp = window.CoC && window.CoC.mediaPicker;
+    if (!mp || !mp.blobIdToDataURI) { _portraitFetching = false; return; }
+    mp.blobIdToDataURI(portraitId).then(function (dataURI) {
+      if (!dataURI) {
+        _portraitFetching = false;
+        _portraitCache = { id: portraitId, data: null };
+        return;
+      }
+      _downscaleDataURI(dataURI, 128, function (mini) {
+        _portraitFetching = false;
+        _portraitCache = { id: portraitId, data: mini };
+        _broadcastStatus(); // rebroadcast agora que o retrato está pronto
+      });
+    }).catch(function () {
+      _portraitFetching = false;
+      _portraitCache = { id: portraitId, data: null };
+    });
+  }
+
   // Flags booleanas de condição em c.status → rótulos para o painel do Mestre.
   var _CONDITION_FLAGS = {
     majorWound:  'Ferimento Grave',
@@ -198,6 +244,12 @@ window.CoC.campaign = window.CoC.campaign || {};
       if (v != null) skillsOut[name] = Number(v) || 0;
     });
 
+    // Retrato: envia o miniatura cacheada quando disponível; dispara fetch se portraitId mudou.
+    var portraitId = inv.portraitId || null;
+    if (portraitId && _portraitCache.id !== portraitId) {
+      _schedulePortraitFetch(portraitId);
+    }
+
     var ontology = window.CoC.campaign && window.CoC.campaign.ontology;
     var statusPayload = {
       // Prefere o nome ATUAL da ficha (vivo) sobre o _playerName capturado no join
@@ -216,7 +268,10 @@ window.CoC.campaign = window.CoC.campaign || {};
         armor:      Number(st.armor) || 0,
         conditions: conditions,
         attrs:      attrsOut,
-        skills:     skillsOut
+        skills:     skillsOut,
+        // Campos aditivos (clientes antigos os omitem → keeper cai no fallback).
+        occupation: inv.occupation || '',
+        portrait:   (portraitId && _portraitCache.id === portraitId) ? _portraitCache.data : null
       }
     };
     var statusEvt = ontology
