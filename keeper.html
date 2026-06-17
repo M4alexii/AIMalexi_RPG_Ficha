@@ -60,14 +60,16 @@
       <div class="sheet-handle" aria-hidden="true"></div>
       <div class="sheet-title">Ações do Guardião</div>
 
+      <div class="sheet-group-label" aria-label="Grupo Dados">Dados</div>
       <div class="sheet-group">
         <button id="btn-import" class="btn-ghost" title="Importar biblioteca JSON"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-pasta"></use></svg> Importar</button>
         <button id="btn-export" class="btn-export" title="Exportar biblioteca completa como JSON (BACKUP)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-baixar"></use></svg> Exportar</button>
         <button id="btn-print" class="btn-ghost" title="Imprimir / PDF"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-impressora"></use></svg> PDF</button>
-        <a href="compendium.html" class="btn btn-ghost" title="Compêndio de Regras"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-livros"></use></svg> Compêndio</a>
       </div>
 
+      <div class="sheet-group-label" aria-label="Grupo Sistema">Sistema</div>
       <div class="sheet-group">
+        <a href="compendium.html" class="btn btn-ghost" title="Compêndio de Regras"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-livros"></use></svg> Compêndio</a>
         <button id="btn-keeper-tour" class="btn-ghost" title="Rever o tour guiado do Guardião"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-ajuda"></use></svg> Tour</button>
         <button id="btn-settings" class="btn-ghost" title="Central de Configurações"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-engrenagem"></use></svg> Configurações</button>
       </div>
@@ -151,14 +153,25 @@
   <!-- Estado: campanha ativa (dashboard) -->
   <div class="campaign-dashboard" id="campaign-dashboard" style="display:none">
 
-    <!-- Painel dos Investigadores -->
+    <!-- KPIs reativos da mesa -->
+    <div class="inv-kpis" id="investigators-kpis"></div>
+
+    <!-- Ordenação do roster -->
+    <div class="inv-toolbar" id="investigators-sort">
+      <span class="inv-toolbar-lbl" data-i18n="keeper.inv.sort">Ordenar</span>
+      <button class="inv-sort-chip on" type="button" data-sort="perigo" data-i18n="keeper.inv.sortDanger">Por perigo</button>
+      <button class="inv-sort-chip" type="button" data-sort="nome" data-i18n="keeper.inv.sortName">Por nome</button>
+      <button class="inv-sort-chip" type="button" data-sort="online" data-i18n="keeper.inv.sortOnline">Online primeiro</button>
+    </div>
+
+    <!-- Painel dos Investigadores (roster em cards ricos) -->
     <div class="investigators-strip" id="investigators-strip">
       <div class="is-header">
-        <span class="is-title">Investigadores</span>
+        <span class="is-title" data-i18n="keeper.inv.title">Investigadores</span>
         <span class="is-count" id="is-count">0 conectados</span>
       </div>
       <div class="investigators-cards" id="investigators-cards">
-        <div class="inv-card-empty">Aguardando investigadores...</div>
+        <div class="inv-card-empty" data-i18n="keeper.inv.waiting">Aguardando investigadores...</div>
       </div>
     </div>
 
