@@ -13,104 +13,102 @@ window.CoC.keeperTour = window.CoC.keeperTour || {};
   "use strict";
 
   var tourId = "keeper-v1";
+
+  // Helper: clica a aba correta pelo atributo data-ktab.
+  function _goTab(name) {
+    var btn = document.querySelector('.keeper-tab[data-ktab="' + name + '"]');
+    if (btn) btn.click();
+  }
+
   var tourSteps = [
     {
       target: null,
       title: "Bem-vindo, Mestre!",
-      body: "Esta ferramenta ajuda a gerenciar criaturas, NPCs, inventário " +
+      body: "Esta ferramenta ajuda a gerenciar criaturas, NPCs, investigadores " +
             "e combate em tempo real durante suas sessões de Chamado de Cthulhu. " +
-            "Vamos fazer um tour rápido de 5 minutos para você dominar a interface."
+            "Vamos fazer um tour rápido para você dominar a interface."
     },
     {
       target: ".keeper-overview",
       title: "📊 Dashboard Executivo",
       body: "Aqui você vê métricas da campanha: investigadores vivos, sanidade média, " +
-            "criaturas em campo, timeline de eventos. Útil para manter tudo sob controle " +
+            "alertas e timeline de eventos. Útil para manter tudo sob controle " +
             "sem abrir múltiplos painéis.",
       before: function () {
-        document.body.setAttribute("data-tab", "visao-geral");
+        _goTab("investigadores");
       }
     },
     {
-      target: ".library-list",
+      target: "#investigators-kpis",
+      title: "🕵️ Painel de Investigadores",
+      body: "Status em tempo real de cada investigador: Vida, Sanidade, Magia e Sorte. " +
+            "Os KPIs no topo mostram quantos estão vivos, em surto ou mortos. " +
+            "Investigue o perigo mais grave primeiro — o painel ordena por risco.",
+      before: function () {
+        _goTab("investigadores");
+      }
+    },
+    {
+      target: "#library-list",
       title: "📚 Biblioteca de Criaturas",
       body: "Seu banco de dados de NPCs e criaturas. Clique para carregar uma criatura, " +
-            "edite nome/tipo, ou crie novos com o botão +. Busque por nome para encontrar rápido durante o jogo."
+            "edite nome/tipo, ou crie novos com o botão +. Busque por nome para encontrar rápido durante o jogo.",
+      before: function () {
+        _goTab("npcs");
+      }
     },
     {
       target: ".workspace",
       title: "🎭 Espaço de Trabalho",
-      body: "A criatura ativa aparece aqui. <b>Modo Simples</b> mostra HP, ataques, " +
-            "perícias essenciais. <b>Clique [Modo Completo]</b> para editar todos os dados."
-    },
-    {
-      target: ".simple-stats",
-      title: "⚔️ Modo Simples — Ao Vivo",
-      body: "Tudo que você precisa em combate: FOR/AGL/PV/ataques. Sem rolagem, sem confusão. " +
-            "Clique em qualquer valor para rolar D100 direto."
-    },
-    {
-      target: ".stat-tile.tracker.pv",
-      title: "❤️ Tracker de Pontos de Vida",
-      body: "Siga a vida da criatura em tempo real. Clique ± para ajustar. " +
-            "Ferimentos graves e morte são <b>detectados automaticamente</b>."
-    },
-    {
-      target: '[data-tab="combate"]',
-      title: "⚔️ Aba de Combate",
-      body: "Armadura, iniciativa, armas, esquiva. Tudo organizado para combate rápido. " +
-            "Marque ferimentos graves, inconsciente, morrendo — tudo sincronizado com a ficha.",
+      body: "A criatura ativa aparece aqui. <b>Modo Simples</b> mostra atributos, ataques " +
+            "e perícias essenciais. Clique <b>Editar</b> para o Modo Completo com todos os dados.",
       before: function () {
-        var tab = document.querySelector('[data-tab="combate"]');
-        if (tab) tab.click();
-      }
-    },
-    {
-      target: ".attack-card:first-of-type",
-      title: "🗡️ Ataques Rápidos",
-      body: "Clique para rolar ataque. Resultado aparece no log. Modificadores aplicam automaticamente."
-    },
-    {
-      target: '[data-tab="diario"]',
-      title: "📖 Diário de Sessão",
-      body: "Registre eventos, pistas, revelações. Suporta markdown e [[wikilinks]] " +
-            "para conectar notas. Tudo searchable e exportável.",
-      before: function () {
-        var tab = document.querySelector('[data-tab="diario"]');
-        if (tab) tab.click();
+        _goTab("npcs");
       }
     },
     {
       target: ".encounter-panel",
-      title: "🎲 Rastreador de Encontro",
-      body: "Adicione criaturas ao encontro ativo. Mostra round counter e iniciativa. " +
-            "Clique uma criatura para colocá-la no topo da ordem de ação."
+      title: "⚔️ Rastreador de Encontro",
+      body: "Adicione criaturas ao encontro ativo. Mostra contador de rounds e ordem de ação. " +
+            "Clique uma criatura para colocá-la no topo da iniciativa.",
+      before: function () {
+        _goTab("encontro");
+      }
     },
     {
       target: ".enc-round-bar",
       title: "📍 Contador de Rounds",
-      body: "Avança cada turno/round. Mostra quem é a vez e a ordem de ação. " +
-            "Reseta após combate terminar."
+      body: "Avança cada turno/round. <b>Iniciativa</b> ordena automaticamente por DES. " +
+            "Reinicia após o combate terminar.",
+      before: function () {
+        _goTab("encontro");
+      }
     },
     {
       target: "#roll-log",
       title: "📜 Log de Sessão",
-      body: "Timeline de rolagens, dano, sanidade, eventos. Filtrável por tipo. " +
-            "Exportável para relato de campanha ou compartilhamento com players."
-    },
-    {
-      target: "#btn-settings",
-      title: "⚙️ Configurações",
-      body: "Mude tema, acessibilidade, redução de movimento. Suas preferências salvam automaticamente. " +
-            "Também temos efeitos de insanidade visuais — configure aqui!"
-    },
-    {
-      target: ".campaign-badge",
-      title: "🔗 Modo Campanha (Multiplayer)",
-      body: "Convide investigadores via PIN. Sincroniza em tempo real. " +
-            "Mestres sempre têm autoridade final (ações sagradas só de mestre).",
+      body: "Timeline de rolagens, dano, sanidade e eventos manuais. " +
+            "Exportável para relato de campanha ou compartilhamento com os jogadores.",
       before: function () {
-        document.body.setAttribute("data-tab", "visao-geral");
+        _goTab("timeline");
+      }
+    },
+    {
+      target: "#btn-overflow",
+      title: "⚙️ Ações & Configurações",
+      body: "Importe/exporte a biblioteca, gere PDF, acesse o Compêndio de Regras " +
+            "e ajuste tema, acessibilidade e efeitos visuais de insanidade.",
+      before: function () {
+        _goTab("investigadores");
+      }
+    },
+    {
+      target: "#btn-campaign",
+      title: "🔗 Modo Campanha (Multiplayer)",
+      body: "Convide investigadores via PIN. Sincroniza status em tempo real. " +
+            "Mestres sempre têm autoridade final sobre ações sagradas.",
+      before: function () {
+        _goTab("investigadores");
       }
     },
     {
@@ -118,7 +116,7 @@ window.CoC.keeperTour = window.CoC.keeperTour || {};
       title: "✅ Pronto para Mestrar!",
       body: "Você está equipado com tudo que precisa. Dúvidas? " +
             "Abra o <b>Compêndio</b> (→ Guia de Referência) ou releia este tutorial " +
-            "clicando em ❓ Tour no toolbar."
+            "clicando em <b>Tour</b> no menu de ações."
     }
   ];
 
