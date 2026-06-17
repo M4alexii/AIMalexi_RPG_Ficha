@@ -314,6 +314,19 @@ window.CoC.campaign = window.CoC.campaign || {};
       var ui = window.CoC && window.CoC.ui;
       if (ui && ui.toast) ui.toast('A campanha foi encerrada pelo Guardião.', { type: 'info', duration: 5000 });
     }
+    // Ajuste de vital enviado pelo Guardião: aplica na ficha do jogador.
+    if (event.type === 'KEEPER_VITALS_ADJUST' && event.targetPeerId === _tp.getPeerId()) {
+      var executor = window.CoC && window.CoC.core && window.CoC.core.executor;
+      var actions  = window.CoC && window.CoC.actions;
+      if (!executor || !actions) return;
+      var amt = Number(event.amount) || 0;
+      if (amt <= 0) return;
+      if (event.kind === 'dano') {
+        executor.execute(actions.applyDamage(amt, 'keeper'));
+      } else if (event.kind === 'san') {
+        executor.execute(actions.loseSanity(amt, 'keeper'));
+      }
+    }
   }
 
   // ── Bus listener para broadcast de trace events ─────────────────────────────

@@ -1189,6 +1189,48 @@
     startBoot();
   }
 
+  // API pública: permite que keeper-dashboard.js adicione investigadores ao tracker
+  // e sincronize o PV quando o Guardião aplica dano no painel de campanha.
+  window.CoC = window.CoC || {};
+  window.CoC.keeper = {
+    addInvestigatorToEncounter: function (inv) {
+      if (!inv || !inv.peerId) return;
+      if (state.encounter.some(function (e) { return e.peerId === inv.peerId; })) {
+        toast('"' + escapeHtml(inv.characterName || inv.playerName || '?') + '" já está no encontro.', { type: 'info' });
+        return;
+      }
+      var s   = inv.status || {};
+      var dex = (s.attrs && Number(s.attrs.DES)) || 0;
+      var entry = {
+        id:          _encId(),
+        peerId:      inv.peerId,
+        name:        inv.characterName || inv.playerName || '?',
+        hpCur:       Number(s.hp)    || 0,
+        hpMax:       Number(s.hpMax) || 1,
+        mov:         (s.attrs && s.attrs.MOV) ? String(s.attrs.MOV) : '—',
+        armor:       Number(s.armor) || 0,
+        sanLoss:     '—',
+        dex:         dex,
+        ammo:        null,
+        majorWound:  false,
+        type:        'investigador',
+        sourceId:    null,
+        dead:        (Number(s.hp) || 0) <= 0
+      };
+      state.encounter.push(entry);
+      renderEncounter();
+      toast('"' + escapeHtml(entry.name) + '" adicionado ao encontro.', { type: 'success' });
+    },
+    syncInvestigatorHP: function (peerId, hp, hpMax) {
+      var enc = state.encounter.find(function (e) { return e.peerId === peerId; });
+      if (!enc) return;
+      enc.hpCur = Number(hp) || 0;
+      if (hpMax != null) enc.hpMax = Number(hpMax) || enc.hpMax;
+      enc.dead = enc.hpCur <= 0;
+      renderEncounter();
+    }
+  };
+
 })();
 
 /* ═════════════════════════════════════════════════════════════════════════

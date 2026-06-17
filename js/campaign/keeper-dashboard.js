@@ -56,6 +56,7 @@ window.CoC.campaign = window.CoC.campaign || {};
       'keeper.inv.actOpen': 'Abrir ficha',
       'keeper.inv.actDamage': 'Dano',
       'keeper.inv.actSan': 'Perda SAN',
+      'keeper.inv.actEncounter': 'Encontro',
       'keeper.inv.noteTitle': 'Abrir/criar nota do Guardião sobre este investigador'
     });
     i18n.addDict('en', {
@@ -89,6 +90,7 @@ window.CoC.campaign = window.CoC.campaign || {};
       'keeper.inv.actOpen': 'Open sheet',
       'keeper.inv.actDamage': 'Damage',
       'keeper.inv.actSan': 'SAN loss',
+      'keeper.inv.actEncounter': 'Encounter',
       'keeper.inv.noteTitle': "Open/create the Keeper's note about this investigator"
     });
   })();
@@ -313,6 +315,11 @@ window.CoC.campaign = window.CoC.campaign || {};
           characterName: event.characterName || '?',
           status:        st
         });
+        // Atualiza PV no tracker de encontro se este investigador estiver nele.
+        var kApi = window.CoC && window.CoC.keeper;
+        if (kApi && kApi.syncInvestigatorHP) {
+          kApi.syncInvestigatorHP(event.peerId, st.hp, st.hpMax);
+        }
         break;
       }
 
@@ -589,13 +596,16 @@ window.CoC.campaign = window.CoC.campaign || {};
         if (inv) _openFichaModal(inv);
       } else if (action === 'dano' || action === 'san') {
         _localAdjust(peerId, action);
+      } else if (action === 'encontro') {
+        var invEnc = (_cs.getState().investigators || {})[peerId];
+        var kApi = window.CoC && window.CoC.keeper;
+        if (invEnc && kApi && kApi.addInvestigatorToEncounter) {
+          kApi.addInvestigatorToEncounter(invEnc);
+        }
       }
     });
   }
 
-  // Dano / Perda SAN: AJUSTE LOCAL/VISUAL no painel do Guardião. Não há canal
-  // Guardião→jogador; rolagem por crypto (CoC.dice), nunca Math.random.
-  // TODO: propagar ao jogador quando existir um canal de escrita Guardião→jogador.
   function _localAdjust(peerId, kind) {
     var inv = (_cs.getState().investigators || {})[peerId];
     if (!inv) return;
@@ -607,6 +617,20 @@ window.CoC.campaign = window.CoC.campaign || {};
     else                 s.san = Math.max(0, (Number(s.san) || 0) - amt);
     _cs.upsertInvestigator(peerId, { status: s });   // re-render síncrono via subscribe
     _floatNumber(peerId, kind, '-' + amt);
+
+    // Propaga ao investigador via canal de campanha (KEEPER_VITALS_ADJUST).
+    if (_tp && _cs.getState().connected) {
+      var adjEvt = _ontology
+        ? _ontology.make('KEEPER_VITALS_ADJUST', { targetPeerId: peerId, kind: kind, amount: amt })
+        : { type: 'KEEPER_VITALS_ADJUST', targetPeerId: peerId, kind: kind, amount: amt };
+      _tp.broadcast(adjEvt);
+    }
+
+    // Mantém o tracker de encontro sincronizado se o investigador estiver nele.
+    if (kind === 'dano') {
+      var kApi = window.CoC && window.CoC.keeper;
+      if (kApi && kApi.syncInvestigatorHP) kApi.syncInvestigatorHP(peerId, s.hp, s.hpMax);
+    }
   }
 
   function _floatNumber(peerId, kind, txt) {
@@ -749,6 +773,7 @@ window.CoC.campaign = window.CoC.campaign || {};
             '<button type="button" class="inv-act ficha" data-inv-action="ficha" data-peer="' + _esc(pid) + '">⛶ ' + _esc(_t('keeper.inv.actOpen')) + '</button>' +
             '<button type="button" class="inv-act dano" data-inv-action="dano" data-peer="' + _esc(pid) + '"' + (dead ? ' disabled' : '') + '>🩸 ' + _esc(_t('keeper.inv.actDamage')) + '</button>' +
             '<button type="button" class="inv-act san" data-inv-action="san" data-peer="' + _esc(pid) + '"' + (dead ? ' disabled' : '') + '>🧠 ' + _esc(_t('keeper.inv.actSan')) + '</button>' +
+            '<button type="button" class="inv-act enc" data-inv-action="encontro" data-peer="' + _esc(pid) + '">⚔ ' + _esc(_t('keeper.inv.actEncounter')) + '</button>' +
             '<button type="button" class="inv-note-btn" data-inv-note="' + _esc(inv.characterName || '') + '" title="' + _esc(_t('keeper.inv.noteTitle')) + '">📝</button>' +
           '</div>' +
         '</div>' +

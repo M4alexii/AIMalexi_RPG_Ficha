@@ -38,6 +38,11 @@ window.CoC.campaign = window.CoC.campaign || {};
     // seqNo:   monotonic counter per investigator session — enables loss detection
     // eventId: peerId + ':' + seqNo — deduplication key for Supabase at-least-once delivery
     EXECUTION_TRACE:     { domain: 'trace',   requiredFields: ['characterName', 'playerName', 'entry', 'seqNo', 'eventId'] },
+
+    // ── Canal Guardião → Investigador ────────────────────────────────────────
+    // Ajuste de vitais iniciado pelo Guardião (dano/perda SAN aplicados na ficha).
+    // targetPeerId filtra o destinatário; outros jogadores ignoram o evento.
+    KEEPER_VITALS_ADJUST: { domain: 'keeper', requiredFields: ['targetPeerId', 'kind', 'amount'] },
   };
 
   // ── validate(type, payload) → { ok, errors[] } ────────────────────────────
