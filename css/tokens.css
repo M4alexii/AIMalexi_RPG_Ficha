@@ -1,0 +1,53 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   AIMalexi RPG · tokens.css
+   Fundação de tokens — importado ANTES de theme.css.
+
+   theme.css já traz a maior parte da camada de tokens (superfícies semânticas,
+   grid de espaçamento --space-*, --content-max, font-size fluido no body, escala
+   --text-*/--fs-nav). Este arquivo COMPLEMENTA com o que faltava e NÃO duplica:
+
+   1) Eixos de cor de vitais (PV/Sanidade/Magia) — semânticos e FIXOS (independem
+      do tema, assim como --blood/--mist já são). Usados pelo painel de
+      investigadores (eixo de cor por faixa) e replicados do protótipo de mesa.
+   2) Escala tipográfica fluida nomeada (--fs-h1..--fs-meta) para resolver
+      tamanhos pequenos em telas grandes sem tocar componente a componente.
+
+   REGRA DE UPPERCASE: text-transform:uppercase só é permitido em --fs-label e em
+   títulos de seção. Proibido em texto corrido, nomes e itens longos.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* === Eixos de cor de vitais (4 faixas: full → hurt → bad → crit) === */
+  /* PV / Vida — eixo físico (verde → dourado → laranja → vermelho) */
+  --hp-full:  #74a23f;
+  --hp-hurt:  #c9a84c;
+  --hp-bad:   #d27a2e;
+  --hp-crit:  #cf4332;
+
+  /* Sanidade — eixo da mente (lúcido → roxo → bordô-myth) */
+  --san-full: #7f9dc0;
+  --san-hurt: #9a6ab5;
+  --san-bad:  #a8467a;
+  --san-crit: #c25a8a;
+
+  /* Magia — teal frio */
+  --mp-axis:  #4f9b8c;
+
+  /* Mythos / surto — bordô pulsante (destaque de Sanidade) */
+  --myth:        #8a3a5e;
+  --myth-bright: #c25a8a;
+  --myth-glow:   rgba(178, 77, 125, 0.40);
+
+  /* Estado terminal (morto) */
+  --dead:     #52523f;
+
+  /* === Escala tipográfica fluida nomeada ===
+     Complementa --text-*/--fs-nav já existentes. clamp() resolve telas grandes. */
+  --fs-h1:    clamp(1.6rem, 1.2rem + 1.6vw, 2.15rem);
+  --fs-h2:    clamp(1.3rem, 1.05rem + 1.0vw, 1.7rem);
+  --fs-h3:    clamp(1.08rem, 0.95rem + 0.5vw, 1.28rem);
+  --fs-nav:   clamp(0.9rem, 0.86rem + 0.2vw, 1rem);   /* ~1rem (alinha com theme.css) */
+  --fs-body:  0.95rem;
+  --fs-label: 0.8rem;
+  --fs-meta:  0.78rem;
+}

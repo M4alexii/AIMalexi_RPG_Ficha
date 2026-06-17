@@ -115,7 +115,8 @@
   font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--keeper-accent, var(--brass));
+  /* T-21 — bordô legível: --keeper-label é derivado por corSegura() (AA) em runtime */
+  color: var(--keeper-label, var(--keeper-accent-bright, var(--brass)));
   margin-bottom: 0.3rem;
 }
 .lore-card textarea { min-height: 110px; }
@@ -615,7 +616,7 @@
 .attacks-section h3 {
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: var(--keeper-accent-bright);
+  color: var(--keeper-label, var(--keeper-accent-bright));
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 0.4rem;
@@ -723,7 +724,7 @@
 .full-mode-section h3 {
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: var(--keeper-accent-bright);
+  color: var(--keeper-label, var(--keeper-accent-bright));
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 0.5rem;
@@ -752,7 +753,7 @@
 .encounter-panel h3 {
   font-family: var(--font-mono);
   font-size: var(--text-sm);
-  color: var(--keeper-accent-bright);
+  color: var(--keeper-label, var(--keeper-accent-bright));
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 0.5rem;
@@ -1822,7 +1823,7 @@
 .chat-author {
   font-family: var(--font-mono);
   font-size: 0.68rem;
-  text-transform: uppercase;
+  /* T-19 — nomes não vão em uppercase (texto próprio, não label) */
   letter-spacing: 0.03em;
   color: var(--brass-bright);
 }
@@ -2377,7 +2378,7 @@
 .session-entry-author {
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  text-transform: uppercase;
+  /* T-19 — nomes não vão em uppercase (texto próprio, não label) */
   letter-spacing: 0.04em;
   color: #8b6f47;
   margin-right: 0.6rem;

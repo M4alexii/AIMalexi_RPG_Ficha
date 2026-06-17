@@ -1190,3 +1190,39 @@
   }
 
 })();
+
+/* ═════════════════════════════════════════════════════════════════════════
+   T-21 · Legibilidade dos labels bordô (AA em todos os 13 temas + custom)
+   ───────────────────────────────────────────────────────────────────────
+   Os labels de seção em bordô (Lore, ATAQUES/PERÍCIAS, Encontro) usam
+   var(--keeper-label, …). Aqui derivamos --keeper-label do bordô-base contra o
+   fundo REAL do card via corSegura() — clareia em temas escuros, escurece em
+   claros — garantindo contraste WCAG AA (mesma função que alimenta o badge do
+   customizador). Recalcula ao trocar de tema (observa body[data-theme]).
+   ═════════════════════════════════════════════════════════════════════════ */
+(function () {
+  "use strict";
+  function hardenKeeperLabels() {
+    var tc = window.CoC && window.CoC.themeCustom;
+    if (!tc || typeof tc.corSegura !== "function") return;
+    var cs = getComputedStyle(document.body);
+    var bg = (cs.getPropertyValue("--bg-card") || "").trim();
+    // Base bordô legível do tema (terracota-vinho); fallback do protótipo.
+    var base = (cs.getPropertyValue("--keeper-accent-bright") || "").trim() || "#b06a55";
+    if (!/^#?[0-9a-f]{6}$/i.test(bg)) { // fundo não-hex → não dá p/ medir; mantém fallback CSS
+      document.body.style.removeProperty("--keeper-label");
+      return;
+    }
+    document.body.style.setProperty("--keeper-label", tc.corSegura(bg, base, 4.5));
+  }
+  function arm() {
+    hardenKeeperLabels();
+    new MutationObserver(hardenKeeperLabels)
+      .observe(document.body, { attributes: true, attributeFilter: ["data-theme"] });
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", arm);
+  } else {
+    arm();
+  }
+})();
