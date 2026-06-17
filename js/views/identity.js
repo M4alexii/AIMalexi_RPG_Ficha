@@ -67,6 +67,10 @@ window.CoC.views = window.CoC.views || {};
     if (occInput) {
       occInput.onchange = function() {
         c.investigator.occupation = occInput.value;
+        // Troca de ocupação: zera as perícias LIVRES escolhidas (pertenciam à
+        // ocupação anterior). As obrigatórias são derivadas de occ.skills a cada
+        // render, então não se perdem.
+        c.occupationSkills = [];
         var _sOcc = $s('#sidebar-occupation');
         if (_sOcc) _sOcc.textContent = c.investigator.occupation || '—';
         if (window.CoC.views.skills   && window.CoC.views.skills.render)   window.CoC.views.skills.render();
