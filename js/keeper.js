@@ -27,8 +27,9 @@
     mode: "simple",          // "simple" | "full"
     libraryTab: "all",       // "all" | "bestiary" | "saved"
     librarySearch: "",
-    encounter: [],           // criaturas no tracker {id, name, hp, hpMax, armor, sanLoss, type}
+    encounter: [],           // criaturas no tracker {id, name, hp, hpMax, armor, sanLoss, attacks, conditions, type}
     encounterRound: 1,       // contador de rounds do encontro ativo
+    encounterActiveId: null, // id da criatura "na vez" (por id — sobrevive a sort/remoção)
     rollHistory: []
   };
 
@@ -951,6 +952,11 @@
       armor: c.armor ?? 0,
       sanLoss: c.sanLoss ?? "—",
       dex: Number(c.stats?.dex) || 0,
+      db: c.derived?.db || "0",  // bônus de dano (string p/ dice.rollDamage resolver +DB)
+      attacks: Array.isArray(c.attacks)  // cópia defensiva — não muta state.active depois
+        ? c.attacks.map(a => ({ name: a.name, type: a.type, chance: Number(a.chance) || 0, damage: a.damage || "0", note: a.note || "" }))
+        : [],
+      conditions: { feridoGrave: false, inconsciente: false, morrendo: false, loucura: false },
       ammo: null,               // null = sem controle de munição; número = restante
       majorWound: false,
       type: c.type,
@@ -985,43 +991,90 @@
       return;
     }
 
+    const CONDS = [
+      { k: "feridoGrave",  label: "Ferido grave" },
+      { k: "inconsciente", label: "Inconsciente" },
+      { k: "morrendo",     label: "Morrendo" },
+      { k: "loucura",      label: "Loucura" }
+    ];
+
     state.encounter.forEach((e, idx) => {
       const ratio = e.hpMax > 0 ? Math.max(0, Math.min(1, e.hpCur / e.hpMax)) : 1;
       const pct   = Math.round(ratio * 100);
-      const hpCls = e.dead ? "hp-dead" : ratio > 0.5 ? "hp-good" : ratio > 0.25 ? "hp-warn" : "hp-crit";
-      const node = el("div", { class: "encounter-item" + (e.dead ? " dead" : "") });
+      const hpCls = e.dead ? "ec-hp-dead"
+                  : ratio > 0.66 ? "ec-hp-full"
+                  : ratio > 0.40 ? "ec-hp-hurt"
+                  : ratio > 0.20 ? "ec-hp-bad"
+                  : "ec-hp-crit";
+      const kind      = e.type === "mythos" ? "mythos" : (e.type === "investigador" ? "investigador" : "humano");
+      const kindLabel = kind === "mythos" ? "Mythos" : (kind === "investigador" ? "Investigador" : "Humano");
+      const isActive  = e.id === state.encounterActiveId && !e.dead;
+      const conds     = e.conditions || {};
+      const ferido    = !!conds.feridoGrave || !!e.majorWound;
+
+      const node = el("div", {
+        class: "enc-card kind-" + kind +
+          (e.dead ? " is-dead" : (isActive ? " is-active" : (state.encounterActiveId ? " is-inactive" : "")))
+      });
+      node.dataset.enc = String(idx);
+
+      const atksHTML = (e.attacks && e.attacks.length)
+        ? e.attacks.map((a, ai) =>
+            `<button class="ec-atk" data-enc="${idx}" data-op="atk" data-atk="${ai}" title="Rolar ataque: ${escapeHtml(a.name)}" aria-label="Rolar ataque ${escapeHtml(a.name)}">` +
+              `<span class="ec-atk-name">${escapeHtml(a.name)}</span>` +
+              `<span class="ec-atk-pct">${Number(a.chance) || 0}%</span>` +
+              `<span class="ec-atk-dmg">${escapeHtml(String(a.damage))}</span>` +
+            `</button>`
+          ).join("")
+        : `<p class="ec-no-atk">${kind === "investigador" ? "Use a ficha do jogador para ataques." : "Sem ataques cadastrados."}</p>`;
+
+      const condsHTML = CONDS.map(cd => {
+        const on = cd.k === "feridoGrave" ? ferido : !!conds[cd.k];
+        return `<button class="ec-cond${on ? " on" : ""}" data-enc="${idx}" data-op="cond" data-cond="${cd.k}" aria-pressed="${on}">${cd.label}</button>`;
+      }).join("");
+
       node.innerHTML = `
-        <div class="ei-head">
-          <span class="ei-name">${escapeHtml(e.name)}</span>
-          ${e.type ? `<span class="ei-type">${escapeHtml(String(e.type))}</span>` : ""}
+        <span class="ec-accent" aria-hidden="true"></span>
+        <span class="ec-float" id="ecfloat-${escapeHtml(e.id)}" aria-hidden="true"></span>
+        ${isActive ? '<span class="ec-turn">Na vez ⚔</span>' : ""}
+        <div class="ec-head">
+          <div class="ec-head-main">
+            <div class="ec-name">${escapeHtml(e.name)}</div>
+            ${e.type ? `<div class="ec-sub">${escapeHtml(String(e.type))}</div>` : ""}
+          </div>
+          <span class="ec-tag kind-${kind}">${kindLabel}</span>
+          <div class="ec-init" title="Destreza — ordem de iniciativa"><span class="ec-init-v">${Number(e.dex) || 0}</span><span class="ec-init-l">Inic</span></div>
         </div>
-        <div class="ei-hpbar" title="PV ${e.hpCur} de ${e.hpMax}">
-          <div class="ei-hpbar-fill ${hpCls}" style="width:${pct}%"></div>
-          <span class="ei-hp-label">${e.dead ? "💀 Morto" : `PV ${e.hpCur}<span class="ei-hp-max"> / ${e.hpMax}</span>`}</span>
+        <div class="ec-hpbar" title="PV ${e.hpCur} de ${e.hpMax}">
+          <div class="ec-hpbar-fill ${hpCls}${(!e.dead && ratio <= 0.20) ? " is-crit" : ""}" style="width:${pct}%"></div>
+          <span class="ec-hp-label">${e.dead ? "💀 Abatido" : `${e.hpCur}<span class="ec-hp-max"> / ${e.hpMax}</span>`}</span>
         </div>
-        <div class="ei-chips">
-          ${e.dex ? `<span class="ei-chip dex" title="Destreza (ordem de iniciativa)">⚡ ${Number(e.dex)}</span>` : ""}
-          <span class="ei-chip" title="Movimento">🏃 ${escapeHtml(String(e.mov))}</span>
-          <span class="ei-chip" title="Armadura">🛡 ${e.armor}</span>
-          <span class="ei-chip" title="Perda de Sanidade">🧠 ${escapeHtml(String(e.sanLoss))}</span>
-          ${e.ammo != null ? `<span class="ei-chip ${e.ammo <= 0 ? "ammo-empty" : "ammo"}" title="Munição restante — clique em 🔫 para gastar">🔫 ${e.ammo <= 0 ? "vazio" : e.ammo}</span>` : ""}
-          ${e.majorWound && !e.dead ? `<span class="ei-chip mw" title="Ferimento Grave — dano ≥ metade do PV máximo (teste de CON ou inconsciente)">🩸 Fer. Grave</span>` : ""}
+        <div class="ec-stats">
+          <div class="ec-stat"><span class="ec-stat-l">Mov</span><span class="ec-stat-v">${escapeHtml(String(e.mov))}</span></div>
+          <div class="ec-stat"><span class="ec-stat-l">Armadura</span><span class="ec-stat-v">${Number(e.armor) || 0}</span></div>
+          <div class="ec-stat"><span class="ec-stat-l">Dano+</span><span class="ec-stat-v">${escapeHtml(String(e.db || "0"))}</span></div>
+          <div class="ec-stat ec-stat-san"><span class="ec-stat-l">Perda SAN</span><span class="ec-stat-v">${escapeHtml(String(e.sanLoss))}</span></div>
         </div>
-        <div class="ei-controls">
-          <button data-enc="${idx}" data-op="-1" title="Tirar 1 PV">−1</button>
-          <button data-enc="${idx}" data-op="-X" title="Tirar X PV (número ou dado, ex: 1d6)">−X</button>
-          <button data-enc="${idx}" data-op="+1" title="Curar 1 PV">+1</button>
-          <button data-enc="${idx}" data-op="ammo" title="${e.ammo == null || e.ammo <= 0 ? "Definir munição" : "Gastar 1 munição (zera → redefine)"}">🔫</button>
-          <button data-enc="${idx}" data-op="kill" title="Alternar morto">💀</button>
-          <button data-enc="${idx}" data-op="remove" title="Remover do encontro">✕</button>
+        <div class="ec-atk-lbl">⚔ Ataques rápidos</div>
+        <div class="ec-attacks">${atksHTML}</div>
+        <div class="ec-controls">
+          <button class="ec-hpbtn minus" data-enc="${idx}" data-op="-1" title="Tirar 1 PV">−1</button>
+          <button class="ec-hpbtn dmg" data-enc="${idx}" data-op="dmg-open" title="Aplicar dano (número ou dado, ex: 1d6)">Dano</button>
+          <button class="ec-hpbtn plus" data-enc="${idx}" data-op="+1" title="Curar 1 PV">+1</button>
+          <button class="ec-hpbtn ico" data-enc="${idx}" data-op="ammo" title="${e.ammo == null || e.ammo <= 0 ? "Definir munição" : "Gastar 1 munição (zera → redefine)"}">🔫${e.ammo != null ? ` <span class="ec-ammo${e.ammo <= 0 ? " empty" : ""}">${e.ammo <= 0 ? "0" : e.ammo}</span>` : ""}</button>
+          <button class="ec-hpbtn ico" data-enc="${idx}" data-op="kill" title="Alternar abatido">💀</button>
+          <button class="ec-hpbtn ico" data-enc="${idx}" data-op="remove" title="Remover do encontro">✕</button>
         </div>
+        <div class="ec-dmg-field">
+          <input type="number" min="1" placeholder="dano (nº ou 1d6)" class="ec-dmg-input" aria-label="Quantidade de dano" />
+          <button class="ec-dmg-apply" data-enc="${idx}" data-op="dmg-apply">Aplicar</button>
+        </div>
+        <div class="ec-conds">${condsHTML}</div>
+        ${e.dead ? '<div class="ec-dead-overlay" aria-hidden="true">☠ ABATIDO</div>' : ""}
       `;
       list.appendChild(node);
     });
-
-    $$("[data-enc]", list).forEach(b => {
-      b.onclick = (e) => { e.stopPropagation(); adjustEncounter(parseInt(b.dataset.enc, 10), b.dataset.op); };
-    });
+    // Eventos: ligados por delegação única em bindEncounter (#encounter-list).
   }
 
   // Ordena o tracker em ordem de iniciativa (CoC 7e: DES decrescente; mortos no fim).
@@ -1040,31 +1093,107 @@
     if (op === "reset") state.encounterRound = 1;
     else state.encounterRound = Math.max(1, state.encounterRound + (op === "next" ? 1 : -1));
     const roundNum = $("#enc-round-num");
-    if (roundNum) roundNum.textContent = String(state.encounterRound);
+    if (roundNum) {
+      roundNum.textContent = String(state.encounterRound);
+      roundNum.classList.remove("tick"); void roundNum.offsetWidth; roundNum.classList.add("tick");
+    }
+    if (state.encounter.length) logRoll({ skill: `🕑 Round ${state.encounterRound}` });
   }
 
-  async function adjustEncounter(idx, op) {
+  // Número flutuante (dano/cura) + flash no card. Chamado APÓS renderEncounter,
+  // pois o re-render recria o nó #ecfloat (espelha keeper-dashboard _floatNumber).
+  function _encFloat(entryId, kind, txt) {
+    const node = document.getElementById("ecfloat-" + entryId);
+    if (node) {
+      node.textContent = txt;
+      node.className = "ec-float " + (kind === "heal" ? "heal" : "dmg");
+      void node.offsetWidth;
+      node.classList.add("go");
+      const card = node.closest(".enc-card");
+      if (card) {
+        const fc = kind === "heal" ? "flash-heal" : "flash-dmg";
+        card.classList.add(fc);
+        setTimeout(() => card.classList.remove(fc), 500);
+      }
+    }
+  }
+
+  // Rola um ataque rápido do card (d100 vs %, tiers, dano via dice — sem Math.random).
+  // Não auto-aplica dano: sem seleção de alvo no tracker inline, o Guardião clica
+  // "Dano" na vítima. Registra no console (roll-log).
+  function rollEncounterAttack(idx, atkIdx) {
+    const e = state.encounter[idx];
+    const a = e && e.attacks && e.attacks[atkIdx];
+    if (!a) return;
+    const chance = Number(a.chance) || 0;
+    const r = dice.rollD100(null);
+    const level = dice.classifyRoll(r.value, chance);
+    const hit = ["crit", "extreme", "hard", "regular"].includes(level);
+    let dmgStr = "(errou)";
+    if (hit) {
+      const impale = (level === "crit" || level === "extreme") &&
+        /espada|faca|adaga|empala|rifle|garra|mordida|tridente|lança|lâmina/i.test(a.name + " " + (a.note || ""));
+      const d = dice.rollDamage(a.damage || "0", e.db || "0", impale);
+      const diceStr = d.rolls.map(x => `(${x.dice.join("+")})`).join("+");
+      dmgStr = `${a.damage} → ${d.total}${impale ? " ⚡EMPALA" : ""} ${diceStr}`;
+    }
+    logRoll({ skill: `⚔ ${e.name} · ${a.name}`, target: chance, d100: r.value, level, dmg: dmgStr });
+  }
+
+  async function adjustEncounter(idx, op, arg) {
     const e = state.encounter[idx];
     if (!e) return;
-    if (op === "+1") e.hpCur = Math.min(e.hpMax, e.hpCur + 1);
-    else if (op === "-1") e.hpCur = Math.max(-10, e.hpCur - 1);
-    else if (op === "-X") {
-      const v = await prompt("Quanto deduzir?", { title: "Ajuste de PV" });
-      if (v == null || v.trim() === "") return;
-      const t = v.trim();
+    const wasDead = e.dead;
+    let floatKind = null, floatTxt = "";
+
+    if (op === "activate") {
+      if (!e.dead) state.encounterActiveId = e.id;
+      renderEncounter();
+      return;
+    } else if (op === "cond") {
+      e.conditions = e.conditions || {};
+      if (arg === "feridoGrave") {
+        // O chip exibe feridoGrave OU majorWound (auto, por dano ≥ metade do PV) —
+        // alterna o estado VISÍVEL em um clique e mantém os dois flags em sincronia.
+        const cur = !!(e.conditions.feridoGrave || e.majorWound);
+        e.conditions.feridoGrave = !cur;
+        e.majorWound = !cur;
+      } else {
+        e.conditions[arg] = !e.conditions[arg];
+      }
+      renderEncounter();
+      return;
+    } else if (op === "+1") {
+      if (e.hpCur < e.hpMax) { e.hpCur = Math.min(e.hpMax, e.hpCur + 1); floatKind = "heal"; floatTxt = "+1"; }
+    } else if (op === "-1") {
+      e.hpCur = Math.max(-10, e.hpCur - 1); floatKind = "dmg"; floatTxt = "−1";
+    } else if (op === "-X" || op === "dmg-apply") {
+      let t;
+      if (op === "dmg-apply") {
+        t = String(arg == null ? "" : arg).trim();
+      } else {
+        const v = await prompt("Quanto deduzir?", { title: "Ajuste de PV" });
+        t = v == null ? "" : v.trim();
+      }
+      if (t === "") { renderEncounter(); return; }
       let d = 0;
       if (/^-?\d+$/.test(t)) d = Math.abs(parseInt(t, 10));
       else { const r = dice.rollNotation(t); d = Math.abs(r.total); }
-      e.hpCur = Math.max(-10, e.hpCur - d);
-      // CoC 7e: dano único ≥ metade do PV máximo = Ferimento Grave.
-      if (e.hpMax > 0 && d >= e.hpMax / 2) {
-        e.majorWound = true;
-        toast(`⚠ Ferimento Grave! ${escapeHtml(e.name)} sofreu ${d} dano — ≥ metade do PV máximo (${e.hpMax}).`, { type: "warn", duration: 6000 });
+      if (d > 0) {
+        e.hpCur = Math.max(-10, e.hpCur - d);
+        // CoC 7e: dano único ≥ metade do PV máximo = Ferimento Grave.
+        if (e.hpMax > 0 && d >= e.hpMax / 2) {
+          e.majorWound = true;
+          if (e.conditions) e.conditions.feridoGrave = true;
+          toast(`⚠ Ferimento Grave! ${escapeHtml(e.name)} sofreu ${d} dano — ≥ metade do PV máximo (${e.hpMax}).`, { type: "warn", duration: 6000 });
+        }
+        floatKind = "dmg"; floatTxt = "−" + d;
+        logRoll({ skill: `🩸 ${e.name}`, dmg: `−${d} PV (${e.hpCur}/${e.hpMax})` });
       }
     } else if (op === "ammo") {
       if (e.ammo == null || e.ammo <= 0) {
         const v = await prompt("Munição inicial (vazio remove o controle):", { title: `Munição — ${e.name}` });
-        if (v == null) return;
+        if (v == null) { renderEncounter(); return; }
         const n = parseInt(v.trim(), 10);
         e.ammo = Number.isFinite(n) && n > 0 ? n : null;
       } else {
@@ -1072,10 +1201,12 @@
         if (e.ammo === 0) toast(`🔫 ${escapeHtml(e.name)} ficou sem munição — precisa recarregar.`, { type: "warn", duration: 4000 });
       }
     } else if (op === "kill") { e.dead = !e.dead; }
-    else if (op === "remove") { state.encounter.splice(idx, 1); }
+    else if (op === "remove") { state.encounter.splice(idx, 1); renderEncounter(); return; }
 
-    if (e && e.hpCur <= 0 && !e.dead) e.dead = true;
+    if (e.hpCur <= 0 && !e.dead) e.dead = true;
+    if (e.dead && !wasDead) logRoll({ skill: `💀 ${e.name} foi abatido`, level: "fumble" });
     renderEncounter();
+    if (floatKind) _encFloat(e.id, floatKind, floatTxt);
   }
 
   function updateEncounterHP(creature) {
@@ -1096,6 +1227,7 @@
       if (await confirm("Limpar todo o tracker de encontro?", { title: "Limpar encontro" })) {
         state.encounter = [];
         state.encounterRound = 1;
+        state.encounterActiveId = null;
         renderEncounter();
       }
     });
@@ -1103,6 +1235,52 @@
     $("#btn-round-next")?.addEventListener("click", () => setRound("next"));
     $("#btn-round-reset")?.addEventListener("click", () => setRound("reset"));
     $("#btn-enc-initiative")?.addEventListener("click", sortEncounterByInitiative);
+
+    // Delegação única no grid: ataques, controles de PV, condições, campo de dano
+    // inline e clique no corpo do card (= tornar "na vez"). Registrada 1×.
+    const listEl = $("#encounter-list");
+    if (listEl && !listEl._encDelegated) {
+      listEl._encDelegated = true;
+      listEl.addEventListener("click", (ev) => {
+        const opEl = ev.target.closest("[data-op]");
+        if (opEl) {
+          ev.stopPropagation();
+          const idx = parseInt(opEl.dataset.enc, 10);
+          const op  = opEl.dataset.op;
+          if (op === "atk") { rollEncounterAttack(idx, parseInt(opEl.dataset.atk, 10)); return; }
+          if (op === "dmg-open") {
+            const field = opEl.closest(".enc-card")?.querySelector(".ec-dmg-field");
+            if (field) {
+              field.classList.toggle("is-open");
+              if (field.classList.contains("is-open")) field.querySelector(".ec-dmg-input")?.focus();
+            }
+            return;
+          }
+          if (op === "cond")      { adjustEncounter(idx, "cond", opEl.dataset.cond); return; }
+          if (op === "dmg-apply") {
+            const inp = opEl.closest(".enc-card")?.querySelector(".ec-dmg-input");
+            adjustEncounter(idx, "dmg-apply", inp ? inp.value : "");
+            return;
+          }
+          adjustEncounter(idx, op);
+          return;
+        }
+        // Clique no corpo do card → tornar a criatura "na vez". Ignora campos
+        // interativos: o input de dano não tem data-op e re-renderizar fecharia o
+        // campo e tiraria o foco no meio da digitação.
+        if (ev.target.closest("input, textarea, select")) return;
+        const card = ev.target.closest(".enc-card");
+        if (card && card.dataset.enc != null) adjustEncounter(parseInt(card.dataset.enc, 10), "activate");
+      });
+      // Enter no campo de dano aplica.
+      listEl.addEventListener("keydown", (ev) => {
+        if (ev.key === "Enter" && ev.target.classList && ev.target.classList.contains("ec-dmg-input")) {
+          ev.preventDefault();
+          const card = ev.target.closest(".enc-card");
+          if (card) adjustEncounter(parseInt(card.dataset.enc, 10), "dmg-apply", ev.target.value);
+        }
+      });
+    }
   }
 
   // ═════════════════════════════════════════════════════════════════════
@@ -1201,6 +1379,7 @@
       }
       var s   = inv.status || {};
       var dex = (s.attrs && Number(s.attrs.DES)) || 0;
+      var invConds = (Array.isArray(s.conditions) ? s.conditions : []).map(function (x) { return String(x).toLowerCase(); });
       var entry = {
         id:          _encId(),
         peerId:      inv.peerId,
@@ -1211,6 +1390,14 @@
         armor:       Number(s.armor) || 0,
         sanLoss:     '—',
         dex:         dex,
+        db:          '0',
+        attacks:     [],   // armas do investigador não são sincronizadas — card aponta p/ a ficha
+        conditions:  {
+          feridoGrave:  invConds.some(function (c) { return /ferid|sangr/.test(c); }),
+          inconsciente: invConds.some(function (c) { return /inconsc/.test(c); }),
+          morrendo:     invConds.some(function (c) { return /morrend|moribund/.test(c); }),
+          loucura:      invConds.some(function (c) { return /loucura|insan|surto|fobia/.test(c); })
+        },
         ammo:        null,
         majorWound:  false,
         type:        'investigador',

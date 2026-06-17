@@ -804,108 +804,210 @@
 /* Grade de criaturas — preenche a largura da aba (antes: lista de 1 coluna). */
 .encounter-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 0.6rem;
   align-items: start;
 }
 
-.encounter-item {
+/* ── Card de combate (deck) ──────────────────────────────────────────────── */
+.enc-card {
+  position: relative;
+  overflow: hidden;
   background: var(--bg-card-hi);
   border: 1px solid var(--ink-faded);
-  border-left: 3px solid var(--keeper-accent);
-  border-radius: var(--radius);
-  padding: 0.55rem 0.65rem;
+  border-radius: var(--radius-lg);
+  padding: 0.7rem 0.75rem 0.6rem;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.5rem;
+  transition: transform var(--dur-base) var(--ease), box-shadow var(--dur-base) var(--ease),
+              filter var(--dur-base) var(--ease), opacity var(--dur-base) var(--ease);
 }
-.encounter-item.dead { opacity: 0.5; border-left-color: var(--ink-faded); }
-.encounter-item.dead .ei-name { text-decoration: line-through; }
+/* Faixa de acento por tipo (esquerda) */
+.enc-card .ec-accent {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  background: var(--brass);
+}
+.enc-card.kind-mythos       .ec-accent { background: var(--myth-bright); }
+.enc-card.kind-investigador .ec-accent { background: var(--mp-axis); }
+.enc-card.kind-mythos { border-color: color-mix(in srgb, var(--myth) 55%, var(--ink-faded)); }
 
-.ei-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.4rem; }
-.encounter-item .ei-name {
-  font-family: var(--font-serif);
-  font-size: 1rem;
-  line-height: 1.15;
-  color: var(--ink);
-  flex: 1;
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+/* Mythos respira (inquietação ambiente) quando não está ativo/abatido */
+.enc-card.kind-mythos:not(.is-active):not(.is-dead) { animation: ec-breathe 6s ease-in-out infinite; }
+
+/* Turno ativo: destaque; inativos recuam */
+.enc-card.is-active {
+  transform: translateY(-3px);
+  border-color: var(--brass);
+  box-shadow: 0 0 0 1px var(--brass), var(--shadow-2);
 }
-.ei-type {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--ink-faded);
-  background: var(--bg-deep);
-  border-radius: 999px;
-  padding: 0.1rem 0.45rem;
-  white-space: nowrap;
+.enc-card.kind-mythos.is-active {
+  border-color: var(--myth-bright);
+  box-shadow: 0 0 0 1px var(--myth-bright), 0 0 30px -8px var(--myth-glow), var(--shadow-2);
+}
+.enc-card.is-inactive { filter: saturate(0.6) brightness(0.92); opacity: 0.82; }
+.enc-card.is-dead { filter: saturate(0.15) brightness(0.7); opacity: 0.65; }
+
+.ec-turn {
+  position: absolute; top: 0; right: 0.8rem; z-index: 2;
+  font-family: var(--font-mono); font-size: 0.6rem; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  padding: 0.18rem 0.5rem 0.22rem; border-radius: 0 0 var(--radius) var(--radius);
+  background: var(--brass); color: var(--bg-deep);
+}
+.enc-card.kind-mythos .ec-turn { background: var(--myth-bright); color: #fff; }
+
+/* Cabeçalho */
+.ec-head { display: flex; align-items: flex-start; gap: 0.5rem; }
+.ec-head-main { flex: 1; min-width: 0; }
+.ec-name {
+  font-family: var(--font-serif); font-size: 1.05rem; line-height: 1.1; color: var(--ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.enc-card.is-dead .ec-name { text-decoration: line-through; }
+.ec-sub {
+  font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--ink-faded); margin-top: 0.15rem;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ec-tag {
+  font-family: var(--font-mono); font-size: 0.56rem; letter-spacing: 0.08em;
+  text-transform: uppercase; white-space: nowrap; align-self: center;
+  padding: 0.16rem 0.42rem; border-radius: var(--radius);
+  border: 1px solid var(--ink-faded); color: var(--ink-dim); background: var(--bg-deep);
+}
+.ec-tag.kind-mythos       { color: var(--myth-bright); border-color: color-mix(in srgb, var(--myth-bright) 50%, transparent); }
+.ec-tag.kind-investigador { color: var(--mp-axis); border-color: color-mix(in srgb, var(--mp-axis) 50%, transparent); }
+.ec-init { text-align: center; line-height: 1; align-self: center; }
+.ec-init-v { font-family: var(--font-serif); font-size: 1.3rem; color: var(--keeper-accent-bright, var(--brass-bright)); display: block; }
+.ec-init-l { font-family: var(--font-mono); font-size: 0.5rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faded); }
+
+/* Barra de PV (4 faixas) */
+.ec-hpbar {
+  position: relative; height: 1.3rem; background: var(--bg-deep);
+  border: 1px solid var(--ink-faded); border-radius: 999px; overflow: hidden;
+}
+.ec-hpbar-fill {
+  position: absolute; inset: 0 auto 0 0; height: 100%; border-radius: 999px;
+  transition: width 0.45s var(--ease), background 0.3s var(--ease);
+}
+.ec-hpbar-fill.ec-hp-full { background: var(--hp-full); }
+.ec-hpbar-fill.ec-hp-hurt { background: var(--hp-hurt); }
+.ec-hpbar-fill.ec-hp-bad  { background: var(--hp-bad); }
+.ec-hpbar-fill.ec-hp-crit { background: var(--hp-crit); }
+.ec-hpbar-fill.ec-hp-dead { background: var(--dead); }
+.ec-hpbar-fill.is-crit    { animation: ec-hp-crit-pulse 1s ease-in-out infinite; }
+.ec-hp-label {
+  position: relative; z-index: 1; display: block; text-align: center;
+  font-family: var(--font-mono); font-size: 0.76rem; font-weight: 700; line-height: 1.3rem;
+  color: var(--paper, #f0e6d2); text-shadow: 0 1px 2px rgba(0,0,0,0.65);
+}
+.ec-hp-max { font-weight: 400; opacity: 0.8; }
+
+/* Grade de 4 stats */
+.ec-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.3rem; }
+.ec-stat {
+  background: var(--bg-deep); border: 1px solid var(--ink-faded); border-radius: var(--radius);
+  padding: 0.3rem 0.2rem; text-align: center;
+}
+.ec-stat-l { font-family: var(--font-mono); font-size: 0.52rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-faded); display: block; }
+.ec-stat-v { font-family: var(--font-mono); font-size: 0.85rem; color: var(--ink); margin-top: 0.12rem; display: block; }
+.ec-stat-san .ec-stat-v { color: var(--myth-bright); }
+
+/* Ataques rápidos */
+.ec-atk-lbl { font-family: var(--font-mono); font-size: 0.56rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faded); }
+.ec-attacks { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.ec-atk {
+  display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer;
+  padding: 0.3rem 0.5rem; border-radius: var(--radius);
+  border: 1px solid var(--ink-faded); background: var(--bg-deep); color: var(--ink);
+  transition: border-color 0.15s var(--ease), background 0.15s var(--ease), transform 0.15s var(--ease);
+}
+.ec-atk:hover { border-color: var(--brass); transform: translateY(-1px); }
+.ec-atk-name { font-family: var(--font-serif); font-size: 0.85rem; }
+.ec-atk-pct  { font-family: var(--font-mono); font-size: 0.68rem; color: var(--brass-bright); }
+.ec-atk-dmg  { font-family: var(--font-mono); font-size: 0.62rem; color: var(--ink-dim); }
+.ec-no-atk   { font-size: var(--text-xs); color: var(--ink-faded); font-style: italic; margin: 0; }
+
+/* Controles de PV */
+.ec-controls { display: flex; gap: 0.25rem; padding-top: 0.45rem; border-top: 1px dashed var(--ink-faded); }
+.ec-hpbtn {
+  flex: 1; min-height: 36px; cursor: pointer;
+  border: 1px solid var(--ink-faded); border-radius: var(--radius); background: var(--bg-deep);
+  font-family: var(--font-mono); font-size: var(--text-xs); color: var(--ink);
+  transition: border-color 0.15s var(--ease), background 0.15s var(--ease), color 0.15s var(--ease);
+}
+.ec-hpbtn.ico { flex: 0 0 auto; padding: 0 0.5rem; }
+.ec-hpbtn.dmg { flex: 1.4; letter-spacing: 0.06em; color: var(--brass-bright); }
+.ec-hpbtn.minus:hover { border-color: var(--hp-crit); color: var(--hp-crit); }
+.ec-hpbtn.plus:hover  { border-color: var(--hp-full); color: var(--hp-full); }
+.ec-hpbtn.dmg:hover, .ec-hpbtn.ico:hover { border-color: var(--brass); background: var(--bg-card-hi); }
+.ec-ammo { color: var(--brass-bright); font-weight: 700; }
+.ec-ammo.empty { color: var(--hp-crit); }
+
+/* Campo de dano inline (abre ao clicar em "Dano") */
+.ec-dmg-field { display: none; gap: 0.3rem; }
+.ec-dmg-field.is-open { display: flex; }
+.ec-dmg-input {
+  flex: 1; min-width: 0; min-height: 36px; text-align: center;
+  background: var(--bg-deep); border: 1px solid var(--brass); border-radius: var(--radius);
+  color: var(--ink); font-family: var(--font-mono); font-size: 0.9rem;
+}
+.ec-dmg-input:focus { outline: none; border-color: var(--brass-bright); }
+.ec-dmg-apply {
+  min-height: 36px; padding: 0 0.7rem; cursor: pointer;
+  border: 1px solid var(--brass); border-radius: var(--radius);
+  background: var(--brass); color: var(--bg-deep); font-family: var(--font-mono); font-size: var(--text-xs);
 }
 
-/* Barra de PV com cor por faixa de vida */
-.ei-hpbar {
-  position: relative;
-  height: 1.2rem;
-  background: var(--bg-deep);
-  border-radius: 999px;
-  overflow: hidden;
+/* Chips de condição */
+.ec-conds { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.ec-cond {
+  cursor: pointer; font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.04em;
+  text-transform: uppercase; padding: 0.22rem 0.45rem; border-radius: var(--radius);
+  border: 1px solid var(--ink-faded); background: var(--bg-deep); color: var(--ink-faded);
+  transition: color 0.15s var(--ease), border-color 0.15s var(--ease), background 0.15s var(--ease);
 }
-.ei-hpbar-fill {
-  position: absolute;
-  inset: 0 auto 0 0;
-  height: 100%;
-  border-radius: 999px;
-  transition: width var(--dur-base) var(--ease);
-}
-.ei-hpbar-fill.hp-good { background: var(--ok, #5a8a5a); }
-.ei-hpbar-fill.hp-warn { background: var(--brass, #c89b3c); }
-.ei-hpbar-fill.hp-crit { background: var(--danger, #8b1a1a); }
-.ei-hpbar-fill.hp-dead { background: var(--ink-faded); }
-.ei-hp-label {
-  position: relative;
-  z-index: 1;
-  display: block;
-  text-align: center;
-  font-family: var(--font-mono);
-  font-size: 0.74rem;
-  font-weight: 700;
-  line-height: 1.2rem;
-  color: var(--paper, #f0e6d2);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
-}
-.ei-hp-max { font-weight: 400; opacity: 0.8; }
+.ec-cond:hover { color: var(--ink-dim); border-color: var(--ink-dim); }
+.ec-cond.on { color: var(--bg-deep); font-weight: 700; }
+.ec-cond.on[data-cond="feridoGrave"]  { background: var(--hp-bad);    border-color: var(--hp-bad); }
+.ec-cond.on[data-cond="inconsciente"] { background: var(--san-hurt);  border-color: var(--san-hurt); color: #fff; }
+.ec-cond.on[data-cond="morrendo"]     { background: var(--hp-crit);   border-color: var(--hp-crit); color: #fff; }
+.ec-cond.on[data-cond="loucura"]      { background: var(--myth);      border-color: var(--myth-bright); color: #fff; }
 
-.ei-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; }
-.ei-chip {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: var(--ink-dim);
-  background: var(--bg-deep);
-  border-radius: var(--radius);
-  padding: 0.12rem 0.4rem;
-}
-.ei-chip.dex        { color: var(--keeper-accent-bright, var(--brass-bright)); }
-.ei-chip.ammo-empty { color: var(--blood); font-weight: 700; }
-.ei-chip.mw {
-  color: var(--blood);
-  border: 1px solid var(--blood);
-  background: transparent;
+/* Overlay de abatido */
+.ec-dead-overlay {
+  position: absolute; inset: 0; display: grid; place-items: center; z-index: 3;
+  font-family: var(--font-mono); font-size: 0.95rem; font-weight: 700; letter-spacing: 0.25em;
+  color: var(--ink-dim); background: color-mix(in srgb, var(--bg-deep) 55%, transparent);
+  pointer-events: none;
 }
 
-.encounter-item .ei-controls {
-  display: flex;
-  gap: 0.2rem;
-  padding-top: 0.35rem;
-  border-top: 1px dashed var(--ink-faded);
+/* Número flutuante de dano/cura + flash */
+.ec-float {
+  position: absolute; left: 50%; top: 38%; transform: translateX(-50%); z-index: 8;
+  pointer-events: none; font-family: var(--font-serif); font-weight: 600; font-size: 2rem; opacity: 0;
 }
-.encounter-item .ei-controls button {
-  font-size: var(--text-xs);
-  padding: 0.22rem 0.3rem;
-  flex: 1;
+.ec-float.go  { animation: ec-floatup 1s ease-out; }
+.ec-float.dmg  { color: var(--hp-crit); }
+.ec-float.heal { color: var(--hp-full); }
+.enc-card.flash-dmg  { box-shadow: 0 0 0 1px var(--hp-crit), var(--shadow-2); }
+.enc-card.flash-heal { box-shadow: 0 0 0 1px var(--hp-full), var(--shadow-2); }
+
+@keyframes ec-breathe { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+@keyframes ec-hp-crit-pulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.4); } }
+@keyframes ec-floatup {
+  0%   { opacity: 0; transform: translate(-50%, 6px) scale(0.7); }
+  25%  { opacity: 1; transform: translate(-50%, -6px) scale(1.1); }
+  100% { opacity: 0; transform: translate(-50%, -42px) scale(1); }
+}
+#enc-round-num.tick { animation: ec-round-tick 0.45s ease; display: inline-block; }
+@keyframes ec-round-tick { 0% { transform: scale(1.4); color: var(--hp-full); } 100% { transform: scale(1); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .enc-card, .ec-hpbar-fill, .ec-float, .ec-accent, .ec-turn, #enc-round-num {
+    transition: none !important; animation: none !important;
+  }
 }
 
 /* Roll log no painel direito */
@@ -2114,13 +2216,10 @@
   border-color: var(--frame-line);
   box-shadow: inset 0 1px 0 rgba(232, 220, 196, 0.04), 0 6px 18px rgba(0, 0, 0, 0.3);
 }
-.encounter-item {
-  transition: box-shadow 0.15s, border-color 0.15s;
-}
-.encounter-item:hover {
+.enc-card:hover {
   box-shadow: inset 0 0 16px rgba(139, 26, 26, 0.08);
 }
-.encounter-item.dead { filter: grayscale(0.7); }
+.enc-card.is-dead { filter: grayscale(0.7); }
 
 /* ── Dashboard: KPIs como placas gravadas ───────────────────────────────── */
 .keeper-overview {
@@ -2265,11 +2364,11 @@
 .encounter-panel {
   background: linear-gradient(135deg, #282320 0%, #1f1b18 100%);
 }
-.encounter-item {
+.enc-card {
   background: #323037;
   border-color: #4a4540;
 }
-.encounter-item:hover {
+.enc-card:hover {
   background: #3a3640;
   box-shadow: inset 0 0 16px rgba(139, 26, 26, 0.12);
 }
