@@ -33,10 +33,17 @@ window.CoC.views = window.CoC.views || {};
   function _vitalCard(label, cur, max, cls) {
     var frac = (max != null) ? (cur + '<span class="ed-vital-max">/' + max + '</span>') : cur;
     var pct = (max && max > 0) ? Math.max(0, Math.min(100, (cur / max) * 100)) : 100;
+    // 6B: faixa de cor por % apenas para PV e SAN (PM/Sorte mantêm o acento).
+    var band = '';
+    if (max != null && max > 0 && (cls === 'pv' || cls === 'san')) {
+      var axis = (cls === 'san') ? 'san' : 'hp';
+      var lvl = pct <= 15 ? 'crit' : (pct <= 40 ? 'bad' : (pct <= 75 ? 'hurt' : 'full'));
+      band = ' ' + axis + '-' + lvl;
+    }
     return '<div class="ed-vital ' + cls + '">' +
       '<div class="ed-vital-label">' + label + '</div>' +
       '<div class="ed-vital-val">' + frac + '</div>' +
-      (max != null ? '<div class="ed-vital-bar"><i style="width:' + pct + '%"></i></div>' : '') +
+      (max != null ? '<div class="ed-vital-bar' + band + '"><i style="width:' + pct + '%"></i></div>' : '') +
     '</div>';
   }
 

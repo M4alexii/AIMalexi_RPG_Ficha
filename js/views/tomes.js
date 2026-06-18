@@ -70,9 +70,11 @@ window.CoC.views = window.CoC.views || {};
 
     if (tomes.length === 0) {
       list.appendChild(
-        el("p", { class: "tomes-empty" }, [
-          "Nenhum grimório. Use ", el("strong", {}, ["+ Adicionar Grimório"]), " para registrar tomos encontrados."
-        ])
+        window.CoC.ui.emptyState({
+          icon: "livros",
+          title: "Nenhum grimório ainda",
+          hint: 'Use <b>+ Adicionar Grimório</b> para registrar tomos encontrados.'
+        })
       );
       return;
     }

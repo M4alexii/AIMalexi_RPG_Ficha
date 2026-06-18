@@ -124,7 +124,9 @@
   /* — Texto (cor) — (distinto de --text-xs..xl, que são TAMANHOS) */
   --text-1:       var(--ink);       /* primário      */
   --text-2:       var(--ink-dim);   /* secundário    */
-  --text-3:       var(--ink-faded); /* terciário ≥3:1 */
+  /* terciário: piso de contraste WCAG AA ≥3:1 em qualquer tema, derivado do
+     texto secundário (sempre legível) misturado à superfície — resolve F-006 */
+  --text-3:       color-mix(in oklab, var(--ink-dim) 78%, var(--bg-card));
 
   /* — Bordas — */
   --border-1:     var(--line);      /* divisórias sutis */
@@ -151,6 +153,12 @@
   --shadow-1: 0 1px 2px rgba(0,0,0,.35);
   --shadow-2: 0 4px 12px rgba(0,0,0,.45);
   --shadow-3: 0 12px 32px rgba(0,0,0,.55);
+
+  /* — Elevação por hierarquia (reusa as sombras acima) — resolve F-012 — */
+  --elev-flat:    none;
+  --elev-card:    var(--shadow-1);
+  --elev-section: var(--shadow-2);
+  --elev-hero:    var(--shadow-3);
 
   /* — Camadas (z-index) — */
   --z-dropdown: 100;
@@ -186,6 +194,10 @@
 
   /* Controles nativos (checkbox/radio/range/progress) herdam o tema — resolve E4 */
   accent-color: var(--accent);
+
+  /* Consolidação tipográfica (F-010): aposenta Special Elite — micro-rótulos
+     passam a usar o mono. Alias mantém a compatibilidade dos componentes. */
+  --font-typewriter: var(--font-mono);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -808,8 +820,30 @@ label {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.5rem;
-  border-bottom: 1px dashed var(--ink-faded);
+  border-bottom: 1px solid var(--border-1); /* F-004: divisória estrutural sólida */
   padding-bottom: 0.4rem;
+}
+
+/* Mobília de log/chat — classes que substituem estilos inline (resolve F-001).
+   A cor do título usa --keeper-accent-bright quando presente (páginas do
+   Guardião) e cai para --brass na ficha do investigador. */
+.roll-log-title,
+.chat-title {
+  font-family: var(--font-serif);
+  color: var(--keeper-accent-bright, var(--brass));
+}
+.roll-log-actions { display: flex; gap: var(--space-1); }
+.roll-log-list { list-style: none; padding: 0; margin: 0; }
+
+/* Rodapé de navegação padrão das páginas (resolve F-001 + F-004 + F-006). */
+.app-footer {
+  text-align: center;
+  margin-top: var(--space-7);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-1);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-3);
 }
 
 /* Roll entry with stamp animation on new rolls */
@@ -1083,7 +1117,7 @@ label {
   margin-bottom: 1.25rem;
   padding: 0;
   list-style: none;
-  border-bottom: 1px dashed var(--ink-faded);
+  border-bottom: 1px solid var(--border-1); /* F-004: divisória estrutural sólida */
   overflow-x: auto;
   padding-bottom: 0.75rem;
 }
@@ -1128,7 +1162,7 @@ label {
   flex-wrap: wrap;
   padding: 0.5rem 0;
   margin-bottom: 1rem;
-  border-bottom: 1px dashed var(--ink-faded);
+  border-bottom: 1px solid var(--border-1); /* F-004: divisória estrutural sólida */
 }
 
 .toolbar-spacer { flex: 1; }

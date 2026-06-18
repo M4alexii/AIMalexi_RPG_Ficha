@@ -59,6 +59,39 @@ window.CoC.views = window.CoC.views || {};
   }
   let _search = "";
 
+  // ── Colapso de grupos (UI efêmera · localStorage, NÃO vai ao Store) ─────────
+  // F-009: categorias em accordions. O estado de colapso é de UI (não sobrevive
+  // como dado de ficha) → localStorage com o prefixo padrão do app.
+  const _COLLAPSE_KEY = "aimalexi-rpg/skills-collapsed";
+  let _collapsedCats = null;
+  function _loadCollapsed() {
+    if (_collapsedCats) return _collapsedCats;
+    _collapsedCats = new Set();
+    try {
+      const raw = localStorage.getItem(_COLLAPSE_KEY);
+      if (raw) JSON.parse(raw).forEach(c => _collapsedCats.add(c));
+    } catch (e) { /* sem localStorage: começa tudo expandido */ }
+    return _collapsedCats;
+  }
+  function _saveCollapsed() {
+    try { localStorage.setItem(_COLLAPSE_KEY, JSON.stringify([..._loadCollapsed()])); }
+    catch (e) { /* sem persistência: vale só nesta sessão */ }
+  }
+  function _isCollapsed(cat) { return _loadCollapsed().has(cat); }
+  function _toggleCollapsed(cat) {
+    const set = _loadCollapsed();
+    if (set.has(cat)) set.delete(cat); else set.add(cat);
+    _saveCollapsed();
+  }
+  // Cabeçalho-botão do accordion (ícone de chevron gira via CSS quando colapsado).
+  function _groupHeaderHTML(cat, label, count, collapsed) {
+    return `<button type="button" class="skill-group-toggle" data-cat="${escapeHtml(cat)}" aria-expanded="${collapsed ? "false" : "true"}">`
+      + `<span class="skill-group-name">${escapeHtml(label)}</span>`
+      + `<span class="skill-group-meta"><span class="skill-group-count">${count}</span>`
+      + `<svg class="icon skill-group-chevron" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-chevron-baixo"></use></svg></span>`
+      + `</button>`;
+  }
+
   // ── Helpers puros ─────────────────────────────────────────────────────────
 
   function _computeBaseValue(skill, attrs) {
@@ -141,7 +174,7 @@ window.CoC.views = window.CoC.views || {};
           enc.interacoes.map(x => `<span class="enc-tag">${escapeHtml(x)}</span>`).join("")
         }</div></div>`);
       }
-      if (enc.nota) parts.push(`<p class="enc-note">⚠ ${escapeHtml(enc.nota)}</p>`);
+      if (enc.nota) parts.push(`<p class="enc-note"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-alerta"></use></svg> ${escapeHtml(enc.nota)}</p>`);
     } else {
       // Fallback: usa metadados da definição base
       if (def && def.note) parts.push(`<p class="enc-desc">${escapeHtml(def.note)}</p>`);
@@ -280,8 +313,9 @@ window.CoC.views = window.CoC.views || {};
         (c.skills?.[name]?.fav ? 2 : 0) + (_sessionBoosted(name) ? 1 : 0);
       filtered.sort((a, b) => _rank(b.name) - _rank(a.name));
 
-      const group = el("div", { class: "skill-group" });
-      group.innerHTML = `<h3 class="skill-group-title">${escapeHtml(labels[cat] || cat)}</h3>`;
+      const isColl = !search && _isCollapsed(cat);
+      const group = el("div", { class: "skill-group" + (isColl ? " collapsed" : "") });
+      group.innerHTML = _groupHeaderHTML(cat, labels[cat] || cat, filtered.length, isColl);
       const inner = el("div", { class: "skills-list" });
       group.appendChild(inner);
 
@@ -337,8 +371,9 @@ window.CoC.views = window.CoC.views || {};
         (c.skills[b]?.fav ? 1 : 0) - (c.skills[a]?.fav ? 1 : 0));
 
       if (customFiltered.length > 0) {
-        const group = el("div", { class: "skill-group" });
-        group.innerHTML = `<h3 class="skill-group-title">Perícias Específicas</h3>`;
+        const isColl = !search && _isCollapsed("__custom__");
+        const group = el("div", { class: "skill-group" + (isColl ? " collapsed" : "") });
+        group.innerHTML = _groupHeaderHTML("__custom__", "Perícias Específicas", customFiltered.length, isColl);
         const inner = el("div", { class: "skills-list" });
         group.appendChild(inner);
 
@@ -393,8 +428,9 @@ window.CoC.views = window.CoC.views || {};
       occMissing.sort((a, b) => a.localeCompare(b, "pt-BR"));
 
       if (occMissing.length > 0) {
-        const group = el("div", { class: "skill-group" });
-        group.innerHTML = `<h3 class="skill-group-title">Perícias da Ocupação</h3>`;
+        const isColl = !search && _isCollapsed("__occ__");
+        const group = el("div", { class: "skill-group" + (isColl ? " collapsed" : "") });
+        group.innerHTML = _groupHeaderHTML("__occ__", "Perícias da Ocupação", occMissing.length, isColl);
         const inner = el("div", { class: "skills-list" });
         group.appendChild(inner);
 
@@ -454,7 +490,7 @@ window.CoC.views = window.CoC.views || {};
         style: { marginTop: "0.75rem", marginLeft: "0.5rem" },
         title: `${markedSkills.length} perícia(s) marcada(s) para evolução`,
         on: { click: () => _endOfSession() }
-      }, [`⭐ Fim de Sessão (${markedSkills.length} marcada${markedSkills.length > 1 ? "s" : ""})`]);
+      }, [`★ Fim de Sessão (${markedSkills.length} marcada${markedSkills.length > 1 ? "s" : ""})`]);
       container.appendChild(eosBtn);
     }
   }
@@ -539,6 +575,17 @@ window.CoC.views = window.CoC.views || {};
     container._skillsDelegated = true;
 
     container.addEventListener("click", (e) => {
+      // F-009: toggle do accordion de categoria (estado em localStorage).
+      const grpToggle = e.target.closest(".skill-group-toggle[data-cat]");
+      if (grpToggle) {
+        const cat = grpToggle.dataset.cat;
+        _toggleCollapsed(cat);
+        const nowColl = _isCollapsed(cat);
+        const grp = grpToggle.closest(".skill-group");
+        if (grp) grp.classList.toggle("collapsed", nowColl);
+        grpToggle.setAttribute("aria-expanded", nowColl ? "false" : "true");
+        return;
+      }
       const rollBtn = e.target.closest(".skill-roll[data-roll-skill]");
       if (rollBtn) {
         // Fronteira M3.4: não acoplamos diretamente ao rollSkill() de investigator.js

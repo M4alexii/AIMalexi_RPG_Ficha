@@ -5,6 +5,65 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-18 - Auditoria UX/Design System: remediação F-001…F-016
+
+Aplica os achados abertos/parciais do dossiê de auditoria de Produto/UX/UI/Design
+System. Re-baselinado contra o código: itens já resolvidos não foram refeitos
+(ex.: mini-md já renderiza headings/parágrafos; barra/chips do wizard já existiam;
+bottom-nav mobile e o offset do FAB de rolagem já estavam corretos).
+
+### Adicionado
+
+- **Fundação de tokens** (`theme.css`): `--text-3` agora deriva por `color-mix` do
+  texto secundário (piso de contraste WCAG AA ≥3:1 em qualquer tema · F-006);
+  escala de elevação `--elev-flat/card/section/hero` reaproveitando as sombras
+  existentes (F-012); alias `--font-typewriter → --font-mono` consolidando os
+  papéis tipográficos (F-010 · as famílias opcionais do criador de temas seguem
+  disponíveis).
+- **Ícone `ico-alerta`** no sprite local (único símbolo novo necessário · F-002).
+- **OG/Twitter + `description`** em `investigator.html` e `keeper.html`; `og:image`
+  passou de SVG para PNG; `theme-color` sincroniza com o tema ativo via JS (F-011).
+- **Perícias colapsáveis** (F-009): cada categoria é um accordion (estado em
+  `localStorage`, não no Store); o botão de dado se revela no hover/foco e fica
+  sempre visível com alvo ≥44px no toque; `hyphens:auto` evita corte no meio da
+  palavra.
+- **Wizard**: linha de progresso "Passo N de T · etapa" (F-008).
+- **Home** (`index.html`): bloco "Primeira vez? Comece aqui" como porta de entrada
+  do iniciante (liga F-005); a faixa redundante de ações rápidas saiu.
+- **Tour guiado da ficha** (F-005): reaproveita `guided-tour.js` — dispara após a
+  criação no assistente (auto-limitado por "já visto") e pode ser revisto em
+  "Mais → Tour guiado".
+
+### Alterado
+
+- **Emojis de UI → sprite** em cabeçalhos de painel e botões (F-002): Criar
+  Campanha, Pacote Padrão, Encontro, Timeline/Eventos, Log, Chat, Reativar, Copiar
+  log, Fechar e Alertas (keeper/investigator + estados vazios em JS). Emojis de
+  conteúdo do usuário e os ícones de condição/status (sistema iconográfico à parte)
+  foram preservados.
+- **Estilos inline → classes** na mobília de log/chat/rodapé (F-001): novas classes
+  `.roll-log-title`, `.chat-title`, `.roll-log-actions`, `.roll-log-list` e
+  `.app-footer` em `theme.css`.
+- **Empty-states universais** (F-016): Inventário, Magias, Tomos e Chat passam a
+  usar o componente padrão `CoC.ui.emptyState` (ícone + título + próximo passo).
+- **Tracejados estruturais → sólidos** (F-004): divisórias de toolbar, abas,
+  cabeçalhos e seções usam `1px solid var(--border-1)`; tracejado fica reservado a
+  campos editáveis, drop-zones e placeholders.
+- **Tooltips** (F-003): botões de toolbar migraram de `title=` para `data-tooltip`
+  (tooltip estilizado em hover e foco).
+- **Resumo vital dominante** (6B): tiles maiores, eixo de cor canônico
+  (`--hp-*`/`--san-*`/`--mp-axis`) e barra temática por faixa (verde→vermelho;
+  SAN no eixo frio). A moldura vazia já não renderiza sem investigador.
+- **Constituição**: removido o `Math.random` de fallback do d100 inline da home
+  (junto com a faixa de ações rápidas).
+
+### Manutenção
+
+- `sw.js`: `CACHE_VERSION` `v113 → v114` (sem novos arquivos; `guided-tour.js` já
+  estava no `PRECACHE_URLS`).
+
+---
+
 ## 2026-06-15 - Direção "Arquivo de Arkham": preset tipográfico + split quente/frio
 
 ### Adicionado

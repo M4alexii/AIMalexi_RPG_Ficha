@@ -35,7 +35,7 @@
   letter-spacing: 0.1em;
   margin-bottom: 0.75rem;
   padding-bottom: 0.4rem;
-  border-bottom: 1px dashed var(--ink-faded);
+  border-bottom: 1px solid var(--border-1);
 }
 
 .guia-toc ol {

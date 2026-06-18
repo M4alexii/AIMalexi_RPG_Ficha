@@ -71,9 +71,11 @@ window.CoC.views = window.CoC.views || {};
 
     if (spells.length === 0) {
       list.appendChild(
-        el("p", { class: "spells-empty" }, [
-          "Nenhuma magia. Use ", el("strong", {}, ["+ Adicionar Magia"]), " para registrar rituais conhecidos."
-        ])
+        window.CoC.ui.emptyState({
+          icon: "cerebro",
+          title: "Nenhuma magia ainda",
+          hint: 'Use <b>+ Adicionar Magia</b> para registrar rituais conhecidos.'
+        })
       );
       return;
     }

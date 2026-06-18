@@ -61,9 +61,11 @@ window.CoC.views = window.CoC.views || {};
 
     if (items.length === 0) {
       list.appendChild(
-        el("p", { class: "inv-empty" }, [
-          "Nenhum item. Use ", el("strong", {}, ["+ Adicionar"]), " para registrar posses."
-        ])
+        window.CoC.ui.emptyState({
+          icon: "mochila",
+          title: "Nenhum item ainda",
+          hint: 'Use <b>+ Adicionar</b> para registrar posses.'
+        })
       );
       return;
     }
