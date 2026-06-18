@@ -64,7 +64,7 @@
   font-size: 1.1rem;
   color: var(--ink);
   margin: 1.5rem 0 0.5rem;
-  border-bottom: 1px dashed var(--ink-faded);
+  border-bottom: 1px solid var(--border-1);
   padding-bottom: 0.3rem;
 }
 

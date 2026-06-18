@@ -86,10 +86,10 @@ window.CoC.views = window.CoC.views || {};
     var active = _campaignActive();
     _ctx.listEl.innerHTML =
       '<div class="chat-empty">' +
-        '<span class="chat-empty-ico" aria-hidden="true">💬</span>' +
+        '<span class="chat-empty-ico" aria-hidden="true"><svg class="icon"><use href="assets/icons/sprite.svg#ico-chat"></use></svg></span>' +
         '<p>' + (active
           ? 'Sem mensagens ainda. Fale com a mesa pelo campo abaixo.'
-          : 'O chat da mesa aparece aqui. Entre numa campanha em <b>🌐 Campanha</b> para conversar com os outros jogadores.') +
+          : 'O chat da mesa aparece aqui. Entre numa campanha em <b>Campanha</b> para conversar com os outros jogadores.') +
         '</p>' +
       '</div>';
   }

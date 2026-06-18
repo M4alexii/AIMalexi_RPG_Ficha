@@ -316,14 +316,15 @@ window.CoC.views = window.CoC.views || {};
       '<div class="wz-backdrop"></div>' +
       '<div class="wz-panel" role="dialog" aria-modal="true" aria-label="Assistente de criação">' +
         '<header class="wz-head">' +
-          '<div class="wz-title">🧭 Criador de Investigadores</div>' +
+          '<div class="wz-title"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-usuarios"></use></svg> Criador de Investigadores</div>' +
           '<button type="button" class="wz-exit" title="Ir para a ficha completa">Ficha completa →</button>' +
         '</header>' +
+        '<div class="wz-progress-label">Passo ' + (W.step + 1) + ' de ' + STEPS.length + ' · ' + _esc(STEPS[W.step].label) + '</div>' +
         '<div class="wz-progress"><div class="wz-progress-bar" style="width:' + pct + '%"></div></div>' +
         '<div class="wz-stepper">' + stepper + '</div>' +
         '<div class="wz-body">' +
           '<main class="wz-main">' + _renderStep() + '</main>' +
-          '<aside class="wz-tip"><div class="wz-tip-h">💡 Dica</div><p>' + _esc(STEPS[W.step].tip) + '</p></aside>' +
+          '<aside class="wz-tip"><div class="wz-tip-h"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-vela"></use></svg> Dica</div><p>' + _esc(STEPS[W.step].tip) + '</p></aside>' +
         '</div>' +
         '<footer class="wz-nav">' +
           '<button type="button" class="wz-prev btn-ghost"' + (W.step === 0 ? ' disabled' : '') + '>← Voltar</button>' +

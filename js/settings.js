@@ -119,6 +119,13 @@ window.CoC = window.CoC || {};
     // Tema
     body.dataset.theme = s.theme || 'arkham';
 
+    // Sincroniza a barra do sistema/PWA com o fundo do tema ativo (F-011).
+    try {
+      var bg = getComputedStyle(body).getPropertyValue('--bg').trim();
+      var tcMeta = document.querySelector('meta[name="theme-color"]');
+      if (tcMeta && bg) tcMeta.setAttribute('content', bg);
+    } catch (e) { /* sem suporte: mantém o valor estático */ }
+
     // Cor de destaque (override do --accent do tema)
     if (s.accent) {
       document.documentElement.style.setProperty('--accent', s.accent);

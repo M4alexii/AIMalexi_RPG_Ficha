@@ -347,6 +347,12 @@
     const tc = window.CoC.themeCustom;
     if (tc) { if (t === "custom") tc.applySaved(); else tc.clear(); }
     $$(".theme-swatch").forEach(s => s.classList.toggle("active", s.dataset.theme === t));
+    // Sincroniza a barra do sistema/PWA com o fundo do tema ativo (F-011).
+    try {
+      const bg = getComputedStyle(document.body).getPropertyValue("--bg").trim();
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta && bg) meta.setAttribute("content", bg);
+    } catch (e) { /* sem suporte: mantém o valor estático */ }
   }
 
   // ─── MODO DE SESSÃO (🎬 cena: neutro → investigação → combate) ─────────
@@ -905,6 +911,43 @@
     persistCurrent();
     toast("Investigador criado! Agora escolha Ocupação e Perícias na ficha.", { type: "success" });
     setTimeout(() => $("#id-name")?.focus(), 250);
+    // F-005: na 1ª criação, apresenta as áreas da ficha (auto-gate por wasSeen;
+    // roda só após o wizard já estar fechado, evitando colisão de overlays).
+    setTimeout(() => startSheetTour(false), 700);
+  }
+
+  // ── F-005: tour guiado da ficha (reusa js/shared/guided-tour.js) ───────────
+  // Não auto-inicia no boot: só dispara após _finishWizard (wizard fechado) ou
+  // via "Mais → Tour guiado". O start() sem force se auto-limita por wasSeen.
+  let _sheetTour = null;
+  function _getSheetTour() {
+    if (_sheetTour) return _sheetTour;
+    if (!window.CoC.ui || !window.CoC.ui.guidedTour) return null;
+    const goTab = (name) => { try { state.mobileTab = name; applyTab(); } catch (e) { /* nunca quebra o tour */ } };
+    _sheetTour = window.CoC.ui.guidedTour({
+      id: "investigator-v1",
+      steps: [
+        { target: null,
+          title: "Bem-vindo à sua ficha",
+          body: "Vou mostrar as áreas principais em poucos passos. Nada aqui é definitivo — você pode ajustar tudo depois." },
+        { target: ".ed-vitals",
+          title: "Resumo vital",
+          body: "Seus pontos de <b>Vida</b>, <b>Sanidade</b>, <b>Magia</b> e <b>Sorte</b>. As barras mudam de cor conforme o perigo.",
+          before: () => goTab("personagem") },
+        { target: "#skills-groups",
+          title: "Perícias",
+          body: "Agrupadas por categoria. Toque no título de um grupo para recolher; passe o mouse (ou toque) numa linha para <b>rolar o dado</b>.",
+          before: () => goTab("pericias") },
+        { target: null,
+          title: "Pronto para jogar!",
+          body: "Use as abas (ou a barra inferior no celular) para navegar. Para rever este tour, abra <b>Mais → Tour guiado</b>." }
+      ]
+    });
+    return _sheetTour;
+  }
+  function startSheetTour(force) {
+    const t = _getSheetTour();
+    if (t) t.start(force);
   }
 
   function _openWizardFallback() {
@@ -1155,6 +1198,8 @@
       moreSheet.querySelectorAll("[data-more-tab]").forEach(b => {
         b.onclick = () => { state.mobileTab = b.dataset.moreTab; applyTab(); closeMore(); };
       });
+      const tourItem = moreSheet.querySelector("[data-more-action='tour']");
+      if (tourItem) tourItem.onclick = () => { closeMore(); startSheetTour(true); };
       const settingsItem = moreSheet.querySelector("[data-more-action='settings']");
       if (settingsItem) settingsItem.onclick = () => {
         closeMore();

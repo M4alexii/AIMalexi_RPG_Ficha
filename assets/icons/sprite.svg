@@ -199,4 +199,10 @@
   <circle cx="10" cy="8" r="0.8" fill="currentColor" stroke="none"/>
   <circle cx="14" cy="8" r="0.8" fill="currentColor" stroke="none"/>
 </symbol>
+
+<symbol id="ico-alerta" viewBox="0 0 24 24">
+  <path d="M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/>
+  <path d="M12 9v4"/>
+  <path d="M12 17h.01"/>
+</symbol>
 </svg>

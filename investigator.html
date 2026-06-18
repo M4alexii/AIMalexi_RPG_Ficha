@@ -19,6 +19,18 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <meta name="description" content="Ficha completa do investigador para Chamado de Cthulhu 7ª Edição: atributos, perícias, combate, sanidade e inventário — com rolagens automáticas. Offline-first e gratuita." />
+
+  <!-- Open Graph / compartilhamento (resolve F-011) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="AIMalexi RPG" />
+  <meta property="og:title" content="Ficha do Investigador · Chamado de Cthulhu 7E" />
+  <meta property="og:description" content="Crie e gerencie seu investigador: atributos, perícias, combate e sanidade com rolagens automáticas. PWA gratuita e offline-first." />
+  <meta property="og:image" content="assets/icon-512.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Ficha do Investigador · Chamado de Cthulhu 7E" />
+  <meta name="twitter:description" content="Atributos, perícias, combate e sanidade com rolagens automáticas — grátis, offline e open source." />
 </head>
 
 <body data-theme="arkham">
@@ -81,22 +93,22 @@
 
       <div class="sheet-group">
         <div class="sheet-group-label" aria-hidden="true">Dados</div>
-        <button id="btn-session-export" class="btn-ghost" title="Exportar sessão completa com trace de eventos (rolagens, dano, sanidade)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-grafico"></use></svg> Sessão</button>
-        <button id="btn-import" class="btn-ghost" title="Importar JSON"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-pasta"></use></svg> Importar</button>
-        <button id="btn-export" class="btn-export" title="Exportar personagem como JSON (BACKUP!)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-baixar"></use></svg> Exportar JSON</button>
-        <button id="btn-print" class="btn-ghost" title="Imprimir / Salvar como PDF"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-impressora"></use></svg> PDF</button>
+        <button id="btn-session-export" class="btn-ghost" data-tooltip="Exportar sessão completa com trace de eventos (rolagens, dano, sanidade)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-grafico"></use></svg> Sessão</button>
+        <button id="btn-import" class="btn-ghost" data-tooltip="Importar JSON"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-pasta"></use></svg> Importar</button>
+        <button id="btn-export" class="btn-export" data-tooltip="Exportar personagem como JSON (BACKUP!)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-baixar"></use></svg> Exportar JSON</button>
+        <button id="btn-print" class="btn-ghost" data-tooltip="Imprimir / Salvar como PDF"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-impressora"></use></svg> PDF</button>
       </div>
 
       <div class="sheet-group">
         <div class="sheet-group-label" aria-hidden="true">Mesa</div>
-        <button id="btn-global-search" class="btn-ghost" title="Busca global (Ctrl+K)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-lupa"></use></svg> Buscar</button>
-        <button id="btn-session-mode" class="btn-ghost" title="Modo de sessão: prioriza as perícias da cena (neutro → investigação → combate)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-claquete"></use></svg> Cena</button>
-        <button id="btn-immersion" class="btn-ghost" title="Modo Imersão: menos números, mais narrativa — ideal para interpretação"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-vela"></use></svg> Imersão</button>
+        <button id="btn-global-search" class="btn-ghost" data-tooltip="Busca global (Ctrl+K)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-lupa"></use></svg> Buscar</button>
+        <button id="btn-session-mode" class="btn-ghost" data-tooltip="Modo de sessão: prioriza as perícias da cena (neutro → investigação → combate)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-claquete"></use></svg> Cena</button>
+        <button id="btn-immersion" class="btn-ghost" data-tooltip="Modo Imersão: menos números, mais narrativa — ideal para interpretação"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-vela"></use></svg> Imersão</button>
       </div>
 
       <div class="sheet-group">
         <div class="sheet-group-label" aria-hidden="true">Aparência</div>
-        <button id="btn-settings" class="btn-ghost" title="Central de Configurações (tema, idioma, acessibilidade)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-engrenagem"></use></svg> Configurações</button>
+        <button id="btn-settings" class="btn-ghost" data-tooltip="Central de Configurações (tema, idioma, acessibilidade)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-engrenagem"></use></svg> Configurações</button>
         <div class="theme-picker no-print" id="theme-picker" aria-label="Tema da campanha">
           <button class="theme-swatch active" data-theme="arkham"     data-tooltip="Arkham — padrão"              aria-label="Tema Arkham (padrão)"></button>
           <button class="theme-swatch"        data-theme="classico"   data-tooltip="Clássico — Dourado"           aria-label="Tema Clássico"></button>
@@ -116,11 +128,11 @@
 
       <div class="sheet-group">
         <div class="sheet-group-label" aria-hidden="true">Efeitos</div>
-        <button id="btn-sanity-fx" class="btn-ghost" title="Configurar efeitos visuais de insanidade"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-cerebro"></use></svg> Efeitos de Insanidade</button>
+        <button id="btn-sanity-fx" class="btn-ghost" data-tooltip="Configurar efeitos visuais de insanidade"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-cerebro"></use></svg> Efeitos de Insanidade</button>
       </div>
 
       <div class="sheet-group sheet-group-danger">
-        <button id="btn-delete" class="btn-danger" title="Deletar este personagem"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-lixeira"></use></svg> Excluir</button>
+        <button id="btn-delete" class="btn-danger" data-tooltip="Deletar este personagem"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-lixeira"></use></svg> Excluir</button>
       </div>
     </div>
 
@@ -162,6 +174,7 @@
     <div class="sheet-title">Mais</div>
     <button class="more-item" data-more-tab="diario" role="menuitem"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-diario"></use></svg> Diário de Campanha</button>
     <button class="more-item" data-more-tab="log" role="menuitem"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-dado"></use></svg> Log de Rolagens</button>
+    <button class="more-item" data-more-action="tour" role="menuitem"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-ajuda"></use></svg> Tour guiado</button>
     <button class="more-item" data-more-action="settings" role="menuitem"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-engrenagem"></use></svg> Configurações</button>
   </div>
   <div class="sheet-backdrop no-print" id="more-backdrop" hidden></div>
@@ -215,7 +228,7 @@
         <!-- Estado de boas-vindas: mostrado quando nenhum personagem está carregado -->
         <div id="welcome-state" class="welcome-state" hidden>
           <div class="ws-icon" aria-hidden="true">
-            <svg class="icon icon-xl" style="width:3rem;height:3rem;opacity:.55"><use href="assets/icons/sprite.svg#ico-dado"></use></svg>
+            <svg class="icon icon-xl"><use href="assets/icons/sprite.svg#ico-dado"></use></svg>
           </div>
           <h2 class="ws-title">Bem-vindo ao AIMalexi RPG</h2>
           <p class="ws-lead">Crie seu primeiro investigador para começar uma sessão de Chamado de Cthulhu 7ª Edição.</p>
@@ -423,7 +436,7 @@
           <span class="meta">
             Clique numa arma para atacar
 
-            <button id="btn-add-weapon" style="margin-left: 0.5rem;">
+            <button id="btn-add-weapon">
               + Arma
             </button>
           </span>
@@ -540,13 +553,11 @@
 
         <div class="roll-log-header">
 
-          <strong
-            style="font-family: var(--font-serif); color: var(--brass);"
-          >
-            🎲 Log de Rolagens
+          <strong class="roll-log-title">
+            <svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-dado"></use></svg> Log de Rolagens
           </strong>
 
-          <div style="display:flex; gap: 0.25rem;">
+          <div class="roll-log-actions">
 
             <button
               class="btn-ghost btn-icon"
@@ -554,7 +565,7 @@
               data-tooltip="Copiar log (markdown)"
               aria-label="Copiar log de rolagens como markdown"
             >
-              ↗
+              <svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-link"></use></svg>
             </button>
 
             <button
@@ -569,14 +580,14 @@
 
         </div>
 
-        <ul style="list-style:none; padding:0; margin:0;"></ul>
+        <ul class="roll-log-list"></ul>
 
       </div>
 
       <!-- CHAT DE CAMPANHA (#18) -->
       <div class="chat-panel no-print" id="chat-panel">
         <div class="chat-header">
-          <strong style="font-family: var(--font-serif); color: var(--brass);">💬 Chat da Campanha</strong>
+          <strong class="chat-title"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-chat"></use></svg> Chat da Campanha</strong>
           <span class="chat-hint" id="chat-hint"></span>
         </div>
         <div class="chat-list" id="chat-list" aria-live="polite"></div>
@@ -593,17 +604,7 @@
   </div>
 
   <!-- FOOTER -->
-  <footer
-    style="
-      text-align: center;
-      margin-top: 2rem;
-      padding-top: 1rem;
-      border-top: 1px solid var(--ink-faded);
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      color: var(--ink-faded);
-    "
-  >
+  <footer class="app-footer">
     <a href="index.html">← Portal</a>
     ·
     <a href="guia-iniciante.html">Guia do Iniciante</a>
@@ -653,6 +654,7 @@
 <script src="js/shared/ambient-fx.js"></script>
 <script src="js/shared/theme-custom.js"></script>
 <script src="js/shared/global-search.js"></script>
+<script src="js/shared/guided-tour.js"></script>
 <script src="js/shared/media-picker.js"></script>
 
 <!-- ═══════════════════════════════════════════════════════════════════════

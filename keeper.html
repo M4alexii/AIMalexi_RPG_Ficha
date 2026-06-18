@@ -16,6 +16,18 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <meta name="description" content="Centro de campanha do Guardião para Chamado de Cthulhu 7ª Edição: bestiário, NPCs, tracker de encontro, timeline, lore e chat da mesa. Offline-first e gratuito." />
+
+  <!-- Open Graph / compartilhamento (resolve F-011) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="AIMalexi RPG" />
+  <meta property="og:title" content="Centro de Campanha do Guardião · Chamado de Cthulhu 7E" />
+  <meta property="og:description" content="Gerencie a mesa: bestiário, NPCs, encontros, timeline, lore e chat — com PINs de campanha. PWA gratuita e offline-first." />
+  <meta property="og:image" content="assets/icon-512.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Centro de Campanha do Guardião · Chamado de Cthulhu 7E" />
+  <meta name="twitter:description" content="Bestiário, NPCs, encontros, timeline, lore e chat da mesa — grátis, offline e open source." />
 </head>
 <body>
 <script>
@@ -44,11 +56,11 @@
 
   <!-- Toolbar -->
   <div class="toolbar">
-    <a href="index.html" class="btn btn-ghost btn-back" title="Voltar ao portal"><span aria-hidden="true">←</span><span class="btn-label"> Início</span></a>
+    <a href="index.html" class="btn btn-ghost btn-back" data-tooltip="Voltar ao portal"><span aria-hidden="true">←</span><span class="btn-label"> Início</span></a>
 
-    <button id="btn-new-npc" title="Gerar NPC aleatório com 1 clique"><span aria-hidden="true"><svg class="icon"><use href="assets/icons/sprite.svg#ico-dado"></use></svg></span><span class="btn-label"> NPC Aleatório</span></button>
-    <button id="btn-new-custom" title="Criar criatura customizada do zero"><span aria-hidden="true"><svg class="icon"><use href="assets/icons/sprite.svg#ico-mais"></use></svg></span><span class="btn-label"> Criar</span></button>
-    <button id="btn-campaign" class="btn-campaign" title="Gerenciar Campanha"><span aria-hidden="true"><svg class="icon"><use href="assets/icons/sprite.svg#ico-globo"></use></svg></span><span class="btn-label"> Campanha</span></button>
+    <button id="btn-new-npc" data-tooltip="Gerar NPC aleatório com 1 clique"><span aria-hidden="true"><svg class="icon"><use href="assets/icons/sprite.svg#ico-dado"></use></svg></span><span class="btn-label"> NPC Aleatório</span></button>
+    <button id="btn-new-custom" data-tooltip="Criar criatura customizada do zero"><span aria-hidden="true"><svg class="icon"><use href="assets/icons/sprite.svg#ico-mais"></use></svg></span><span class="btn-label"> Criar</span></button>
+    <button id="btn-campaign" class="btn-campaign" data-tooltip="Gerenciar Campanha"><span aria-hidden="true"><svg class="icon"><use href="assets/icons/sprite.svg#ico-globo"></use></svg></span><span class="btn-label"> Campanha</span></button>
     <input type="file" id="file-import" accept="application/json,.json" style="display:none" />
 
     <span class="toolbar-spacer"></span>
@@ -62,16 +74,16 @@
 
       <div class="sheet-group-label" aria-label="Grupo Dados">Dados</div>
       <div class="sheet-group">
-        <button id="btn-import" class="btn-ghost" title="Importar biblioteca JSON"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-pasta"></use></svg> Importar</button>
-        <button id="btn-export" class="btn-export" title="Exportar biblioteca completa como JSON (BACKUP)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-baixar"></use></svg> Exportar</button>
-        <button id="btn-print" class="btn-ghost" title="Imprimir / PDF"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-impressora"></use></svg> PDF</button>
+        <button id="btn-import" class="btn-ghost" data-tooltip="Importar biblioteca JSON"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-pasta"></use></svg> Importar</button>
+        <button id="btn-export" class="btn-export" data-tooltip="Exportar biblioteca completa como JSON (BACKUP)"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-baixar"></use></svg> Exportar</button>
+        <button id="btn-print" class="btn-ghost" data-tooltip="Imprimir / PDF"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-impressora"></use></svg> PDF</button>
       </div>
 
       <div class="sheet-group-label" aria-label="Grupo Sistema">Sistema</div>
       <div class="sheet-group">
-        <a href="compendium.html" class="btn btn-ghost" title="Compêndio de Regras"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-livros"></use></svg> Compêndio</a>
-        <button id="btn-keeper-tour" class="btn-ghost" title="Rever o tour guiado do Guardião"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-ajuda"></use></svg> Tour</button>
-        <button id="btn-settings" class="btn-ghost" title="Central de Configurações"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-engrenagem"></use></svg> Configurações</button>
+        <a href="compendium.html" class="btn btn-ghost" data-tooltip="Compêndio de Regras"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-livros"></use></svg> Compêndio</a>
+        <button id="btn-keeper-tour" class="btn-ghost" data-tooltip="Rever o tour guiado do Guardião"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-ajuda"></use></svg> Tour</button>
+        <button id="btn-settings" class="btn-ghost" data-tooltip="Central de Configurações"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-engrenagem"></use></svg> Configurações</button>
       </div>
     </div>
   </div>
@@ -85,8 +97,8 @@
     </div>
     <div class="ko-kpis" id="ko-kpis"></div>
     <div class="ko-cards">
-      <div class="ko-card" id="ko-alerts"><h3>⚠ Alertas</h3><div class="ko-body"></div></div>
-      <div class="ko-card" id="ko-timeline"><h3>📜 Últimos eventos</h3><div class="ko-body"></div></div>
+      <div class="ko-card" id="ko-alerts"><h3><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-alerta"></use></svg> Alertas</h3><div class="ko-body"></div></div>
+      <div class="ko-card" id="ko-timeline"><h3><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-pergaminho"></use></svg> Últimos eventos</h3><div class="ko-body"></div></div>
     </div>
   </section>
 
@@ -110,7 +122,7 @@
     <div class="cs-inner">
       <div class="cs-host">
         <button id="btn-create-campaign" class="btn-primary cs-btn">
-          🌐 Criar Campanha
+          <svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-globo"></use></svg> Criar Campanha
         </button>
         <p class="cs-hint">Gera PIN · você é o Guardião</p>
       </div>
@@ -137,14 +149,14 @@
   <div class="campaign-stale" id="campaign-stale" style="display:none">
     <div class="stale-inner">
       <div class="stale-info">
-        <span class="stale-icon">⚡</span>
+        <span class="stale-icon"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-raio"></use></svg></span>
         <div>
           <p class="stale-title">Sessão anterior detectada</p>
           <p class="stale-detail" id="stale-detail">—</p>
         </div>
       </div>
       <div class="stale-actions">
-        <button id="btn-reactivate-campaign" class="btn-primary cs-btn">↺ Reativar</button>
+        <button id="btn-reactivate-campaign" class="btn-primary cs-btn"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-recarregar"></use></svg> Reativar</button>
         <button id="btn-discard-stale" class="btn-ghost">Descartar</button>
       </div>
     </div>
@@ -213,9 +225,9 @@
     <div class="workspace-col">
       <div class="workspace" id="workspace">
         <div class="workspace-empty">
-          <span class="icon" aria-hidden="true">📜</span>
+          <svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-pergaminho"></use></svg>
           <p><b>Selecione uma criatura da biblioteca</b> ou gere um NPC aleatório.</p>
-          <p style="margin-top: 0.5rem; font-size: 0.85rem;">Modo Simples por padrão — clique em <b>Editar</b> para o Modo Completo.</p>
+          <p class="workspace-empty-sub">Modo Simples por padrão — clique em <b>Editar</b> para o Modo Completo.</p>
         </div>
       </div>
     </div>
@@ -228,7 +240,7 @@
       <!-- Tracker de Encontro -->
       <div class="encounter-panel">
         <h3>
-          <span>⚔️ Encontro <span class="enc-count" id="enc-count"></span></span>
+          <span><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-espadas"></use></svg> Encontro <span class="enc-count" id="enc-count"></span></span>
           <button class="btn-ghost btn-sm" id="btn-clear-encounter" title="Limpar tracker do encontro"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-lixeira"></use></svg> Limpar</button>
         </h3>
         <div class="enc-round-bar">
@@ -240,9 +252,9 @@
         </div>
         <div class="encounter-list" id="encounter-list">
           <div class="encounter-empty">
-            <span class="enc-empty-ico" aria-hidden="true">⚔️</span>
+            <span class="enc-empty-ico" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-espadas"></use></svg></span>
             <p>Nenhuma criatura no encontro.</p>
-            <p class="enc-empty-hint">Abra uma criatura no <b>Bestiário</b> (aba NPCs) e use <b>⚔ Encontro</b>, ou clique <b>+ Encontro</b>.</p>
+            <p class="enc-empty-hint">Abra uma criatura no <b>Bestiário</b> (aba NPCs) e use <b>Encontro</b>, ou clique <b>+ Encontro</b>.</p>
           </div>
         </div>
       </div>
@@ -255,7 +267,7 @@
       <!-- Timeline de Eventos -->
       <div class="timeline-panel" id="timeline-panel">
         <div class="tp-header">
-          <strong class="tp-title">📜 Timeline</strong>
+          <strong class="tp-title"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-pergaminho"></use></svg> Timeline</strong>
           <button class="btn-ghost btn-sm" id="btn-clear-timeline" title="Limpar timeline"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-lixeira"></use></svg> Limpar</button>
         </div>
         <div class="tp-compose">
@@ -270,19 +282,19 @@
       <!-- Roll Log -->
       <div class="roll-log" id="roll-log">
         <div class="roll-log-header">
-          <strong style="font-family: var(--font-serif); color: var(--keeper-accent-bright);">🎲 Log</strong>
-          <div style="display:flex; gap: 0.25rem;">
-            <button class="btn-ghost btn-icon" id="btn-copy-log" data-tooltip="Copiar log" aria-label="Copiar log do Guardião">↗</button>
+          <strong class="roll-log-title"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-dado"></use></svg> Log</strong>
+          <div class="roll-log-actions">
+            <button class="btn-ghost btn-icon" id="btn-copy-log" data-tooltip="Copiar log" aria-label="Copiar log do Guardião"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-link"></use></svg></button>
             <button class="btn-ghost btn-sm" id="btn-clear-log" title="Limpar log"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-lixeira"></use></svg> Limpar</button>
           </div>
         </div>
-        <ul style="list-style:none; padding:0; margin:0;"></ul>
+        <ul class="roll-log-list"></ul>
       </div>
 
       <!-- CHAT DE CAMPANHA (espelho do investigador; Guardião ⇄ Jogadores) -->
       <div class="chat-panel no-print" id="chat-panel">
         <div class="chat-header">
-          <strong style="font-family: var(--font-serif); color: var(--keeper-accent-bright, var(--brass));">💬 Chat da Campanha</strong>
+          <strong class="chat-title"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-chat"></use></svg> Chat da Campanha</strong>
           <span class="chat-hint" id="chat-hint"></span>
         </div>
         <div class="chat-list" id="chat-list" aria-live="polite"></div>
@@ -299,7 +311,7 @@
     <div class="lore-head">
       <p class="ktab-hint">Wiki interna do Guardião — salva localmente neste dispositivo.</p>
       <button id="btn-load-standard-pack" class="btn-primary btn-sm" type="button"
-        title="Carrega criaturas clássicas do Mythos no Bestiário + uma estrutura inicial de campanha (Lore e Diário) para editar.">🧰 Carregar Pacote Padrão</button>
+        title="Carrega criaturas clássicas do Mythos no Bestiário + uma estrutura inicial de campanha (Lore e Diário) para editar."><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-mochila"></use></svg> Carregar Pacote Padrão</button>
     </div>
     <div class="lore-grid">
       <div class="lore-card"><label for="lore-faccoes">Facções</label><textarea id="lore-faccoes" placeholder="Organizações, cultos, grupos..."></textarea></div>
@@ -314,7 +326,7 @@
   <!-- ═══ T7 · DIÁRIO DO MESTRE (avançado — tópicos estruturados) ═══ -->
   <section class="ktab-panel" data-ktab="diario">
     <div class="journal-toolbar">
-      <p class="ktab-hint" style="margin:0;flex:1 1 auto;">Diário estruturado — Markdown (#, **, listas), <b>[[ligações]]</b> entre tópicos e backlinks. Salvo localmente.</p>
+      <p class="ktab-hint journal-toolbar-hint">Diário estruturado — Markdown (#, **, listas), <b>[[ligações]]</b> entre tópicos e backlinks. Salvo localmente.</p>
       <input type="search" id="journal-search" class="journal-search" placeholder="🔍 Buscar no diário…" aria-label="Buscar tópicos por título, conteúdo ou pasta" />
       <select id="journal-filter" class="journal-filter" aria-label="Filtrar por categoria">
         <option value="all">Todas as categorias</option>
@@ -349,7 +361,7 @@
     <div class="modal-box">
       <div class="modal-header">
         <h2>Campanha</h2>
-        <button class="modal-close" id="btn-close-campaign-modal">✕</button>
+        <button class="modal-close" id="btn-close-campaign-modal" aria-label="Fechar"><svg class="icon" aria-hidden="true"><use href="assets/icons/sprite.svg#ico-fechar"></use></svg></button>
       </div>
       <div class="modal-body" id="campaign-modal-body">
         <!-- Preenchido pelo JS -->
@@ -357,7 +369,7 @@
     </div>
   </div>
 
-  <footer style="text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--ink-faded); font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-faded);">
+  <footer class="app-footer">
     <a href="index.html">← Portal</a> · <a href="guia-iniciante.html">Guia do Iniciante</a> · <a href="investigator.html">Ficha do Investigador →</a> · <a href="compendium.html">Compêndio →</a>
   </footer>
 
