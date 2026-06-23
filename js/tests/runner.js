@@ -34,6 +34,14 @@ load('data/damage-bonus-table.js');
 load('data/skills.js');        // window.CoCData.findSkill — usado por computeSkillProvenance
 load('js/engine/coc7e-rules.js');
 load('js/engine/dice.js');
+// storage.js registra listeners de saída (beforeunload/pagehide/visibilitychange) no
+// load. Stub temporário do ambiente browser só durante este require; removido em
+// seguida para não ativar ramos DOM de outros módulos puros. Backend cai p/ "memory".
+global.addEventListener = function () {};
+global.document = { addEventListener: function () {}, visibilityState: 'visible' };
+load('js/engine/storage.js');
+delete global.document;
+delete global.addEventListener;
 
 // Core: signals → bus → store → schema → persist-middleware → safe-render → event-log → render-pipeline
 load('js/core/signals.js');
@@ -108,6 +116,7 @@ load('js/tests/test-store.js');
 load('js/tests/test-dice.js');
 load('js/tests/test-schema.js');
 load('js/tests/test-data-integrity.js');
+load('js/tests/test-storage-migrations.js');
 load('js/tests/test-persist-middleware.js');
 load('js/tests/test-error-boundary.js');
 load('js/tests/test-combat.js');
