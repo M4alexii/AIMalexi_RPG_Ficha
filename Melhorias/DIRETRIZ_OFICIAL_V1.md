@@ -253,6 +253,35 @@ Auditoria de 2026-06-01 contra o código (não contra docs antigos):
 - *Próxima etapa:* dados de equipamentos/preços no Compêndio (conteúdo original, sem texto
   proprietário); retrato real (thumbnail) no roster exige decisão de payload no transport.
 
+### 2026-06-23 — Sessão 7 (Q — fonte única de persistência/autoridade + testes)
+
+Fase **Q** (qualidade contínua), Prioridade 1 (testes + desacoplamento de persistência).
+Remedia achados críticos da auditoria de 2026-06-16 (C-01, C-02) pela mesma técnica que o
+projeto já usa para `RENDER_MAP`/`BOUNDARY_FIELDS`: **derivar da `event-ontology` em vez de
+manter listas paralelas à mão**.
+
+- *Anterior:* `PERSIST_ACTIONS` (`persist-middleware.js`) era uma lista à mão que **omitia**
+  ações `persists:true/live` (`SET_ATTRIBUTE`, `SET_BODY_SLOT`, `SET_ARMOR`, `RELOAD_WEAPON`,
+  `MARK_SKILL_IMPROVEMENT`, `TOGGLE_SKILL_FAVORITE`, `SKILL_IMPROVED`, `ADD_MYTHOS`) → essas
+  edições sumiam no reload se disparadas isoladas (C-01, crítico). `SACRED` (`actions.js`)
+  divergia da ontologia: `ADD_MYTHOS` (sacred na ontologia) nem estava em `actions.TYPES`, e
+  `isSacred('ADD_MYTHOS')` era `false` (C-02). O teste prometia checar essa concordância mas
+  **não tinha asserção**; o caminho de migração de `storage.js` (v0→v3) tinha **0 testes**.
+- *Atual:* `persist-middleware` deriva o conjunto de `eventOntology.CATALOG`
+  (`persists===true && status==='live'`) via `CoC.core.derivePersistActions` no boot (lista
+  estática vira só fallback); `isSacred()` consulta a ontologia (fallback estático), com
+  `ADD_MYTHOS`/`RECALC_DERIVED` registrados em `TYPES`. Novo teste-guarda em
+  `test-event-ontology.js` trava as duas concordâncias (com regressões C-01/C-02); novo
+  `test-storage-migrations.js` cobre `runMigrations` v0→v3 (renames, colisão, criatura,
+  occupationSkills, crédito, Mythos, idempotência). Verificação: **1144/1144** no runner.
+- *Impacto:* elimina toda a classe de drift de catálogo; fecha a perda silenciosa de edições;
+  autoridade sagrada correta para multiplayer; rede de testes no caminho de persistência mais
+  arriscado. Mudanças aditivas — diff-guard inalterado, sem amplificação de escrita.
+- *Próxima etapa (Q, fast-follow):* coerção `Number(...)||0` nos reducers de vitais + `schema.js`
+  (M-02/M-03); `QuotaExceededError`→`type:"quota"` e flush síncrono no exit (STOR-02/03);
+  varredura XSS crítica (V-01/V-03/F06/CMP-V1). Depois, P2: extrair `rollAllAttributes()` do
+  orquestrador para o engine.
+
 ---
 
 ## §9. Critérios de sucesso (da diretriz)

@@ -4,6 +4,14 @@
 > **Método:** varredura forense por subsistema (engine, core, views, shared, campaign/multiplayer+config, orquestrador/keeper/data/SW), com verificação cruzada de imports×exports e declarações×usos. Achados verificados no código; localizações em `arquivo:linha`.
 > **Stack:** JavaScript vanilla, sem build/módulos, namespace `window.CoC`. Call of Cthulhu 7e (PT-BR), PWA estático.
 
+> **Atualização 2026-06-23 (Sessão 7):** **C-01 e C-02 RESOLVIDOS.** `PERSIST_ACTIONS` e
+> `SACRED` agora são derivados/autoritativos pela `event-ontology` (`persist-middleware.js`
+> via `CoC.core.derivePersistActions`; `actions.isSacred()` consulta a ontologia). Adicionado o
+> teste-guarda de concordância que faltava em `test-event-ontology.js` e cobertura de
+> `runMigrations` em `test-storage-migrations.js` (runner 1144/1144). Itens ainda **abertos**
+> desta auditoria: XSS (V-01/V-03/F06/CMP-V1), `Math.random` (F01/RULES-04), STOR-01/02/03,
+> coerção NaN (M-02/M-03), autoridade de broadcast (CMP-A1) — ver Parte 3.
+
 ---
 
 ## Parte 1 — Resumo Executivo

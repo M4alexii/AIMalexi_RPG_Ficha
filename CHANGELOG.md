@@ -5,6 +5,38 @@ Histórico resumido de mudanças relevantes do AIMalexi RPG Ficha.
 Para detalhes históricos de arquitetura e fases antigas, consulte também
 `Melhorias/DIRETRIZ_OFICIAL_V1.md`.
 
+## 2026-06-23 - Fonte única de persistência/autoridade (C-01/C-02) + testes
+
+Remedia achados críticos da auditoria de 2026-06-16 derivando da `event-ontology`
+em vez de manter listas paralelas à mão (mesma técnica já usada por `RENDER_MAP`).
+
+### Corrigido
+
+- **C-01 (perda silenciosa de edições):** `PERSIST_ACTIONS` agora é **derivado** de
+  `eventOntology.CATALOG` (`persists:true && status:'live'`) em
+  `js/core/persist-middleware.js` (via `CoC.core.derivePersistActions`, montado no boot;
+  lista estática vira fallback). Ações antes omitidas — `SET_ATTRIBUTE`, `SET_BODY_SLOT`,
+  `SET_ARMOR`, `RELOAD_WEAPON`, `MARK_SKILL_IMPROVEMENT`, `TOGGLE_SKILL_FAVORITE`,
+  `SKILL_IMPROVED`, `ADD_MYTHOS` — agora auto-persistem (não somem no reload).
+- **C-02 (autoridade sagrada):** `js/core/actions.js` registra `ADD_MYTHOS`/`RECALC_DERIVED`
+  em `TYPES`, inclui `ADD_MYTHOS` em `SACRED`, e `isSacred()` consulta a ontologia
+  (fallback estático). `ADD_MYTHOS` passa a ser tratado como sagrado no multiplayer.
+
+### Adicionado
+
+- **Teste-guarda de consistência** em `js/tests/test-event-ontology.js`: trava
+  `PERSIST_ACTIONS` × ontologia e `SACRED` × ontologia (com regressões C-01/C-02) — o teste
+  que o cabeçalho prometia mas não existia.
+- **`js/tests/test-storage-migrations.js`** (novo): cobre `storage.runMigrations` v0→v3
+  (rename de perícias em ficha/criatura/armas/occupationSkills, colisão mantém maior,
+  `creditRating`→"Nível de Crédito", rótulo Mythos, idempotência). `runner.js` passa a
+  carregar `storage.js` (com stub temporário de ambiente browser) e a suíte.
+
+### Manutenção
+
+- Runner: **1144/1144** asserções. Sem mudança em `sw.js`/`PRECACHE_URLS` (só arquivos de
+  teste, não servidos).
+
 ## 2026-06-18 - Auditoria UX/Design System: remediação F-001…F-016
 
 Aplica os achados abertos/parciais do dossiê de auditoria de Produto/UX/UI/Design
