@@ -24,12 +24,14 @@ window.CoC = window.CoC || {};
     // ── Personagem (carga/meta) ──────────────────────────────────────────
     SET_CHARACTER:   "SET_CHARACTER",
     SET_CHARACTER_ID:"SET_CHARACTER_ID",
+    RECALC_DERIVED:  "RECALC_DERIVED",   // recálculo de derivados (despachada ao vivo)
 
     // ── Vitais ──────────────────────────────────────────────────────────
     APPLY_DAMAGE:    "APPLY_DAMAGE",
     HEAL_DAMAGE:     "HEAL_DAMAGE",
     LOSE_SANITY:     "LOSE_SANITY",
     RECOVER_SANITY:  "RECOVER_SANITY",
+    ADD_MYTHOS:      "ADD_MYTHOS",     // ganho de Mythos: baixa SAN-máx (sagrado)
     SPEND_MAGIC:     "SPEND_MAGIC",
     RESTORE_MAGIC:   "RESTORE_MAGIC",
     SPEND_LUCK:      "SPEND_LUCK",
@@ -95,6 +97,7 @@ window.CoC = window.CoC || {};
   const SACRED = Object.freeze(new Set([
     TYPES.APPLY_DAMAGE, TYPES.HEAL_DAMAGE,
     TYPES.LOSE_SANITY,  TYPES.RECOVER_SANITY,
+    TYPES.ADD_MYTHOS,   // ganho de Mythos é sagrado (espelha event-ontology)
     TYPES.SPEND_MAGIC,  TYPES.RESTORE_MAGIC,
     TYPES.RESOLVE_COMBAT, TYPES.ADD_STATUS, TYPES.REMOVE_STATUS
   ]));
@@ -162,8 +165,13 @@ window.CoC = window.CoC || {};
     removeTome: (id)   => make(TYPES.REMOVE_TOME, { id }),
   };
 
+  // FONTE ÚNICA: a classificação sagrada vem da event-ontology (campo `sacred`)
+  // quando carregada; o Set SACRED estático é só fallback defensivo. Evita o drift
+  // em que ADD_MYTHOS era sacred:true na ontologia mas isSacred() retornava false (C-02).
   function isSacred(action) {
     const t = typeof action === "string" ? action : (action && action.type);
+    const onto = window.CoC.core && window.CoC.core.eventOntology;
+    if (onto && onto.CATALOG && onto.CATALOG[t]) return !!onto.CATALOG[t].sacred;
     return SACRED.has(t);
   }
 

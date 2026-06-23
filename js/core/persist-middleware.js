@@ -14,13 +14,21 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 window.CoC = window.CoC || {};
+window.CoC.core = window.CoC.core || {};
 
 (function () {
 
-  // Ações que mutam semanticamente o personagem.
-  // SET_CHARACTER_ID excluído: atualiza apenas o id gerado pelo storage,
-  // não dados de jogo — incluí-lo causaria loop (persistCurrent → SET_CHARACTER_ID → persist...).
-  const PERSIST_ACTIONS = new Set([
+  // FONTE ÚNICA DE VERDADE: o conjunto de ações que auto-persistem é DERIVADO de
+  // js/core/event-ontology.js (campo `persists`), exatamente como RENDER_MAP e
+  // BOUNDARY_FIELDS já são. Manter a lista à mão aqui causava drift silencioso —
+  // ações persists:true/live (ex.: SET_BODY_SLOT, SET_ARMOR, RELOAD_WEAPON,
+  // MARK_SKILL_IMPROVEMENT, TOGGLE_SKILL_FAVORITE, SKILL_IMPROVED, ADD_MYTHOS,
+  // SET_ATTRIBUTE) ficavam de fora e suas edições sumiam no reload (bug C-01).
+  //
+  // O conjunto abaixo é apenas FALLBACK defensivo (usado só se a ontologia ainda
+  // não estiver carregada). SET_CHARACTER_ID fica de fora porque persists:false na
+  // ontologia (atualiza só o id; incluí-lo causaria loop persist → SET_CHARACTER_ID → persist).
+  const FALLBACK_PERSIST_ACTIONS = new Set([
     'SET_CHARACTER',
     'APPLY_DAMAGE',   'HEAL_DAMAGE',
     'LOSE_SANITY',    'RECOVER_SANITY',
@@ -37,6 +45,32 @@ window.CoC = window.CoC || {};
   ]);
 
   /**
+   * Deriva o conjunto de ações que devem auto-persistir a partir do CATALOG da
+   * ontologia: persists === true && status === 'live'. Pura e testável.
+   * @param {object} catalog - window.CoC.core.eventOntology.CATALOG
+   * @returns {Set<string>}
+   */
+  function derivePersistActions(catalog) {
+    const set = new Set();
+    if (!catalog || typeof catalog !== 'object') return set;
+    Object.keys(catalog).forEach(function (type) {
+      const e = catalog[type];
+      if (e && e.persists === true && e.status === 'live') set.add(type);
+    });
+    return set;
+  }
+
+  // Resolve o conjunto efetivo: ontologia (fonte única) ou fallback estático.
+  function _resolvePersistActions() {
+    const onto = window.CoC.core && window.CoC.core.eventOntology;
+    if (onto && onto.CATALOG) {
+      const derived = derivePersistActions(onto.CATALOG);
+      if (derived.size > 0) return derived;
+    }
+    return FALLBACK_PERSIST_ACTIONS;
+  }
+
+  /**
    * @param {{ bus: object, getState: function, saveCharacter: function }} opts
    *   bus           — window.CoC.bus (pub/sub)
    *   getState      — () => { character } — retorna estado atual do store
@@ -49,6 +83,7 @@ window.CoC = window.CoC || {};
 
     let _lastJSON = null;   // snapshot do último character persistido
     let _cancel   = null;   // cleanup do subscribe
+    let _persistActions = null;   // conjunto efetivo, resolvido no init()
 
     function _tryPersist() {
       const char = getState().character;
@@ -65,9 +100,10 @@ window.CoC = window.CoC || {};
 
     function init() {
       if (_cancel) _cancel();   // idempotência: re-init limpa listener anterior
+      _persistActions = _resolvePersistActions();   // derivado da ontologia (fonte única)
       _cancel = bus.subscribe('store:dispatch', function (event) {
         if (!event.changed) return;
-        if (!PERSIST_ACTIONS.has(event.action.type)) return;
+        if (!_persistActions.has(event.action.type)) return;
         _tryPersist();
       });
     }
@@ -83,9 +119,16 @@ window.CoC = window.CoC || {};
       if (_cancel) { _cancel(); _cancel = null; }
     }
 
-    return Object.freeze({ init, updateBaseline, dispose });
+    // Introspecção do conjunto efetivo (testes/diagnóstico). Funciona antes do init().
+    function getPersistActions() {
+      return new Set(_persistActions || _resolvePersistActions());
+    }
+
+    return Object.freeze({ init, updateBaseline, dispose, getPersistActions });
   }
 
   window.CoC.createPersistMiddleware = createPersistMiddleware;
+  // Exposto para derivação/teste da fonte única (ontologia → PERSIST_ACTIONS).
+  window.CoC.core.derivePersistActions = derivePersistActions;
 
 })();
