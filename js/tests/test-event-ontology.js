@@ -366,3 +366,71 @@ _cExec.execute({ type: 'PUSH_ROLL', payload: {
 }});
 assert(_cStore.getState() === _stateAfterPush,
   'PUSH_ROLL live não muta estado do store');
+
+// ── PERSIST_ACTIONS derivado da ontologia (fonte única — corrige C-01) ──────
+group('event-ontology — PERSIST_ACTIONS derivado concorda com a ontologia');
+
+const _derivePersist = window.CoC.core.derivePersistActions;
+assert(typeof _derivePersist === 'function', 'CoC.core.derivePersistActions exportado');
+
+const _persistSet = _derivePersist(_catalog);
+assert(_persistSet instanceof Set && _persistSet.size > 0, 'derivePersistActions retorna Set não vazio');
+
+// Toda ação persists:true & live DEVE estar no conjunto derivado
+let _allPersistMapped = true;
+_allTypes.forEach(function (t) {
+  const e = _catalog[t];
+  if (e.persists === true && e.status === 'live' && !_persistSet.has(t)) _allPersistMapped = false;
+});
+assert(_allPersistMapped, 'toda ação persists:true & live está no PERSIST_ACTIONS derivado');
+
+// O conjunto derivado NÃO contém ações fora de (persists:true & live)
+let _noExtraPersist = true;
+_persistSet.forEach(function (t) {
+  const e = _catalog[t];
+  if (!e || e.persists !== true || e.status !== 'live') _noExtraPersist = false;
+});
+assert(_noExtraPersist, 'PERSIST_ACTIONS derivado contém apenas ações persists:true & live');
+
+// SET_CHARACTER_ID nunca persiste (evita loop) — persists:false na ontologia
+assert(!_persistSet.has('SET_CHARACTER_ID'), 'SET_CHARACTER_ID fora do PERSIST_ACTIONS (anti-loop)');
+
+// Regressão C-01: ações que a lista à mão omitia agora auto-persistem
+['SET_ATTRIBUTE', 'SET_BODY_SLOT', 'SET_ARMOR', 'RELOAD_WEAPON',
+ 'MARK_SKILL_IMPROVEMENT', 'TOGGLE_SKILL_FAVORITE', 'SKILL_IMPROVED', 'ADD_MYTHOS']
+  .forEach(function (t) {
+    assert(_persistSet.has(t), 'C-01: ' + t + ' auto-persiste (derivado da ontologia)');
+  });
+
+// A instância do persist-middleware usa EXATAMENTE o conjunto derivado
+const _pmInst = window.CoC.createPersistMiddleware({
+  bus:           window.CoC.bus,
+  getState:      function () { return { character: null }; },
+  saveCharacter: function () {}
+});
+const _pmActions = _pmInst.getPersistActions();   // funciona antes do init() (não vaza listener)
+let _instMatches = _pmActions.size === _persistSet.size;
+_persistSet.forEach(function (t) { if (!_pmActions.has(t)) _instMatches = false; });
+assert(_instMatches, 'instância do persist-middleware usa o conjunto derivado da ontologia');
+
+// ── SACRED concorda com a ontologia (autoridade multiplayer — corrige C-02) ─
+group('event-ontology — SACRED concorda com a ontologia');
+
+const _actions = window.CoC.actions;
+assert(typeof _actions.isSacred === 'function', 'actions.isSacred disponível');
+
+// Toda ação sacred:true & live → isSacred(t) === true
+let _allSacredOk = true;
+_allTypes.forEach(function (t) {
+  const e = _catalog[t];
+  if (e.sacred === true && e.status === 'live' && !_actions.isSacred(t)) _allSacredOk = false;
+});
+assert(_allSacredOk, 'toda ação sacred:true & live → isSacred(t) === true');
+
+// Ações não-sacred → isSacred false
+assert(!_actions.isSacred('SET_SKILL'),   'SET_SKILL não é sacred');
+assert(!_actions.isSacred('SPEND_LUCK'),  'SPEND_LUCK não é sacred');
+
+// Regressão C-02: ADD_MYTHOS agora é tratado como sagrado
+assert(_actions.isSacred('ADD_MYTHOS'), 'C-02: ADD_MYTHOS é tratado como sacred (ontologia autoritativa)');
+assert(_actions.isSacred('APPLY_DAMAGE'), 'APPLY_DAMAGE permanece sacred');
